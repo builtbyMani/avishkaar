@@ -1,0 +1,38 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": null,
+  "phases": [
+    {
+      "number": "1",
+      "name": "Foundation, 5-Table Schema & Seed Data",
+      "status": "complete"
+    },
+    {
+      "number": "2",
+      "name": "Discovery Feed, Auth, Post Form & Vouches",
+      "status": "complete"
+    },
+    {
+      "number": "3",
+      "name": "Location Detail, Gemini AI, Support Local, Offline & Map",
+      "status": "complete"
+    },
+    {
+      "number": "4",
+      "name": "Check-ins, Badges & Volunteer Guides",
+      "status": "complete"
+    },
+    {
+      "number": "5",
+      "name": "Polish, Deploy & Demo Readiness",
+      "status": "complete"
+    }
+  ],
+  "next": {
+    "command": "/gsd-new-milestone",
+    "label": "Start a new milestone",
+    "reason": "All phases complete — start a new milestone"
+  },
+  "updated_at": "2026-11-27T09:35:27.530Z"
+}

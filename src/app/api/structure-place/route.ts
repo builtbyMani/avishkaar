@@ -9,6 +9,13 @@ export async function POST(request: NextRequest) {
       region?: string;
     };
 
+    if (body.rawDescription && body.rawDescription.length > 4000) {
+      return NextResponse.json(
+        { error: "rawDescription is limited to 4000 characters" },
+        { status: 400 },
+      );
+    }
+
     if (!body.rawDescription?.trim()) {
       return NextResponse.json(
         { error: "rawDescription is required" },

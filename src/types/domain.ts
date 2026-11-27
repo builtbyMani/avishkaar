@@ -32,6 +32,7 @@ export interface StructuredCards {
   commute: string[];
   food: FoodCard[];
   activities: string[];
+  livingHeritage?: string[];
 }
 
 export interface LocalVendor {
@@ -42,6 +43,8 @@ export interface LocalVendor {
   lat: number;
   lng: number;
   contact: string;
+  whatsapp?: string;
+  upiId?: string;
 }
 
 export interface SafetyAlert {
@@ -49,6 +52,9 @@ export interface SafetyAlert {
   message: string;
   lat?: number;
   lng?: number;
+  authorTier?: TrailblazerTier;
+  verifiedBy?: string[];
+  flaggedBy?: string[];
 }
 
 export interface Profile {
@@ -129,6 +135,7 @@ export interface OfflinePocketCard {
   savedAt: string;
   commute: string[];
   food: FoodCard[];
+  livingHeritage?: string[];
   safetyAlerts: SafetyAlert[];
   localVendors: LocalVendor[];
 }

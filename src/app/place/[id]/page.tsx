@@ -12,20 +12,24 @@ import {
   CheckCircle2,
   Compass,
   HandHeart,
+  Landmark,
   MapPin,
+  MessageCircle,
   Navigation,
   Phone,
   Printer,
+  QrCode,
   ShieldAlert,
   Store,
   UserCheck,
   Utensils,
   WifiOff,
+  X,
 } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import type { EnrichedPlace, GuideRequest, Profile, UserBadge } from "@/types/domain";
+import type { EnrichedPlace, GuideRequest, LocalVendor, Profile, UserBadge } from "@/types/domain";
 
 export default function PlaceDetailPage() {
   const params = useParams<{ id: string }>();
@@ -48,6 +52,7 @@ export default function PlaceDetailPage() {
   const [preferredDate, setPreferredDate] = useState("2026-12-10");
   const [requestNotes, setRequestNotes] = useState("");
   const [submittingGuide, setSubmittingGuide] = useState(false);
+  const [upiVendor, setUpiVendor] = useState<LocalVendor | null>(null);
 
   const loadPlace = useCallback(async () => {
     if (!placeId) return;
@@ -175,6 +180,7 @@ export default function PlaceDetailPage() {
       savedAt: new Date().toISOString(),
       commute: place.structuredCards.commute,
       food: place.structuredCards.food,
+      livingHeritage: place.structuredCards.livingHeritage ?? [],
       safetyAlerts: place.safetyAlerts,
       localVendors: place.localVendors,
     });
@@ -402,8 +408,8 @@ export default function PlaceDetailPage() {
         </section>
       )}
 
-      {/* Structured Commute, Food & Activity Cards */}
-      <section className="grid gap-5 md:grid-cols-3">
+      {/* Structured Commute, Food, Activity & Living Heritage Cards */}
+      <section className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <div className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-5">
           <div className="flex items-center gap-2 text-[#1B3B36]">
             <Bus className="h-5 w-5 text-[#C85A32]" />
@@ -455,48 +461,111 @@ export default function PlaceDetailPage() {
             ))}
           </ul>
         </div>
+
+        <div className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-5">
+          <div className="flex items-center gap-2 text-[#1B3B36]">
+            <Landmark className="h-5 w-5 text-[#C85A32]" />
+            <h2 className="font-display text-lg font-bold">Living Heritage &amp; Etiquette</h2>
+          </div>
+          <ul className="mt-3 space-y-2.5 text-sm text-[#52635F]">
+            {(place.structuredCards.livingHeritage?.length
+              ? place.structuredCards.livingHeritage
+              : [
+                  `Support community craft studios directly in ${place.region}.`,
+                  "Ask permission before taking close-up photos of artisans and elders.",
+                ]
+            ).map((tip, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C85A32]" />
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
-      {/* Support Local (Local Economy Spotlight) */}
+      {/* Support Local (Zero-Commission Local Economy Action Cards) */}
       <section className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-6">
-        <div className="flex items-center gap-2">
-          <Store className="h-5 w-5 text-[#D97706]" />
-          <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
-            Support Local — Vendors, Artisans &amp; Homestays
-          </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-[#D97706]" />
+            <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+              Zero-Commission &ldquo;Support Local&rdquo; Cards
+            </h2>
+          </div>
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900">
+            0% Platform Commission
+          </span>
         </div>
         <p className="mt-1 text-sm text-[#52635F]">
-          Direct community spots verified by travelers so tourism revenue stays in local hands.
+          Direct community spots verified by travelers so 100% of tourism revenue stays in local hands.
         </p>
 
         {place.localVendors.length === 0 ? (
           <p className="mt-4 text-sm text-[#52635F]">No local vendors tagged yet.</p>
         ) : (
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            {place.localVendors.map((v) => (
-              <div
-                key={v.id}
-                className="rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] p-4"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-bold text-[#1B3B36]">{v.name}</span>
-                  <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-900">
-                    {v.category}
-                  </span>
+            {place.localVendors.map((v) => {
+              const phoneDigits = (v.whatsapp || v.contact).replace(/[^\d+]/g, "");
+              const waDigits = phoneDigits.replace(/^\+/, "");
+              const upiHandle =
+                v.upiId ||
+                `${v.name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12)}@upi`;
+              return (
+                <div
+                  key={v.id}
+                  className="flex flex-col justify-between rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] p-4"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-[#1B3B36]">{v.name}</span>
+                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-900">
+                        {v.category}
+                      </span>
+                    </div>
+                    <p className="mt-1.5 text-xs text-[#52635F]">{v.specialty}</p>
+                    <p className="mt-2 text-xs font-semibold text-[#1B3B36]">
+                      {v.contact} · {v.lat.toFixed(4)}, {v.lng.toFixed(4)}
+                    </p>
+                  </div>
+                  <div className="no-print mt-3 flex flex-wrap gap-2 border-t border-[#E8E0D4] pt-3">
+                    <a
+                      href={`https://www.openstreetmap.org/directions?to=${v.lat},${v.lng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded-lg bg-[#1B3B36] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#C85A32]"
+                    >
+                      <Navigation className="h-3 w-3" /> Navigate to Pin
+                    </a>
+                    {waDigits.length >= 8 ? (
+                      <a
+                        href={`https://wa.me/${waDigits}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-[11px] font-bold text-emerald-900 hover:bg-emerald-100"
+                      >
+                        <MessageCircle className="h-3 w-3" /> WhatsApp
+                      </a>
+                    ) : null}
+                    {phoneDigits.length >= 6 ? (
+                      <a
+                        href={`tel:${phoneDigits}`}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#E8E0D4] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#1B3B36] hover:bg-stone-50"
+                      >
+                        <Phone className="h-3 w-3" /> Call
+                      </a>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setUpiVendor({ ...v, upiId: upiHandle })}
+                      className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-bold text-amber-950 hover:bg-amber-100"
+                    >
+                      <QrCode className="h-3 w-3" /> Direct UPI QR
+                    </button>
+                  </div>
                 </div>
-                <p className="mt-1.5 text-xs text-[#52635F]">{v.specialty}</p>
-                <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#1B3B36]">
-                  <span className="inline-flex items-center gap-1">
-                    <Phone className="h-3.5 w-3.5 text-[#C85A32]" />
-                    {v.contact}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[#52635F]">
-                    <MapPin className="h-3.5 w-3.5 text-[#D97706]" />
-                    {v.lat.toFixed(4)}, {v.lng.toFixed(4)}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
@@ -652,6 +721,56 @@ export default function PlaceDetailPage() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Zero-Commission Direct UPI QR Modal */}
+      {upiVendor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-sm space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 text-center shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setUpiVendor(null)}
+              className="absolute right-4 top-4 rounded-full p-1 text-[#52635F] hover:bg-[#E8E0D4]"
+              aria-label="Close UPI preview"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900">
+              0% Platform Commission · Direct to Local
+            </span>
+            <h3 className="font-display text-xl font-bold text-[#1B3B36]">{upiVendor.name}</h3>
+            <p className="text-xs text-[#52635F]">{upiVendor.specialty}</p>
+            <div className="mx-auto flex h-40 w-40 items-center justify-center rounded-2xl border border-[#E8E0D4] bg-white p-3">
+              <svg viewBox="0 0 21 21" className="h-full w-full fill-[#1B3B36]" aria-label="UPI QR Code Preview">
+                <rect x="0" y="0" width="7" height="7" />
+                <rect x="1" y="1" width="5" height="5" fill="#fff" />
+                <rect x="2" y="2" width="3" height="3" />
+                <rect x="14" y="0" width="7" height="7" />
+                <rect x="15" y="1" width="5" height="5" fill="#fff" />
+                <rect x="16" y="2" width="3" height="3" />
+                <rect x="0" y="14" width="7" height="7" />
+                <rect x="1" y="15" width="5" height="5" fill="#fff" />
+                <rect x="2" y="16" width="3" height="3" />
+                <rect x="9" y="2" width="2" height="2" />
+                <rect x="8" y="6" width="3" height="2" />
+                <rect x="9" y="10" width="4" height="3" />
+                <rect x="14" y="9" width="3" height="2" />
+                <rect x="10" y="15" width="3" height="3" />
+                <rect x="15" y="14" width="4" height="2" />
+                <rect x="17" y="17" width="3" height="3" />
+              </svg>
+            </div>
+            <div className="rounded-xl border border-[#E8E0D4] bg-white px-3 py-2 text-xs font-mono font-bold text-[#1B3B36]">
+              {upiVendor.upiId}
+            </div>
+            <a
+              href={`upi://pay?pa=${encodeURIComponent(upiVendor.upiId || "")}&pn=${encodeURIComponent(upiVendor.name)}&cu=INR`}
+              className="block w-full rounded-xl bg-[#1B3B36] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#C85A32]"
+            >
+              Open in UPI App
+            </a>
+          </div>
         </div>
       )}
     </div>

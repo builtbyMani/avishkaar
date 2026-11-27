@@ -109,6 +109,7 @@ function mapSupabasePlace(row: Record<string, unknown>): Place {
       commute: Array.isArray(cards.commute) ? cards.commute : [],
       food: Array.isArray(cards.food) ? cards.food : [],
       activities: Array.isArray(cards.activities) ? cards.activities : [],
+      livingHeritage: Array.isArray(cards.livingHeritage) ? cards.livingHeritage : [],
     },
     localVendors: Array.isArray(row.local_vendors) ? (row.local_vendors as LocalVendor[]) : [],
     safetyAlerts: Array.isArray(row.safety_alerts) ? (row.safety_alerts as SafetyAlert[]) : [],

@@ -15,7 +15,8 @@ const VALID_SAFETY_TAGS: SafetyTag[] = [
 ];
 
 /**
- * Deterministic fallback when GEMINI_API_KEY is unset, API times out, or JSON parsing fails.
+ * Deterministic multilingual-aware fallback when GEMINI_API_KEY is unset,
+ * API times out, or JSON parsing fails. Recognizes English + Hindi/Hinglish/Telugu/Tamil cues.
  */
 export function extractStructuredPlaceFallback(
   rawText: string,
@@ -23,37 +24,47 @@ export function extractStructuredPlaceFallback(
   region: string,
 ): GeminiExtractionResult {
   const sentences = rawText
-    .split(/(?<=[.!?])\s+|\n+/)
+    .split(/(?<=[.!?।])\s+|\n+/)
     .map((s) => s.trim())
     .filter(Boolean);
 
   const commuteMatches = sentences.filter((s) =>
-    /\b(bus|train|ferry|walk|trek|auto|cab|jeep|km|hr|min|road|trail|station|ghat)\b/i.test(s),
+    /\b(bus|train|ferry|walk|trek|auto|rikshaw|cab|jeep|km|hr|min|road|trail|station|ghat|gaadi|rasta|padal|bandi)\b/i.test(
+      s,
+    ),
   );
   const foodMatches = sentences.filter((s) =>
-    /\b(eat|food|dish|meal|tea|chai|coffee|rice|curry|roti|thali|bread|sweet|fish|honey|try|kitchen)\b/i.test(s),
+    /\b(eat|food|dish|meal|tea|chai|coffee|rice|curry|roti|thali|bread|sweet|fish|honey|try|kitchen|khana|khaye|mithai|idli|dosa|biryani|chutney|bojanam|saapadu)\b/i.test(
+      s,
+    ),
   );
+  const heritageMatches = sentences.filter((s) =>
+    /\b(heritage|tradition|weave|loom|artisan|craft|temple|mandir|kovil|folk|etiquette|ritual|bamboo|mask|potter|parampara|kalakari|sanskriti|elders|courtyard)\b/i.test(
+      s,
+    ),
+  );
+
   const safetyAlerts: SafetyAlert[] = [];
 
-  if (/\b(dark|night|evening|sunset|fog|unlit|cliff)\b/i.test(rawText)) {
+  if (/\b(dark|night|evening|sunset|fog|unlit|cliff|raat|shaam|andhera|cheekati|iravu)\b/i.test(rawText)) {
     safetyAlerts.push({
       tag: "Avoid After Dark",
       message: "Limited lighting on approach routes—plan return before dusk.",
     });
   }
-  if (/\b(network|signal|wifi|offline|cash|upi|bsnl)\b/i.test(rawText)) {
+  if (/\b(network|signal|wifi|offline|cash|upi|bsnl|paise|dabbu|kaasu)\b/i.test(rawText)) {
     safetyAlerts.push({
       tag: "Low Network",
       message: "Weak cellular reception reported; save this pocket card offline and carry cash.",
     });
   }
-  if (/\b(temple|dress|shoes|photo|permission|sacred|elder|respect|monastery)\b/i.test(rawText)) {
+  if (/\b(temple|dress|shoes|photo|permission|sacred|elder|respect|monastery|mandir|chappal|kovil)\b/i.test(rawText)) {
     safetyAlerts.push({
       tag: "Cultural Etiquette",
       message: "Respect local customs, dress modestly in sacred spaces, and ask before photographing residents.",
     });
   }
-  if (/\b(scam|tout|broker|overcharge|fake|fare)\b/i.test(rawText)) {
+  if (/\b(scam|tout|broker|overcharge|fake|fare|dhoka|loot|mosam|cheat|extra)\b/i.test(rawText)) {
     safetyAlerts.push({
       tag: "Scam Alert",
       message: "Confirm official transport rates with locals before booking private rides.",
@@ -88,7 +99,15 @@ export function extractStructuredPlaceFallback(
           },
         ];
 
-  const used = new Set([...commuteMatches, ...foodMatches]);
+  const livingHeritage =
+    heritageMatches.length > 0
+      ? heritageMatches.slice(0, 3)
+      : [
+          `Observe living craft traditions and architectural heritage in ${title} quietly without disrupting artisans.`,
+          `Greet village elders respectfully and carry back all plastic waste.`,
+        ];
+
+  const used = new Set([...commuteMatches, ...foodMatches, ...heritageMatches]);
   const remaining = sentences.filter((s) => !used.has(s));
   const activities =
     remaining.length > 0
@@ -99,7 +118,7 @@ export function extractStructuredPlaceFallback(
         ];
 
   return {
-    structuredCards: { commute, food, activities },
+    structuredCards: { commute, food, activities, livingHeritage },
     safetyAlerts,
     source: "fallback",
   };
@@ -118,9 +137,9 @@ export async function structurePlaceWithGemini(
   const ai = new GoogleGenAI({ apiKey });
   const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-  const prompt = `Extract structured travel field cards from this user submission for "${title}" in "${region}".
-Keep every item concise, practical, and faithful to the input without inventing fake names.
-Return strict JSON matching the schema.
+  const prompt = `The user may write field notes in English, Hindi, Telugu, Tamil, or Hinglish (romanized regional text).
+Translate and extract concise, practical, accurate English travel cards for "${title}" in "${region}" without inventing fake place or vendor names.
+Return strict JSON matching the schema, including Living Heritage & Etiquette.
 
 User description:
 """
@@ -161,6 +180,10 @@ ${rawText}
                 type: Type.ARRAY,
                 items: { type: Type.STRING },
               },
+              livingHeritage: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+              },
               safetyAlerts: {
                 type: Type.ARRAY,
                 items: {
@@ -176,7 +199,7 @@ ${rawText}
                 },
               },
             },
-            required: ["commute", "food", "activities", "safetyAlerts"],
+            required: ["commute", "food", "activities", "livingHeritage", "safetyAlerts"],
           },
         },
       }),
@@ -187,6 +210,7 @@ ${rawText}
       commute?: string[];
       food?: Array<{ name: string; detail: string; priceHint?: string }>;
       activities?: string[];
+      livingHeritage?: string[];
       safetyAlerts?: Array<{ tag: SafetyTag; message: string }>;
     };
 
@@ -198,16 +222,19 @@ ${rawText}
       return extractStructuredPlaceFallback(rawText, title, region);
     }
 
+    const fallback = extractStructuredPlaceFallback(rawText, title, region);
     return {
       structuredCards: {
         commute: parsed.commute?.slice(0, 4) ?? [],
         food: parsed.food?.slice(0, 4) ?? [],
         activities: parsed.activities?.slice(0, 4) ?? [],
+        livingHeritage:
+          parsed.livingHeritage && parsed.livingHeritage.length > 0
+            ? parsed.livingHeritage.slice(0, 4)
+            : fallback.structuredCards.livingHeritage,
       },
       safetyAlerts:
-        sanitizedAlerts.length > 0
-          ? sanitizedAlerts
-          : extractStructuredPlaceFallback(rawText, title, region).safetyAlerts,
+        sanitizedAlerts.length > 0 ? sanitizedAlerts : fallback.safetyAlerts,
       source: "gemini",
     };
   } catch {

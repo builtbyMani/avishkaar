@@ -264,7 +264,7 @@ export default function SubmitGemPage() {
         <div className="space-y-3 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
-              Photo or Short Vertical Clip
+              Photo, Short Clip (&lt;8 MB Hover-Play), or YouTube Short URL
             </span>
             <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#1B3B36] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-[#C85A32]">
               <UploadCloud className="h-3.5 w-3.5" />
@@ -284,12 +284,12 @@ export default function SubmitGemPage() {
               className="rounded-xl border border-[#E8E0D4] bg-white px-3 py-2 text-xs font-semibold"
             >
               <option value="image">Photo</option>
-              <option value="video">Short Video Clip</option>
+              <option value="video">Short Clip / YouTube Short</option>
             </select>
             <input
               value={mediaUrl}
               onChange={(e) => setMediaUrl(e.target.value)}
-              placeholder="Paste image/MP4 URL or upload above"
+              placeholder="Paste image, <8 MB MP4, or YouTube Shorts URL (youtube.com/shorts/...)"
               className="rounded-xl border border-[#E8E0D4] bg-white px-3 py-2 text-xs sm:col-span-3"
             />
           </div>
@@ -299,7 +299,7 @@ export default function SubmitGemPage() {
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <label className="text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
-              Raw Field Notes (Commute, Food, Activities &amp; Safety)
+              Multilingual Field Notes (English, Hindi, Telugu, Tamil, or Hinglish)
             </label>
             <button
               type="button"
@@ -316,7 +316,7 @@ export default function SubmitGemPage() {
             rows={4}
             value={rawDescription}
             onChange={(e) => setRawDescription(e.target.value)}
-            placeholder="Example: Take the 6 AM local bus from Reckong Peo to Sangla, then walk 3km to the wooden bridge. Try buckwheat chilta pancakes and apricot tea at Dolma's kitchen. Avoid the cliff path after dark and carry cash because mobile network drops completely."
+            placeholder="Example (Hinglish/English): Subah 6 AM local bus lo Reckong Peo se Sangla, phir 3km walk to wooden bridge. Try buckwheat chilta aur apricot chai. Raat ko cliff path avoid karo, network zero hai, temple me chappal bahar utaro."
             className="w-full rounded-xl border border-[#E8E0D4] p-3.5 text-sm outline-none focus:border-[#C85A32]"
           />
         </div>
@@ -325,7 +325,7 @@ export default function SubmitGemPage() {
           <div className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 text-xs">
             <div className="flex items-center justify-between">
               <strong className="text-emerald-950">
-                Structured Preview ({aiSource === "gemini" ? "Gemini JSON Mode" : "Manual Fallback Extractor"})
+                Structured Preview ({aiSource === "gemini" ? "Gemini Multilingual JSON Mode" : "Manual Fallback Extractor"})
               </strong>
               <span className="text-emerald-800">Editable before publish</span>
             </div>
@@ -336,6 +336,20 @@ export default function SubmitGemPage() {
                 value={structured.commute.join("\n")}
                 onChange={(e) =>
                   setStructured({ ...structured, commute: e.target.value.split("\n").filter(Boolean) })
+                }
+                className="mt-1 w-full rounded-lg border border-emerald-200 bg-white p-2"
+              />
+            </div>
+            <div>
+              <span className="font-bold text-[#1B3B36]">Living Heritage &amp; Etiquette:</span>
+              <textarea
+                rows={2}
+                value={(structured.livingHeritage ?? []).join("\n")}
+                onChange={(e) =>
+                  setStructured({
+                    ...structured,
+                    livingHeritage: e.target.value.split("\n").filter(Boolean),
+                  })
                 }
                 className="mt-1 w-full rounded-lg border border-emerald-200 bg-white p-2"
               />

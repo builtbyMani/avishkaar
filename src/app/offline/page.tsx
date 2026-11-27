@@ -101,6 +101,19 @@ export default function OfflinePocketPage() {
                 </ul>
               </div>
 
+              {card.livingHeritage && card.livingHeritage.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+                    Living Heritage &amp; Etiquette
+                  </h3>
+                  <ul className="mt-1.5 space-y-1 text-xs text-[#52635F]">
+                    {card.livingHeritage.map((item, i) => (
+                      <li key={i}>• {item}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {card.safetyAlerts.length > 0 && (
                 <div className="rounded-xl border border-red-200 bg-red-50 p-3">
                   <h3 className="flex items-center gap-1.5 text-xs font-bold text-red-900">

@@ -3,29 +3,29 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  /* Pale Sage Ivory + Muted Forest Sage palette */
-  --bg-parchment: #eaece0;
-  --bg-surface: #f4f5ed;
-  --bg-well: #e0e3d3;
-  --ink-forest: #1f271c;
-  --ink-muted: #566151;
-  --sage-muted: #667d5c;
-  --sage-deep: #3d5236;
-  --accent-terracotta: #b85a3a;
-  --accent-amber: #c27821;
-  --border-warm: rgb(31 39 28 / 0.12);
+  /* 60% Neutral warm off-white · 30% Deep green / ink · 10% Turmeric accent */
+  --bg-parchment: #f5f0e6;
+  --bg-surface: #faf7f0;
+  --bg-well: #ebe4d5;
+  --ink-forest: #1b2a22;
+  --ink-muted: #4b5c52;
+  --sage-deep: #1f3d2e;
+  --accent-turmeric: #d9a12b;
+  --alert-brick: #a63d2a;
+  --border-warm: rgb(27 42 34 / 0.12);
+  --font-sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
 }
 
 body {
   background-color: var(--bg-parchment);
   color: var(--ink-forest);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sf);
   caret-color: var(--sage-deep);
 }
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgba(102, 125, 92, 0.4) var(--bg-parchment);
+  scrollbar-color: rgb(31 61 46 / 0.35) var(--bg-parchment);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -40,6 +40,14 @@ html {
   text-wrap: balance;
 }
 
+.font-rozha {
+  font-family: var(--font-rozha), Georgia, serif;
+}
+
+.font-modak {
+  font-family: var(--font-modak), sans-serif;
+}
+
 .font-script {
   font-family: var(--font-script), cursive;
 }
@@ -47,15 +55,6 @@ html {
 :focus-visible {
   outline: 2px solid var(--sage-deep);
   outline-offset: 2px;
-}
-
-.paper-bg {
-  background-color: var(--bg-parchment);
-  background-image:
-    linear-gradient(rgba(234, 236, 224, 0.72), rgba(234, 236, 224, 0.72)),
-    url("/images/paper-bg.jpg");
-  background-size: 480px 480px;
-  background-repeat: repeat;
 }
 
 /* Fix Leaflet container z-index inside sticky header layouts */

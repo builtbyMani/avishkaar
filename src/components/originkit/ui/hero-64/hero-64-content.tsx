@@ -29,7 +29,7 @@ export default function Hero() {
               className="flex items-center gap-2"
             >
               <AvishkaarLogo size={24} />
-              <span className="font-display text-xl font-bold tracking-tight text-[#1F271C]">
+              <span className="font-display text-xl font-bold tracking-tight text-[#1B2A22]">
                 Avishkaar
               </span>
             </motion.div>
@@ -59,20 +59,23 @@ export default function Hero() {
 
       <div className="copy">
         <h1 className="font-display">
-          Places <span className="font-script">off the</span> beaten path.
+          Places <span className="font-script text-[#1F3D2E]">off the</span> beaten path.
         </h1>
-        <p>
+        <p className="hero-lead">
           Community-verified villages, regional kitchens, and living heritage — ranked by
           Hidden Gem Score, never tourist traps.
         </p>
         <button type="button" onClick={enterHome} className="btn btn-lg">
           Explore Gems <span aria-hidden="true">→</span>
         </button>
+        <p lang="hi" className="hero-hindi">
+          आओ कभी हवेली पे
+        </p>
       </div>
 
       <div className="scene" aria-hidden="true">
         <StillSunsetMeadow
-          sky={{ top: "#EAECE0", horizon: "#F5DFC2", glow: "#FFD9A8" }}
+          sky={{ top: "#F5F0E6", horizon: "#E9DFC9", glow: "#F2D59B" }}
           haze={4}
           speed={20}
           hover={20}

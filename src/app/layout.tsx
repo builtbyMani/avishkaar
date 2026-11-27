@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Hind, Instrument_Serif, Satisfy } from "next/font/google";
+import localFont from "next/font/local";
+import { Archivo_Black, Instrument_Serif, Satisfy } from "next/font/google";
 import "./globals.css";
 import { AppProvider, MainShell } from "@/components/AppProvider";
 import { Navbar } from "@/components/Navbar";
 import Preloader from "@/components/Preloader";
 
-const sans = Hind({
-  subsets: ["latin", "devanagari"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
+const rozha = localFont({
+  src: "./fonts/RozhaOne-Regular.ttf",
+  variable: "--font-rozha",
+  display: "swap",
+});
+
+const modak = localFont({
+  src: "./fonts/Modak-Regular.ttf",
+  variable: "--font-modak",
+  display: "swap",
 });
 
 const display = Instrument_Serif({
@@ -44,9 +51,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${display.variable} ${script.variable} ${preloader.variable}`}
+      className={`${rozha.variable} ${modak.variable} ${display.variable} ${script.variable} ${preloader.variable}`}
     >
-      <body className="min-h-dvh antialiased selection:bg-[#667D5C]/25 selection:text-[#1F271C]">
+      <body className="min-h-dvh antialiased selection:bg-[#D9A12B]/25 selection:text-[#1B2A22]">
         <AppProvider>
           <Preloader />
           <Navbar />

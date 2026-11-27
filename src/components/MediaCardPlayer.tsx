@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Film, Play, Pause, Volume2, VolumeX, Youtube } from "lucide-react";
+import { Film, Play, Pause, Volume2, VolumeX, Youtube } from "@/components/Icons";
 import type { MediaItem } from "@/types/domain";
 
 const FALLBACK_SVG =

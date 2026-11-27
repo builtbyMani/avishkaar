@@ -75,7 +75,7 @@ export default function Preloader() {
     <AnimatePresence>
       {shouldShow && !done && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col justify-between bg-[#1F271C] text-[#EAECE0]"
+          className="fixed inset-0 z-[100] flex flex-col justify-between bg-[#1B2A22] text-[#F5F0E6]"
           exit={{ opacity: 0 }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           aria-hidden="true"
@@ -85,7 +85,7 @@ export default function Preloader() {
             <motion.div
               layoutId="avishkaar-brand-mark"
               transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-              className="flex items-center gap-2.5 rounded-full bg-[#EAECE0] px-4 py-1.5 text-[#1F271C]"
+              className="flex items-center gap-2.5 rounded-full bg-[#F5F0E6] px-4 py-1.5 text-[#1B2A22]"
             >
               <AvishkaarLogo size={24} />
               <span className="font-display text-lg font-bold tracking-tight">

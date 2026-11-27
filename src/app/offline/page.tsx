@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Bus, ChevronRight, Landmark, Printer, ShieldAlert, Trash2, Utensils, WifiOff } from "lucide-react";
+import { Bus, ChevronRight, Landmark, Printer, ShieldAlert, Trash2, Utensils, WifiOff } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { GUIDE_MODULE_STYLES, PLACE_CATEGORY_STYLES } from "@/lib/domain";
 import type { PlaceCategory } from "@/types/domain";

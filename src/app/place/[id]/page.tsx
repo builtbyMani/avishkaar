@@ -29,7 +29,7 @@ import {
   UserCheck,
   Utensils,
   WifiOff,
-} from "lucide-react";
+} from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";

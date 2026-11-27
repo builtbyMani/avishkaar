@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Award, Check, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "lucide-react";
+import { Award, Check, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { MemojiAvatar } from "@/components/MemojiAvatar";
 import { canVolunteerAsGuide, getTierDisplayLabel, REGIONS, TRAILBLAZER_TIER_STYLES } from "@/lib/domain";

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AlertTriangle, FileCheck2, Loader2, UploadCloud } from "lucide-react";
+import { AlertTriangle, FileCheck2, Loader2, UploadCloud } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { PLACE_CATEGORIES, REGIONS } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";

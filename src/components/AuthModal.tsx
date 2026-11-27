@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Award, Check, LogOut, Mail, Shield, X } from "lucide-react";
+import { Award, Check, LogOut, Mail, Shield, X } from "@/components/Icons";
 import { TRAILBLAZER_TIER_STYLES, getTierDisplayLabel } from "@/lib/domain";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import { useApp } from "./AppProvider";
@@ -172,8 +172,8 @@ export function AuthModal({
         )}
 
         <div className="mt-5">
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#52635F]">
-            <Shield className="h-3.5 w-3.5 text-[#C85A32]" />
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#4B5C52]">
+            <Shield className="h-3.5 w-3.5 text-[#D9A12B]" />
             Traveler Profiles
           </div>
           <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
@@ -190,14 +190,14 @@ export function AuthModal({
                   className={`flex min-h-12 w-full items-center justify-between rounded-xl border p-3 text-left transition ${
                     selected
                       ? `${TRAILBLAZER_TIER_STYLES[p.tier].cardRing} bg-white`
-                      : "border-black/12 bg-white hover:border-[#1B3B36]"
+                      : "border-[#1B2A22]/12 bg-[#FAF7F0] hover:border-[#1F3D2E]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <MemojiAvatar id={p.id} name={p.displayName} size={34} />
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-[#1B3B36]">{p.displayName}</span>
+                        <span className="text-sm font-bold text-[#1B2A22]">{p.displayName}</span>
                         <span
                           className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
                             TRAILBLAZER_TIER_STYLES[p.tier].badge
@@ -206,20 +206,20 @@ export function AuthModal({
                           {getTierDisplayLabel(p.tier)}
                         </span>
                         {p.isGuide && (
-                          <span className="rounded-full border border-black/12 bg-[#EAECE0] px-2 py-0.5 text-[11px] font-medium text-[#3D5236]">
+                          <span className="rounded-full border border-[#1F3D2E]/20 bg-[#E6ECE5] px-2 py-0.5 text-[11px] font-medium text-[#1F3D2E]">
                             Local Guide
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-[#566151]">
+                      <p className="mt-0.5 text-xs text-[#4B5C52]">
                         {getTierDisplayLabel(p.tier)} · {p.trailblazerScore} pts
                         {p.guideRegion ? ` · ${p.guideRegion}` : ""}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Award className="h-4 w-4 text-[#D97706]" />
-                    {selected && <Check className="h-4 w-4 text-[#C85A32]" />}
+                    <Award className="h-4 w-4 text-[#D9A12B]" />
+                    {selected && <Check className="h-4 w-4 text-[#1F3D2E]" />}
                   </div>
                 </button>
               );

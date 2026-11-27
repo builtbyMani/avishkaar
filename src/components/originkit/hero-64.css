@@ -1,13 +1,13 @@
 .hero-64 {
-  --ink: #1f271c;
-  --muted: #667d5c;
-  --sub: #566151;
-  --sage-deep: #3d5236;
-  --canvas: #eaece0;
+  --ink: #1b2a22;
+  --muted: #4b5c52;
+  --sub: #4b5c52;
+  --sage-deep: #1f3d2e;
+  --canvas: #f5f0e6;
   --pad-x: clamp(20px, 4vw, 56px);
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   position: relative;
   isolation: isolate;
@@ -29,11 +29,6 @@
   flex-direction: column;
   justify-content: flex-start;
   background-color: var(--canvas);
-  background-image:
-    linear-gradient(rgba(234, 236, 224, 0.74), rgba(234, 236, 224, 0.74)),
-    url("/images/paper-bg.jpg");
-  background-size: 480px 480px;
-  background-repeat: repeat;
 }
 
 .hero-64 .nav {
@@ -80,7 +75,7 @@
   align-items: center;
   justify-content: center;
   background: var(--sage-deep);
-  color: #f4f5ed;
+  color: #f5f0e6;
   border: 1px solid var(--sage-deep);
   border-radius: 999px;
   font-weight: 600;
@@ -90,7 +85,7 @@
   transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease;
 }
 .hero-64 .btn:hover {
-  background: #2f4029;
+  background: #162c21;
   transform: translateY(-1px);
 }
 .hero-64 .btn-sm {
@@ -132,13 +127,22 @@
   color: var(--muted);
   padding: 0 0.08em;
 }
-.hero-64 .copy p {
+.hero-64 .copy p.hero-lead {
   margin: 0;
   max-width: 44ch;
   text-wrap: balance;
-  font-size: clamp(14px, 1.05vw, 17px);
-  line-height: 1.6;
-  color: var(--sub);
+  font-family: var(--font-rozha), Georgia, serif;
+  font-size: clamp(18px, 1.45vw, 24px);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.hero-64 .copy p.hero-hindi {
+  margin: 4px 0 0;
+  font-family: var(--font-modak), sans-serif;
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 1.25;
+  color: var(--sage-deep);
+  letter-spacing: 0.01em;
 }
 .hero-64 .cta-row {
   display: flex;
@@ -153,14 +157,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 54%;
+  height: 52%;
   z-index: 1;
 }
 .hero-64 .fade {
   position: absolute;
   inset: 0 0 auto;
   height: 46%;
-  background: linear-gradient(var(--canvas), rgba(234, 236, 224, 0));
+  background: linear-gradient(var(--canvas), rgba(245, 240, 230, 0));
   pointer-events: none;
 }
 

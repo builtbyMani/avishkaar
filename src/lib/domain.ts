@@ -284,29 +284,29 @@ export const PLACE_CATEGORY_STYLES: Record<
   { pillIdle: string; pillActive: string; badge: string }
 > = {
   "Hidden Village": {
-    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
-    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
-    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]",
+    pillActive: "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#1B2A22]",
   },
   "Regional Cuisine": {
-    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
-    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
-    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]",
+    pillActive: "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#1B2A22]",
   },
   "Living Heritage": {
-    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
-    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
-    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]",
+    pillActive: "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#1B2A22]",
   },
   "Sacred & Craft": {
-    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
-    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
-    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]",
+    pillActive: "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#1B2A22]",
   },
   "Nature & Trail": {
-    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
-    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
-    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]",
+    pillActive: "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#1B2A22]",
   },
 };
 
@@ -315,44 +315,44 @@ export const REGION_STYLES: Record<
   { cardBg: string; border: string; pill: string; dot: string }
 > = {
   "Spiti & Kinnaur": {
-    cardBg: "bg-[#E9ECEF]",
-    border: "border-[#64748B]/25",
-    pill: "bg-[#DCE3E8] text-[#26323F]",
-    dot: "bg-[#4A6074]",
+    cardBg: "bg-[#F7F4EC]",
+    border: "border-[#1B2A22]/12",
+    pill: "bg-[#EAE5D8] text-[#1B2A22]",
+    dot: "bg-[#1F3D2E]",
   },
   "Meghalaya & Northeast": {
-    cardBg: "bg-[#E3ECE3]",
-    border: "border-[#3D5236]/25",
-    pill: "bg-[#D3E2D4] text-[#1F3422]",
-    dot: "bg-[#3D5236]",
+    cardBg: "bg-[#EEF1E8]",
+    border: "border-[#1F3D2E]/16",
+    pill: "bg-[#E0E7D8] text-[#1B2A22]",
+    dot: "bg-[#1F3D2E]",
   },
   "Deccan & Western Ghats": {
-    cardBg: "bg-[#EFE6DC]",
-    border: "border-[#7C4D34]/22",
-    pill: "bg-[#E7D8C8] text-[#452819]",
-    dot: "bg-[#7C4D34]",
+    cardBg: "bg-[#F5EDE1]",
+    border: "border-[#1B2A22]/12",
+    pill: "bg-[#EAE0CE] text-[#1B2A22]",
+    dot: "bg-[#D9A12B]",
   },
   "Kutch & Thar": {
-    cardBg: "bg-[#F3ECD9]",
-    border: "border-[#8A6D2F]/24",
-    pill: "bg-[#EAE0C3] text-[#463612]",
-    dot: "bg-[#8A6D2F]",
+    cardBg: "bg-[#F7F0DE]",
+    border: "border-[#D9A12B]/28",
+    pill: "bg-[#EFE3C2] text-[#1B2A22]",
+    dot: "bg-[#D9A12B]",
   },
   "Malabar & Konkan": {
-    cardBg: "bg-[#E2ECEA]",
-    border: "border-[#2D615B]/24",
-    pill: "bg-[#D1E3DF] text-[#183834]",
-    dot: "bg-[#2D615B]",
+    cardBg: "bg-[#EDF2EE]",
+    border: "border-[#1F3D2E]/14",
+    pill: "bg-[#DFE9E2] text-[#1B2A22]",
+    dot: "bg-[#1F3D2E]",
   },
 };
 
 export function getRegionStyle(region: string) {
   return (
     REGION_STYLES[region] ?? {
-      cardBg: "bg-[#F4F5ED]",
-      border: "border-black/12",
-      pill: "bg-[#E0E3D3] text-[#1F271C]",
-      dot: "bg-[#667D5C]",
+      cardBg: "bg-[#FAF7F0]",
+      border: "border-[#1B2A22]/12",
+      pill: "bg-[#EBE4D5] text-[#1B2A22]",
+      dot: "bg-[#1F3D2E]",
     }
   );
 }
@@ -372,19 +372,19 @@ export const TRAILBLAZER_TIER_STYLES: Record<
   { badge: string; progressFill: string; cardRing: string }
 > = {
   Wanderer: {
-    badge: "border-black/12 bg-[#F4F5ED] text-[#566151]",
-    progressFill: "bg-[#667D5C]",
-    cardRing: "border-black/20",
+    badge: "border-[#1B2A22]/15 bg-[#FAF7F0] text-[#4B5C52]",
+    progressFill: "bg-[#4B5C52]",
+    cardRing: "border-[#1B2A22]/20",
   },
   Pathfinder: {
-    badge: "border-[#3D5236]/25 bg-[#E3ECE3] text-[#283B23]",
-    progressFill: "bg-[#4A6443]",
-    cardRing: "border-[#4A6443]",
+    badge: "border-[#1F3D2E]/25 bg-[#E6ECE5] text-[#1F3D2E]",
+    progressFill: "bg-[#1F3D2E]",
+    cardRing: "border-[#1F3D2E]",
   },
   "Local Legend": {
-    badge: "border-[#3D5236]/30 bg-[#DCE5D5] text-[#1F271C]",
-    progressFill: "bg-[#3D5236]",
-    cardRing: "border-[#3D5236]",
+    badge: "border-[#D9A12B]/50 bg-[#D9A12B]/15 text-[#1B2A22]",
+    progressFill: "bg-[#1F3D2E]",
+    cardRing: "border-[#D9A12B]",
   },
 };
 
@@ -396,9 +396,9 @@ export interface FeedbackMessage {
 }
 
 export const FEEDBACK_TONE_STYLES: Record<FeedbackTone, string> = {
-  success: "border-emerald-300 bg-emerald-50 text-emerald-900",
-  error: "border-red-300 bg-red-50 text-red-900",
-  info: "border-black/15 bg-[#FAF7F2] text-[#1B3B36]",
+  success: "border-[#1F3D2E]/25 bg-[#E8EFE9] text-[#1B2A22]",
+  error: "border-[#A63D2A]/35 bg-[#F8EAE6] text-[#A63D2A]",
+  info: "border-[#1B2A22]/15 bg-[#FAF7F0] text-[#1B2A22]",
 };
 
 export type GuideModuleKey = "commute" | "food" | "activities" | "livingHeritage";

@@ -147,7 +147,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       <LayoutGroup>
-        <div className="min-h-dvh w-full bg-[#EAECE0]">
+        <div className="min-h-dvh w-full bg-[#F5F0E6]">
           {children}
         </div>
       </LayoutGroup>

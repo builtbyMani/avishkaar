@@ -21,7 +21,7 @@ import { ScrollProgressBar } from "./ScrollProgressBar";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { activeUser, offlineCards, openAuthModal } = useApp();
+  const { activeUser, offlineCards, openAuthModal, preloaderDone } = useApp();
   const [impactOpen, setImpactOpen] = useState(false);
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export function Navbar() {
   return (
     <>
       {/* Desktop Left Slim Rail (Pinterest-style) */}
-      <aside className="no-print fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-black/12 bg-[#FAF7F2] py-4 md:flex">
+      <aside className="no-print fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-black/12 bg-[#EAECE0] py-4 md:flex">
         <div className="flex flex-col items-center gap-4">
           <Link
             href="/"
@@ -68,19 +68,19 @@ export function Navbar() {
                   href={item.href}
                   aria-label={item.label}
                   className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition ${
-                    active ? "text-white" : "text-[#1B3B36] hover:bg-black/5"
+                    active ? "text-[#EAECE0]" : "text-[#1F271C] hover:bg-black/5"
                   }`}
                 >
                   {active && (
                     <motion.span
                       layoutId="rail-active"
                       transition={{ type: "spring", stiffness: 320, damping: 28 }}
-                      className="absolute inset-0 rounded-xl bg-[#1B3B36]"
+                      className="absolute inset-0 rounded-xl bg-[#3D5236]"
                     />
                   )}
                   <Icon className="relative z-10 h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
                   {item.badge !== null && item.badge !== undefined && (
-                    <span className="absolute -right-0.5 -top-0.5 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#C85A32] px-1 text-[10px] font-bold text-white">
+                    <span className="absolute -right-0.5 -top-0.5 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#667D5C] px-1 text-[10px] font-bold text-white">
                       {item.badge}
                     </span>
                   )}
@@ -94,22 +94,37 @@ export function Navbar() {
           type="button"
           onClick={() => setImpactOpen(true)}
           aria-label="Impact & Stack"
-          className="flex h-11 w-11 items-center justify-center rounded-xl text-[#52635F] transition hover:bg-black/5 hover:text-[#1B3B36]"
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-[#566151] transition hover:bg-black/5 hover:text-[#1F271C]"
         >
           <BarChart3 className="h-5 w-5" strokeWidth={1.75} />
         </button>
       </aside>
 
       {/* Top Sticky Bar */}
-      <header className="no-print sticky top-0 z-30 border-b border-black/12 bg-[#FAF7F2] md:pl-16">
+      <header className="no-print sticky top-0 z-30 border-b border-black/12 bg-[#EAECE0] md:pl-16">
         <ScrollProgressBar />
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">
-              <AvishkaarLogo size={24} />
-              <span className="font-display text-lg font-bold tracking-tight text-[#1B3B36]">
-                Avishkaar
-              </span>
+              {preloaderDone ? (
+                <motion.div
+                  layoutId="avishkaar-brand-mark"
+                  transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center gap-2"
+                >
+                  <AvishkaarLogo size={24} />
+                  <span className="font-display text-lg font-bold tracking-tight text-[#1F271C]">
+                    Avishkaar
+                  </span>
+                </motion.div>
+              ) : (
+                <div className="flex items-center gap-2 opacity-0" aria-hidden="true">
+                  <AvishkaarLogo size={24} />
+                  <span className="font-display text-lg font-bold tracking-tight">
+                    Avishkaar
+                  </span>
+                </div>
+              )}
             </Link>
           </div>
 

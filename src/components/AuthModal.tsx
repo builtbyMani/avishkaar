@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Award, Check, LogIn, Shield, X } from "lucide-react";
+import { Award, Check, LogOut, Mail, Shield, X } from "lucide-react";
 import { TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import { useApp } from "./AppProvider";
@@ -16,8 +16,6 @@ export function AuthModal({
 }) {
   const { activeUser, profiles, switchDemoUser, refreshProfiles, mode } = useApp();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -34,34 +32,54 @@ export function AuthModal({
 
   const supabaseEnabled = isSupabaseConfigured();
 
-  async function handleEmailAuth(e: React.FormEvent) {
+  async function handleGoogleAuth() {
+    const sb = getSupabaseBrowserClient();
+    if (!sb) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const { error } = await sb.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/` },
+      });
+      if (error) throw error;
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Google sign-in failed");
+      setBusy(false);
+    }
+  }
+
+  async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     const sb = getSupabaseBrowserClient();
     if (!sb) return;
     setBusy(true);
     setMessage(null);
     try {
-      const res = isSignUp
-        ? await sb.auth.signUp({ email, password })
-        : await sb.auth.signInWithPassword({ email, password });
-      if (res.error) throw res.error;
-      await refreshProfiles();
-      setMessage(isSignUp ? "Account created! Check email if verification is enabled." : "Signed in!");
-      onClose();
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/` },
+      });
+      if (error) throw error;
+      setMessage("Check your inbox for the login link.");
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Authentication failed");
+      setMessage(err instanceof Error ? err.message : "Could not send login link");
     } finally {
       setBusy(false);
     }
   }
 
-  async function handleGoogleAuth() {
+  async function handleSignOut() {
     const sb = getSupabaseBrowserClient();
     if (!sb) return;
-    await sb.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: window.location.origin },
-    });
+    setBusy(true);
+    try {
+      await sb.auth.signOut();
+      await refreshProfiles();
+      onClose();
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -75,77 +93,81 @@ export function AuthModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-modal-title"
-        className="animate-panel-in relative w-full max-w-lg rounded-2xl border border-black/20 bg-[#FAF7F2] p-6 shadow-none"
+        className="animate-panel-in relative w-full max-w-lg rounded-2xl border border-black/15 bg-[#EAECE0] p-6 shadow-none"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1.5 text-[#52635F] hover:bg-[#E8E0D4]"
+          className="absolute right-4 top-4 rounded-full p-1.5 text-[#566151] hover:bg-black/5"
           aria-label="Close modal"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#1B3B36]">
+        <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#1F271C]">
           Account &amp; Profiles
         </h2>
-        <p className="mt-1 text-sm text-[#52635F]">
+        <p className="mt-1 text-sm text-[#566151]">
           {mode === "supabase"
-            ? "Sign in with Email or Google."
+            ? "Sign in with Google or an email magic link."
             : "Choose a traveler profile to browse, vouch, or guide."}
         </p>
 
         {supabaseEnabled && (
-          <div className="mt-4 rounded-xl border border-[#E8E0D4] bg-white p-4">
-            <form onSubmit={handleEmailAuth} className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
-                  {isSignUp ? "Create Supabase Account" : "Supabase Email Login"}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setIsSignUp((v) => !v)}
-                  className="text-xs font-semibold text-[#C85A32] hover:underline"
-                >
-                  {isSignUp ? "Have an account? Sign in" : "Need an account? Sign up"}
-                </button>
-              </div>
+          <div className="mt-4 space-y-3 rounded-xl border border-black/12 bg-[#F4F5ED] p-4">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={handleGoogleAuth}
+              className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-[#3D5236] px-4 py-2.5 text-sm font-semibold text-[#F4F5ED] transition hover:bg-[#2f4029] disabled:opacity-60"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81Z"
+                />
+              </svg>
+              Continue with Google
+            </button>
+
+            <div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-[#566151]">
+              <span className="h-px flex-1 bg-black/12" />
+              or email link
+              <span className="h-px flex-1 bg-black/12" />
+            </div>
+
+            <form onSubmit={handleMagicLink} className="flex gap-2">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="traveler@example.com"
-                className="w-full rounded-lg border border-[#E8E0D4] px-3 py-2 text-sm outline-none focus:border-[#C85A32]"
+                className="flex-1 rounded-full border border-black/12 bg-white px-4 py-2 text-sm text-[#1F271C] outline-none focus:border-[#3D5236]"
               />
-              <input
-                type="password"
-                required
-                minLength={6}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password (min 6 chars)"
-                className="w-full rounded-lg border border-[#E8E0D4] px-3 py-2 text-sm outline-none focus:border-[#C85A32]"
-              />
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="submit"
-                  disabled={busy}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#1B3B36] px-4 py-2 text-sm font-semibold text-white hover:bg-[#142c28] disabled:opacity-60"
-                >
-                  <LogIn className="h-4 w-4" />
-                  {isSignUp ? "Sign Up" : "Sign In"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleGoogleAuth}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-[#E8E0D4] bg-white px-4 py-2 text-sm font-semibold text-[#1B3B36] hover:bg-stone-50"
-                >
-                  Continue with Google
-                </button>
-              </div>
-              {message && <p className="text-xs font-medium text-[#C85A32]">{message}</p>}
+              <button
+                type="submit"
+                disabled={busy}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/12 bg-white px-4 py-2 text-xs font-semibold text-[#1F271C] transition hover:border-[#3D5236] disabled:opacity-60"
+              >
+                <Mail className="h-3.5 w-3.5" />
+                Send Link
+              </button>
             </form>
+
+            {mode === "supabase" && activeUser && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={handleSignOut}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#566151] hover:text-[#1F271C]"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign out ({activeUser.displayName})
+              </button>
+            )}
+
+            {message && <p className="text-xs font-medium text-[#3D5236]">{message}</p>}
           </div>
         )}
 

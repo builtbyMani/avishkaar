@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { LayoutGroup } from "motion/react";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import type { OfflinePocketCard, Profile } from "@/types/domain";
 import { AuthModal } from "./AuthModal";
@@ -14,6 +15,8 @@ interface AppContextValue {
   profiles: Profile[];
   mode: "supabase" | "demo";
   offlineCards: OfflinePocketCard[];
+  preloaderDone: boolean;
+  markPreloaderDone: () => void;
   switchDemoUser: (userId: string) => void;
   refreshProfiles: () => Promise<void>;
   openAuthModal: () => void;
@@ -33,6 +36,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<"supabase" | "demo">(supabaseMode ? "supabase" : "demo");
   const [offlineCards, setOfflineCards] = useState<OfflinePocketCard[]>([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(false);
+  const markPreloaderDone = useCallback(() => setPreloaderDone(true), []);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -124,6 +129,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         profiles,
         mode,
         offlineCards,
+        preloaderDone,
+        markPreloaderDone,
         switchDemoUser,
         refreshProfiles,
         openAuthModal: () => setAuthModalOpen(true),
@@ -132,7 +139,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         isSavedOffline,
       }}
     >
-      {children}
+      <LayoutGroup>{children}</LayoutGroup>
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </AppContext.Provider>
   );

@@ -23,6 +23,7 @@ import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
 import { MemojiAvatar } from "@/components/MemojiAvatar";
+import Hero64 from "@/components/originkit/hero-64";
 import {
   FEEDBACK_TONE_STYLES,
   getGemScoreBreakdown,
@@ -166,23 +167,27 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="space-y-5">
-      {/* Pinterest-style Top Search & Action Strip */}
-      <section className="space-y-3">
+    <div className="space-y-6">
+      <div className="overflow-hidden rounded-3xl border border-black/12 bg-[#EAECE0]">
+        <Hero64 />
+      </div>
+
+      {/* Top Search & Action Strip */}
+      <section id="discover-feed" className="scroll-mt-20 space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               void handleDetourSearch(detourQuery);
             }}
-            className="flex flex-1 items-center gap-2 rounded-full border border-black/12 bg-[#EAE2D6]/50 px-4 py-1.5 transition focus-within:border-[#1B3B36] focus-within:bg-white"
+            className="flex flex-1 items-center gap-2 rounded-full border border-black/12 bg-[#F4F5ED] px-4 py-1.5 transition focus-within:border-[#3D5236] focus-within:bg-white"
           >
-            <Search className="h-4 w-4 shrink-0 text-[#52635F]" strokeWidth={2} />
+            <Search className="h-4 w-4 shrink-0 text-[#566151]" strokeWidth={2} />
             <input
               value={detourQuery}
               onChange={(e) => setDetourQuery(e.target.value)}
               placeholder="Skip crowded hubs (Ooty, Goa, Hampi, Manali)..."
-              className="min-h-8 w-full bg-transparent text-sm text-[#1B3B36] placeholder:text-[#52635F] outline-none"
+              className="min-h-8 w-full bg-transparent text-sm text-[#1F271C] placeholder:text-[#566151] outline-none"
             />
             {detourQuery && (
               <button
@@ -191,7 +196,7 @@ export default function DiscoverPage() {
                   setDetourQuery("");
                   setDetourResult(null);
                 }}
-                className="rounded-full p-1 text-[#52635F] hover:bg-black/5 hover:text-[#1B3B36]"
+                className="rounded-full p-1 text-[#566151] hover:bg-black/5 hover:text-[#1F271C]"
                 aria-label="Clear search"
               >
                 <X className="h-3.5 w-3.5" />
@@ -200,7 +205,7 @@ export default function DiscoverPage() {
             <button
               type="submit"
               disabled={detourLoading || !detourQuery.trim()}
-              className="shrink-0 rounded-full bg-[#1B3B36] px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-[#C85A32] disabled:opacity-40"
+              className="shrink-0 rounded-full bg-[#3D5236] px-3.5 py-1.5 text-xs font-bold text-[#F4F5ED] transition hover:bg-[#2f4029] disabled:opacity-40"
             >
               {detourLoading ? "Finding..." : "Detour"}
             </button>
@@ -209,7 +214,7 @@ export default function DiscoverPage() {
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/submit"
-              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#C85A32] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#b24d28]"
+              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#3D5236] px-4 py-2 text-xs font-bold text-[#F4F5ED] transition hover:bg-[#2f4029]"
             >
               <PlusCircle className="h-4 w-4" strokeWidth={2} />
               Post Gem
@@ -217,7 +222,7 @@ export default function DiscoverPage() {
             <button
               type="button"
               onClick={() => setViewMode((m) => (m === "masonry" ? "map" : "masonry"))}
-              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full border border-black/12 bg-white px-4 py-2 text-xs font-semibold text-[#1B3B36] transition hover:border-[#1B3B36]"
+              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full border border-black/12 bg-[#F4F5ED] px-4 py-2 text-xs font-semibold text-[#1F271C] transition hover:border-[#3D5236]"
             >
               {viewMode === "masonry" ? (
                 <>

@@ -1,24 +1,31 @@
 @import "tailwindcss";
+@import "./originkit-section-theme.css";
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --bg-parchment: #faf7f2;
-  --bg-surface: #ffffff;
-  --ink-forest: #1b3b36;
-  --ink-muted: #52635f;
-  --accent-terracotta: #c85a32;
-  --accent-amber: #d97706;
-  --border-warm: #e8e0d4;
+  /* Pale Sage Ivory + Muted Forest Sage palette */
+  --bg-parchment: #eaece0;
+  --bg-surface: #f4f5ed;
+  --bg-well: #e0e3d3;
+  --ink-forest: #1f271c;
+  --ink-muted: #566151;
+  --sage-muted: #667d5c;
+  --sage-deep: #3d5236;
+  --accent-terracotta: #b85a3a;
+  --accent-amber: #c27821;
+  --border-warm: rgb(31 39 28 / 0.12);
 }
 
 body {
   background-color: var(--bg-parchment);
   color: var(--ink-forest);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  caret-color: var(--sage-deep);
 }
 
 html {
   scroll-behavior: smooth;
+  scrollbar-color: rgba(102, 125, 92, 0.4) var(--bg-parchment);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -29,6 +36,17 @@ html {
 
 .font-display {
   font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
 }
 
 /* Fix Leaflet container z-index inside sticky header layouts */

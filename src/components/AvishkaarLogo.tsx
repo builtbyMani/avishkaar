@@ -10,9 +10,9 @@ export function AvishkaarLogo({ size = 28 }: { size?: number }) {
     >
       <path
         d="M16 3L28 27H22.2L16 14.2L9.8 27H4L16 3Z"
-        fill="#1B3B36"
+        fill="#3D5236"
       />
-      <circle cx="16" cy="23.5" r="3" fill="#C85A32" />
+      <circle cx="16" cy="23.5" r="3" fill="#667D5C" />
     </svg>
   );
 }

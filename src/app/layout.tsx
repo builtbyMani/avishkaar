@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import { Archivo_Black, Fraunces, Plus_Jakarta_Sans, Satisfy } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/components/AppProvider";
 import { Navbar } from "@/components/Navbar";
@@ -13,6 +13,12 @@ const sans = Plus_Jakarta_Sans({
 const display = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
+});
+
+const script = Satisfy({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-script",
 });
 
 const preloader = Archivo_Black({
@@ -33,10 +39,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable} ${preloader.variable}`}>
-      <body className="min-h-dvh antialiased selection:bg-[#C85A32]/20">
-        <Preloader />
+    <html
+      lang="en"
+      className={`${sans.variable} ${display.variable} ${script.variable} ${preloader.variable}`}
+    >
+      <body className="min-h-dvh antialiased selection:bg-[#667D5C]/25 selection:text-[#1F271C]">
         <AppProvider>
+          <Preloader />
           <Navbar />
           <main className="mx-auto max-w-[1440px] px-4 pb-16 pt-5 sm:px-6 md:pl-20 lg:px-8 lg:pl-24">
             {children}

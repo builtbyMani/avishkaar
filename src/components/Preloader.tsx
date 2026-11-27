@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { usePreloadProgress } from "@/hooks/usePreloadProgress";
 import { PRELOADER_IMAGES } from "@/data/preloader-images";
+import { useApp } from "./AppProvider";
+import { AvishkaarLogo } from "./AvishkaarLogo";
 
 const WORD_LEFT = "AVISH";
 const WORD_RIGHT = "KAAR";
 const CYCLE_MS = 180;
 
 export default function Preloader() {
+  const { markPreloaderDone } = useApp();
   const [shouldShow, setShouldShow] = useState(false);
   const [done, setDone] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
@@ -18,14 +21,16 @@ export default function Preloader() {
   // Reduced motion gate + unmount overflow cleanup
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduced) {
+    if (reduced) {
+      markPreloaderDone();
+    } else {
       setShouldShow(true);
       document.body.style.overflow = "hidden";
     }
     return () => {
       document.body.style.overflow = "";
     };
-  }, []);
+  }, [markPreloaderDone]);
 
   // Cycle the photo window while visible
   useEffect(() => {
@@ -37,16 +42,17 @@ export default function Preloader() {
     return () => clearInterval(id);
   }, [shouldShow, done]);
 
-  // Finish: release scroll and trigger curtain exit
+  // Finish: release scroll, trigger curtain exit, and hand off logo to top-left Navbar
   useEffect(() => {
     if (progress >= 100 && shouldShow && !done) {
       const t = setTimeout(() => {
         setDone(true);
+        markPreloaderDone();
         document.body.style.overflow = "";
       }, 250);
       return () => clearTimeout(t);
     }
-  }, [progress, shouldShow, done]);
+  }, [progress, shouldShow, done, markPreloaderDone]);
 
   const letters = (word: string, offset: number) =>
     word.split("").map((ch, i) => (
@@ -69,13 +75,23 @@ export default function Preloader() {
     <AnimatePresence>
       {shouldShow && !done && (
         <motion.div
-          className="fixed inset-0 z-[100] flex flex-col justify-between bg-black text-white"
-          exit={{ y: "-100%" }}
-          transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+          className="fixed inset-0 z-[100] flex flex-col justify-between bg-[#1F271C] text-[#EAECE0]"
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           aria-hidden="true"
         >
-          {/* Centre wordmark + cycling photo window */}
-          <div className="flex flex-1 items-center justify-center overflow-hidden px-3">
+          {/* Centre wordmark + cycling photo window + shared logo mark */}
+          <div className="flex flex-1 flex-col items-center justify-center gap-5 overflow-hidden px-3">
+            <motion.div
+              layoutId="avishkaar-brand-mark"
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-2.5 rounded-full bg-[#EAECE0] px-4 py-1.5 text-[#1F271C]"
+            >
+              <AvishkaarLogo size={24} />
+              <span className="font-display text-lg font-bold tracking-tight">
+                Avishkaar
+              </span>
+            </motion.div>
             <div className="flex items-center font-[family-name:var(--font-preloader)] font-black uppercase leading-none tracking-tight text-[11vw] sm:text-[12vw] md:text-[9rem]">
               <span className="flex overflow-hidden">{letters(WORD_LEFT, 0)}</span>
               <motion.span

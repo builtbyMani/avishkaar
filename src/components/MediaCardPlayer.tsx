@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Film, Play, Pause, Volume2, VolumeX, Youtube } from "lucide-react";
+import { Film, Play, Pause, Volume2, VolumeX, Youtube } from "@/components/Icons";
 import type { MediaItem } from "@/types/domain";
 
 const FALLBACK_SVG =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" fill="none"><rect width="600" height="720" fill="#EAE2D6"/><path d="M0 540L160 360L290 480L430 300L600 500V720H0V540Z" fill="#1B3B36" fill-opacity="0.22"/><circle cx="450" cy="170" r="52" fill="#C85A32" fill-opacity="0.35"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" fill="none"><rect width="600" height="720" fill="#EAE2D6"/><path d="M0 540L160 360L290 480L430 300L600 500V720H0V540Z" fill="#6B1D2F" fill-opacity="0.22"/><circle cx="450" cy="170" r="52" fill="#C85A32" fill-opacity="0.35"/></svg>`,
   );
 
 export function extractYouTubeEmbedId(url: string): string | null {
@@ -73,7 +73,7 @@ export function MediaCardPlayer({
           allowFullScreen
           className="h-full w-full border-0"
         />
-        <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-red-600/90 px-2.5 py-1 text-[10px] font-bold text-white">
+        <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-stone-950/90 px-2.5 py-1 text-[10px] font-bold text-white">
           <Youtube className="h-3 w-3" />
           YouTube Short
         </span>
@@ -131,8 +131,8 @@ export function MediaCardPlayer({
           className="h-full w-full object-cover"
         />
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-2.5">
-          <span className="inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-xs">
-            <Film className="h-3 w-3 text-amber-300" />
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#2B141A]/90 px-2.5 py-1 text-[11px] font-semibold text-[#F5F0E6]">
+            <Film className="h-3 w-3 text-[#D9A12B]" />
             {playing ? "Playing" : "Hover Clip"}{" "}
             {media.durationSec ? `· 0:${String(media.durationSec).padStart(2, "0")}` : ""}
           </span>

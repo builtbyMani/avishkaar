@@ -1,0 +1,178 @@
+.hero-64 {
+  --ink: #2b141a;
+  --muted: #61454d;
+  --sub: #61454d;
+  --sage-deep: #6b1d2f;
+  --canvas: #f5f0e6;
+  --pad-x: clamp(20px, 4vw, 56px);
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  isolation: isolate;
+}
+
+.hero-64,
+.hero-64 * {
+  box-sizing: border-box;
+}
+.hero-64 a {
+  text-decoration: none;
+}
+
+.hero-64 .hero {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background-color: var(--canvas);
+}
+
+.hero-64 .nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(18px, 2.8vh, 32px) var(--pad-x) 0;
+  font-size: 14px;
+}
+
+.hero-64 .logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-64 .links {
+  display: flex;
+  gap: clamp(18px, 2.4vw, 36px);
+  color: var(--sub);
+}
+
+.hero-64 .links button,
+.hero-64 .links a {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.hero-64 .links .active,
+.hero-64 .links button:hover,
+.hero-64 .links a:hover {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.hero-64 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sage-deep);
+  color: #f5f0e6;
+  border: 1px solid var(--sage-deep);
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease;
+}
+.hero-64 .btn:hover {
+  background: #521523;
+  transform: translateY(-1px);
+}
+.hero-64 .btn-sm {
+  font-size: 13px;
+  padding: 10px 22px;
+}
+.hero-64 .btn-lg {
+  font-size: 13px;
+  padding: 12px 24px;
+  letter-spacing: 0.04em;
+}
+.hero-64 .btn-lg span {
+  margin-left: 0.45em;
+}
+
+.hero-64 .copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  padding: clamp(36px, 6vh, 64px) var(--pad-x) 0;
+}
+.hero-64 .copy h1 {
+  margin: 0;
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(36px, 4.8vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.hero-64 .copy h1 span {
+  font-family: var(--font-script), cursive;
+  font-weight: 400;
+  color: var(--muted);
+  padding: 0 0.08em;
+}
+.hero-64 .copy p.hero-lead {
+  margin: 0;
+  max-width: 44ch;
+  text-wrap: balance;
+  font-family: var(--font-rozha), Georgia, serif;
+  font-size: clamp(18px, 1.45vw, 24px);
+  line-height: 1.45;
+  color: var(--ink);
+}
+.hero-64 .copy p.hero-hindi {
+  margin: 4px 0 0;
+  font-family: var(--font-modak), sans-serif;
+  font-size: clamp(24px, 2.2vw, 34px);
+  line-height: 1.25;
+  color: var(--sage-deep);
+  letter-spacing: 0.01em;
+}
+.hero-64 .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.hero-64 .scene {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 52%;
+  z-index: 1;
+}
+.hero-64 .fade {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 46%;
+  background: linear-gradient(var(--canvas), rgba(245, 240, 230, 0));
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .hero-64 .links {
+    display: none;
+  }
+  .hero-64 .scene {
+    height: 52%;
+  }
+}

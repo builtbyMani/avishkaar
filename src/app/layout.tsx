@@ -1,17 +1,40 @@
 import type { Metadata } from "next";
-import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
+import { Archivo_Black, Instrument_Serif, Satisfy } from "next/font/google";
 import "./globals.css";
-import { AppProvider } from "@/components/AppProvider";
+import { AppProvider, MainShell } from "@/components/AppProvider";
 import { Navbar } from "@/components/Navbar";
+import Preloader from "@/components/Preloader";
 
-const sans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
+const rozha = localFont({
+  src: "./fonts/RozhaOne-Regular.ttf",
+  variable: "--font-rozha",
+  display: "swap",
 });
 
-const display = Fraunces({
+const modak = localFont({
+  src: "./fonts/Modak-Regular.ttf",
+  variable: "--font-modak",
+  display: "swap",
+});
+
+const display = Instrument_Serif({
   subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
   variable: "--font-display",
+});
+
+const script = Satisfy({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-script",
+});
+
+const preloader = Archivo_Black({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-preloader",
 });
 
 export const metadata: Metadata = {
@@ -26,13 +49,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sans.variable} ${display.variable}`}>
-      <body className="min-h-screen antialiased selection:bg-[#C85A32]/20">
+    <html
+      lang="en"
+      className={`${rozha.variable} ${modak.variable} ${display.variable} ${script.variable} ${preloader.variable}`}
+    >
+      <body className="min-h-dvh antialiased selection:bg-[#D9A12B]/25 selection:text-[#2B141A]">
         <AppProvider>
+          <Preloader />
           <Navbar />
-          <main className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
-            {children}
-          </main>
+          <MainShell>{children}</MainShell>
         </AppProvider>
       </body>
     </html>

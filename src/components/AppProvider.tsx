@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { LayoutGroup } from "motion/react";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import type { OfflinePocketCard, Profile } from "@/types/domain";
 import { AuthModal } from "./AuthModal";
@@ -14,6 +16,10 @@ interface AppContextValue {
   profiles: Profile[];
   mode: "supabase" | "demo";
   offlineCards: OfflinePocketCard[];
+  preloaderDone: boolean;
+  markPreloaderDone: () => void;
+  enteredHome: boolean;
+  enterHome: () => void;
   switchDemoUser: (userId: string) => void;
   refreshProfiles: () => Promise<void>;
   openAuthModal: () => void;
@@ -30,9 +36,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeUserId, setActiveUserId] = useState<string>(
     supabaseMode ? "" : DEFAULT_DEMO_USER_ID,
   );
+  const [authUserMeta, setAuthUserMeta] = useState<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  } | null>(null);
   const [mode, setMode] = useState<"supabase" | "demo">(supabaseMode ? "supabase" : "demo");
   const [offlineCards, setOfflineCards] = useState<OfflinePocketCard[]>([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [preloaderDone, setPreloaderDone] = useState(false);
+  const [enteredHome, setEnteredHome] = useState(false);
+  const markPreloaderDone = useCallback(() => setPreloaderDone(true), []);
+  const enterHome = useCallback(() => setEnteredHome(true), []);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -72,10 +87,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (supabaseMode) {
         const sb = getSupabaseBrowserClient();
         if (sb) {
+          const syncAuth = (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> } | null) => {
+            if (!user) {
+              setActiveUserId("");
+              setAuthUserMeta(null);
+              return;
+            }
+            const meta = user.user_metadata ?? {};
+            const name =
+              (typeof meta.full_name === "string" && meta.full_name) ||
+              (typeof meta.name === "string" && meta.name) ||
+              user.email?.split("@")[0] ||
+              "Traveler";
+            const avatarUrl =
+              typeof meta.avatar_url === "string" ? meta.avatar_url : undefined;
+            setActiveUserId(user.id);
+            setAuthUserMeta({ id: user.id, name, avatarUrl });
+          };
+
           const { data } = await sb.auth.getUser();
-          setActiveUserId(data.user?.id ?? "");
+          syncAuth(data.user);
           const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
-            setActiveUserId(session?.user?.id ?? "");
+            syncAuth(session?.user ?? null);
+            if (session?.user) {
+              void refreshProfiles();
+            }
           });
           unsubscribe = () => sub.subscription.unsubscribe();
         }
@@ -112,8 +148,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [offlineCards],
   );
 
-  const activeUser =
+  const activeUser: Profile | null =
     (activeUserId ? profiles.find((p) => p.id === activeUserId) : undefined) ??
+    (mode === "supabase" && authUserMeta
+      ? {
+          id: authUserMeta.id,
+          username: authUserMeta.name.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+          displayName: authUserMeta.name,
+          avatarUrl: authUserMeta.avatarUrl,
+          trailblazerScore: 0,
+          tier: "Wanderer",
+          isGuide: false,
+          isVerifiedLocal: false,
+          guideRegion: null,
+          languages: ["English"],
+        }
+      : undefined) ??
     (mode === "demo" ? profiles[profiles.length - 1] : null) ??
     null;
 
@@ -124,6 +174,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         profiles,
         mode,
         offlineCards,
+        preloaderDone,
+        markPreloaderDone,
+        enteredHome,
+        enterHome,
         switchDemoUser,
         refreshProfiles,
         openAuthModal: () => setAuthModalOpen(true),
@@ -132,7 +186,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         isSavedOffline,
       }}
     >
-      {children}
+      <LayoutGroup>
+        <div className="min-h-dvh w-full bg-[#F5F0E6]">
+          {children}
+        </div>
+      </LayoutGroup>
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </AppContext.Provider>
   );
@@ -142,4 +200,21 @@ export function useApp() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used inside AppProvider");
   return ctx;
+}
+
+export function MainShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const { enteredHome } = useApp();
+  const isLanding = pathname === "/" && !enteredHome;
+  return (
+    <main
+      className={
+        isLanding
+          ? "min-h-dvh w-full"
+          : "mx-auto max-w-[1440px] px-4 pb-16 pt-6 sm:px-6 md:pl-24 lg:px-8 lg:pl-28"
+      }
+    >
+      {children}
+    </main>
+  );
 }

@@ -1,24 +1,60 @@
 @import "tailwindcss";
+@import "./originkit-section-theme.css";
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --bg-parchment: #faf7f2;
-  --bg-surface: #ffffff;
-  --ink-forest: #1b3b36;
-  --ink-muted: #52635f;
-  --accent-terracotta: #c85a32;
-  --accent-amber: #d97706;
-  --border-warm: #e8e0d4;
+  /* 60% Neutral warm off-white · 30% Wine Red / deep burgundy · 10% Turmeric accent */
+  --bg-parchment: #f5f0e6;
+  --bg-surface: #faf7f0;
+  --bg-well: #ebe4d5;
+  --ink-forest: #2b141a;
+  --ink-muted: #61454d;
+  --sage-deep: #6b1d2f;
+  --accent-turmeric: #d9a12b;
+  --alert-brick: #a63d2a;
+  --border-warm: rgb(43 20 26 / 0.12);
+  --font-sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
 }
 
 body {
   background-color: var(--bg-parchment);
   color: var(--ink-forest);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sf);
+  caret-color: var(--sage-deep);
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: rgb(107 29 47 / 0.35) var(--bg-parchment);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 .font-display {
   font-family: var(--font-display), Georgia, serif;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.font-rozha {
+  font-family: var(--font-rozha), Georgia, serif;
+}
+
+.font-modak {
+  font-family: var(--font-modak), sans-serif;
+}
+
+.font-script {
+  font-family: var(--font-script), cursive;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
 }
 
 /* Fix Leaflet container z-index inside sticky header layouts */

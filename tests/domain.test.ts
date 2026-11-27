@@ -135,8 +135,8 @@ test("Community Safety Verify/Flag gate enforces Pathfinder+ or 2+ user verifica
   assert.equal(isSafetyAlertPublic(flaggedTwice), false);
 });
 
-test("Seed dataset has 18 destinations including Pandavula Gutta, Chettinad, Ziro Valley & public alerts", () => {
-  assert.equal(SEED_PLACES.length, 18);
+test("Seed dataset has 58 destinations including Pandavula Gutta, Chettinad, Ziro Valley & public alerts", () => {
+  assert.equal(SEED_PLACES.length, 58);
   const titles = SEED_PLACES.map((p) => p.title);
   assert.ok(titles.some((t) => t.includes("Pandavula Gutta")));
   assert.ok(titles.some((t) => t.includes("Chettinad")));
@@ -158,7 +158,7 @@ test("Seed dataset has 18 destinations including Pandavula Gutta, Chettinad, Zir
 });
 
 test("Shared domain constants, UPI formatting, and Gem Score breakdown match canonical values", () => {
-  assert.equal(REGIONS.length, 5);
+  assert.equal(REGIONS.length, 9);
   assert.equal(PLACE_CATEGORIES.length, 5);
   assert.equal(formatUpiHandle("Kago Stay Ziro", "kagostayziro@upi"), "kagostayziro@upi");
   assert.equal(formatUpiHandle("Mei Siew Kitchen & Stay"), "meisiewkitch@upi");

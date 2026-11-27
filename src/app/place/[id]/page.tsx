@@ -3,18 +3,20 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   AlertTriangle,
   ArrowLeft,
+  ArrowRight,
   BookmarkCheck,
   BookmarkPlus,
   Bus,
   Check,
   CheckCircle2,
   Compass,
-  Copy,
   Flag,
   HandHeart,
+  Info,
   Landmark,
   MapPin,
   MessageCircle,
@@ -27,14 +29,20 @@ import {
   UserCheck,
   Utensils,
   WifiOff,
-  X,
-} from "lucide-react";
+} from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import { formatUpiHandle, isSafetyAlertPublic } from "@/lib/domain";
+import {
+  FEEDBACK_TONE_STYLES,
+  GUIDE_MODULE_STYLES,
+  isSafetyAlertPublic,
+  PLACE_CATEGORY_STYLES,
+  TRAILBLAZER_TIER_STYLES,
+  type FeedbackMessage,
+} from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
-import type { EnrichedPlace, GuideRequest, LocalVendor, Profile, SafetyAlert, UserBadge } from "@/types/domain";
+import type { EnrichedPlace, GuideRequest, Profile, SafetyAlert, UserBadge } from "@/types/domain";
 
 export default function PlaceDetailPage() {
   const params = useParams<{ id: string }>();
@@ -57,9 +65,7 @@ export default function PlaceDetailPage() {
   const [preferredDate, setPreferredDate] = useState("2026-12-10");
   const [requestNotes, setRequestNotes] = useState("");
   const [submittingGuide, setSubmittingGuide] = useState(false);
-  const [upiVendor, setUpiVendor] = useState<LocalVendor | null>(null);
   const [activeMediaIdx, setActiveMediaIdx] = useState(0);
-  const [copiedUpi, setCopiedUpi] = useState(false);
 
   const loadPlace = useCallback(async () => {
     if (!placeId) return;
@@ -88,16 +94,15 @@ export default function PlaceDetailPage() {
   }, [loadPlace]);
 
   useEffect(() => {
-    if (!selectedGuide && !upiVendor) return;
+    if (!selectedGuide) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setSelectedGuide(null);
-        setUpiVendor(null);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedGuide, upiVendor]);
+  }, [selectedGuide]);
 
   async function handleVouch() {
     if (!activeUser || !place) return;
@@ -277,8 +282,9 @@ export default function PlaceDetailPage() {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 w-40 rounded bg-[#EAE2D6]" />
-        <div className="h-80 rounded-3xl bg-[#EAE2D6]" />
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="h-80 rounded-2xl bg-[#EAE2D6]" />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
           <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
           <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
           <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
@@ -290,7 +296,7 @@ export default function PlaceDetailPage() {
   if (!place) {
     return (
       <div className="rounded-2xl border border-[#E8E0D4] bg-white p-10 text-center">
-        <h1 className="font-display text-2xl font-bold text-[#1B3B36]">Place not found</h1>
+        <h1 className="font-display text-2xl font-bold text-[#6B1D2F]">Place not found</h1>
         <Link href="/" className="mt-4 inline-block text-sm font-bold text-[#C85A32] underline">
           Back to Discover
         </Link>
@@ -312,7 +318,7 @@ export default function PlaceDetailPage() {
       <div className="no-print flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#1B3B36] hover:text-[#C85A32]"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6B1D2F] hover:text-[#C85A32]"
         >
           <ArrowLeft className="h-4 w-4" /> Back to Discovery Feed
         </Link>
@@ -323,7 +329,7 @@ export default function PlaceDetailPage() {
             className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition ${
               savedOffline
                 ? "bg-emerald-700 text-white"
-                : "border border-[#E8E0D4] bg-white text-[#1B3B36] hover:border-[#1B3B36]"
+                : "border border-[#E8E0D4] bg-white text-[#6B1D2F] hover:border-[#6B1D2F]"
             }`}
           >
             {savedOffline ? <BookmarkCheck className="h-4 w-4" /> : <BookmarkPlus className="h-4 w-4" />}
@@ -332,7 +338,7 @@ export default function PlaceDetailPage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#E8E0D4] bg-white px-4 py-2 text-xs font-bold text-[#1B3B36] hover:bg-stone-50"
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#E8E0D4] bg-white px-4 py-2 text-xs font-bold text-[#6B1D2F] hover:bg-stone-50"
           >
             <Printer className="h-4 w-4" /> Print / PDF Card
           </button>
@@ -352,13 +358,23 @@ export default function PlaceDetailPage() {
       )}
 
       {/* Hero Header + Media */}
-      <section className="print-card overflow-hidden rounded-3xl border border-[#E8E0D4] bg-white shadow-xs">
+      <section className="print-card overflow-hidden rounded-2xl border border-black/12 bg-white">
         <div className="grid gap-0 lg:grid-cols-12">
           <div className="lg:col-span-7 space-y-2.5">
-            <MediaCardPlayer
-              media={place.media[activeMediaIdx] ?? place.media[0]}
-              title={place.title}
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeMediaIdx}
+                initial={{ opacity: 0.5, scale: 0.99 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0.5 }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <MediaCardPlayer
+                  media={place.media[activeMediaIdx] ?? place.media[0]}
+                  title={place.title}
+                />
+              </motion.div>
+            </AnimatePresence>
             {place.media.length > 1 && (
               <div className="no-print flex flex-wrap items-center gap-2 px-3 pb-2">
                 {place.media.map((item, idx) => (
@@ -368,8 +384,8 @@ export default function PlaceDetailPage() {
                     onClick={() => setActiveMediaIdx(idx)}
                     className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
                       idx === activeMediaIdx
-                        ? "border-[#1B3B36] bg-[#1B3B36] text-white"
-                        : "border-[#E8E0D4] bg-[#FAF7F2] text-[#1B3B36] hover:border-[#1B3B36]"
+                        ? "border-[#6B1D2F] bg-[#6B1D2F] text-white"
+                        : "border-[#E8E0D4] bg-[#FAF7F2] text-[#6B1D2F] hover:border-[#6B1D2F]"
                     }`}
                   >
                     {idx + 1}. {item.type === "video" ? "Clip" : "Photo"}
@@ -382,10 +398,12 @@ export default function PlaceDetailPage() {
           <div className="flex flex-col justify-between p-6 lg:col-span-5">
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#1B3B36] px-3 py-1 text-xs font-bold text-white">
+                <span className="rounded-full bg-[#6B1D2F] px-3 py-1 text-xs font-bold text-white">
                   Gem Score {place.hiddenGemScore}
                 </span>
-                <span className="rounded-full bg-[#FAF7F2] px-3 py-1 text-xs font-semibold text-[#1B3B36]">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${PLACE_CATEGORY_STYLES[place.category].badge}`}
+                >
                   {place.category}
                 </span>
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#52635F]">
@@ -394,14 +412,14 @@ export default function PlaceDetailPage() {
                 </span>
               </div>
 
-              <h1 className="font-display text-3xl font-bold text-[#1B3B36]">
+              <h1 className="font-display text-3xl font-bold text-[#6B1D2F]">
                 {place.title}
               </h1>
 
               <p className="text-sm leading-relaxed text-[#52635F]">{place.rawDescription}</p>
 
               <div className="rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] p-3 text-xs">
-                <div className="font-bold text-[#1B3B36]">
+                <div className="font-bold text-[#6B1D2F]">
                   Discovered by {place.author.displayName} ({place.author.tier} · {place.author.trailblazerScore} pts)
                 </div>
                 <div className="mt-1 text-[#52635F]">
@@ -438,16 +456,23 @@ export default function PlaceDetailPage() {
                   className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition ${
                     place.userHasCheckedIn
                       ? "border border-emerald-300 bg-emerald-50 text-emerald-900"
-                      : "border border-[#1B3B36] bg-white text-[#1B3B36] hover:bg-[#1B3B36] hover:text-white"
+                      : "border border-[#6B1D2F] bg-white text-[#6B1D2F] hover:bg-[#6B1D2F] hover:text-white"
                   }`}
                 >
-                  <Navigation className="h-4 w-4" />
-                  {place.userHasCheckedIn ? "Checked In ✓" : "Check In"}
+                  {place.userHasCheckedIn ? (
+                    <>
+                      <Check className="h-4 w-4" strokeWidth={2.25} /> Checked In
+                    </>
+                  ) : (
+                    <>
+                      <Navigation className="h-4 w-4" strokeWidth={2} /> Check In
+                    </>
+                  )}
                 </button>
               </div>
 
               <label className="flex cursor-pointer items-center justify-between rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] px-3 py-2 text-xs">
-                <span className="font-semibold text-[#1B3B36]">
+                <span className="font-semibold text-[#6B1D2F]">
                   Simulate GPS Check-In (Bypass radius for live judging)
                 </span>
                 <input
@@ -566,7 +591,7 @@ export default function PlaceDetailPage() {
       {/* Structured Commute, Food, Activity & Living Heritage Cards */}
       <section className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         <div className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-5">
-          <div className="flex items-center gap-2 text-[#1B3B36]">
+          <div className="flex items-center gap-2 text-[#6B1D2F]">
             <Bus className="h-5 w-5 text-[#C85A32]" />
             <h2 className="font-display text-lg font-bold">Last-Mile Commute</h2>
           </div>
@@ -581,7 +606,7 @@ export default function PlaceDetailPage() {
         </div>
 
         <div className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-5">
-          <div className="flex items-center gap-2 text-[#1B3B36]">
+          <div className="flex items-center gap-2 text-[#6B1D2F]">
             <Utensils className="h-5 w-5 text-[#C85A32]" />
             <h2 className="font-display text-lg font-bold">Must-Try Food</h2>
           </div>
@@ -589,7 +614,7 @@ export default function PlaceDetailPage() {
             {place.structuredCards.food.map((item, i) => (
               <div key={i} className="rounded-xl bg-[#FAF7F2] p-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-[#1B3B36]">{item.name}</span>
+                  <span className="text-sm font-bold text-[#6B1D2F]">{item.name}</span>
                   {item.priceHint && (
                     <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
                       {item.priceHint}
@@ -603,14 +628,14 @@ export default function PlaceDetailPage() {
         </div>
 
         <div className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-5">
-          <div className="flex items-center gap-2 text-[#1B3B36]">
+          <div className="flex items-center gap-2 text-[#6B1D2F]">
             <Compass className="h-5 w-5 text-[#C85A32]" />
             <h2 className="font-display text-lg font-bold">Local Activities</h2>
           </div>
           <ul className="mt-3 space-y-2.5 text-sm text-[#52635F]">
             {place.structuredCards.activities.map((act, i) => (
               <li key={i} className="flex gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1B3B36]" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#6B1D2F]" />
                 <span>{act}</span>
               </li>
             ))}
@@ -618,7 +643,7 @@ export default function PlaceDetailPage() {
         </div>
 
         <div className="print-card rounded-2xl border border-[#E8E0D4] bg-white p-5">
-          <div className="flex items-center gap-2 text-[#1B3B36]">
+          <div className="flex items-center gap-2 text-[#6B1D2F]">
             <Landmark className="h-5 w-5 text-[#C85A32]" />
             <h2 className="font-display text-lg font-bold">Living Heritage &amp; Etiquette</h2>
           </div>
@@ -644,7 +669,7 @@ export default function PlaceDetailPage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Store className="h-5 w-5 text-[#D97706]" />
-            <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+            <h2 className="font-display text-2xl font-bold text-[#6B1D2F]">
               Zero-Commission &ldquo;Support Local&rdquo; Cards
             </h2>
           </div>
@@ -663,7 +688,6 @@ export default function PlaceDetailPage() {
             {place.localVendors.map((v) => {
               const phoneDigits = (v.whatsapp || v.contact).replace(/[^\d+]/g, "");
               const waDigits = phoneDigits.replace(/^\+/, "");
-              const upiHandle = formatUpiHandle(v.name, v.upiId);
               return (
                 <div
                   key={v.id}
@@ -671,13 +695,13 @@ export default function PlaceDetailPage() {
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-bold text-[#1B3B36]">{v.name}</span>
+                      <span className="font-bold text-[#6B1D2F]">{v.name}</span>
                       <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-bold text-amber-900">
                         {v.category}
                       </span>
                     </div>
                     <p className="mt-1.5 text-xs text-[#52635F]">{v.specialty}</p>
-                    <p className="mt-2 text-xs font-semibold text-[#1B3B36]">
+                    <p className="mt-2 text-xs font-semibold text-[#6B1D2F]">
                       {v.contact} · {v.lat.toFixed(4)}, {v.lng.toFixed(4)}
                     </p>
                   </div>
@@ -686,7 +710,7 @@ export default function PlaceDetailPage() {
                       href={`https://www.openstreetmap.org/directions?to=${v.lat},${v.lng}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg bg-[#1B3B36] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#C85A32]"
+                      className="inline-flex items-center gap-1 rounded-lg bg-[#6B1D2F] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#C85A32]"
                     >
                       <Navigation className="h-3 w-3" /> Navigate to Pin
                     </a>
@@ -703,21 +727,11 @@ export default function PlaceDetailPage() {
                     {phoneDigits.length >= 6 ? (
                       <a
                         href={`tel:${phoneDigits}`}
-                        className="inline-flex items-center gap-1 rounded-lg border border-[#E8E0D4] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#1B3B36] hover:bg-stone-50"
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#E8E0D4] bg-white px-2.5 py-1.5 text-[11px] font-bold text-[#6B1D2F] hover:bg-stone-50"
                       >
                         <Phone className="h-3 w-3" /> Call
                       </a>
                     ) : null}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCopiedUpi(false);
-                        setUpiVendor({ ...v, upiId: upiHandle });
-                      }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-bold text-amber-950 hover:bg-amber-100"
-                    >
-                      <Copy className="h-3 w-3" /> Direct UPI Pay
-                    </button>
                   </div>
                 </div>
               );
@@ -728,7 +742,7 @@ export default function PlaceDetailPage() {
 
       {/* Interactive Leaflet Map */}
       <section className="no-print space-y-3">
-        <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+        <h2 className="font-display text-2xl font-bold text-[#6B1D2F]">
           Interactive Area &amp; Safety Map
         </h2>
         <LeafletMap
@@ -746,19 +760,20 @@ export default function PlaceDetailPage() {
           <div>
             <div className="flex items-center gap-2">
               <UserCheck className="h-5 w-5 text-emerald-700" />
-              <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+              <h2 className="font-display text-2xl font-bold text-[#6B1D2F]">
                 Trust-Gated Volunteer Local Guides
               </h2>
             </div>
-            <p className="mt-1 text-sm text-[#52635F]">
-              Only Pathfinder (100+ pts), Local Legend (300+ pts), or verified locals can guide in {place.region}.
+            <p className="mt-1 text-sm text-[#566151]">
+              Only Field Scouts (100+ pts), Regional Stewards (300+ pts), or verified locals can guide in {place.region}.
             </p>
           </div>
           <Link
             href="/profile"
-            className="text-xs font-bold text-[#C85A32] hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-bold text-[#C85A32] hover:underline"
           >
-            Volunteer as a Guide →
+            Volunteer as a Guide
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
           </Link>
         </div>
 
@@ -775,7 +790,7 @@ export default function PlaceDetailPage() {
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-[#1B3B36]">{guide.displayName}</span>
+                    <span className="font-bold text-[#6B1D2F]">{guide.displayName}</span>
                     <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-900">
                       {guide.tier} · {guide.trailblazerScore} pts
                     </span>
@@ -787,7 +802,7 @@ export default function PlaceDetailPage() {
                 <button
                   type="button"
                   onClick={() => setSelectedGuide(guide)}
-                  className="mt-4 rounded-lg bg-[#1B3B36] px-4 py-2 text-xs font-bold text-white hover:bg-[#C85A32]"
+                  className="mt-4 rounded-lg bg-[#6B1D2F] px-4 py-2 text-xs font-bold text-white hover:bg-[#C85A32]"
                 >
                   Request Guide
                 </button>
@@ -807,7 +822,7 @@ export default function PlaceDetailPage() {
                   key={req.id}
                   className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E8E0D4] bg-white px-3.5 py-2.5 text-xs"
                 >
-                  <span className="text-[#1B3B36]">
+                  <span className="text-[#6B1D2F]">
                     <strong>{req.preferredDate || "Flexible"}</strong> — {req.notes}
                   </span>
                   <span
@@ -829,7 +844,7 @@ export default function PlaceDetailPage() {
       {/* Request Guide Modal */}
       {selectedGuide && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedGuide(null);
           }}
@@ -839,16 +854,16 @@ export default function PlaceDetailPage() {
             aria-modal="true"
             aria-labelledby="guide-modal-title"
             onSubmit={handleGuideRequestSubmit}
-            className="w-full max-w-md space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl"
+            className="animate-panel-in w-full max-w-md space-y-4 rounded-2xl border border-black/20 bg-[#FAF7F2] p-6 shadow-none"
           >
-            <h3 id="guide-modal-title" className="font-display text-xl font-bold text-[#1B3B36]">
+            <h3 id="guide-modal-title" className="font-display text-xl font-bold text-[#6B1D2F]">
               Request Guide: {selectedGuide.displayName}
             </h3>
             <p className="text-xs text-[#52635F]">
               Speaks {selectedGuide.languages.join(", ")} · {place.title}
             </p>
             <div>
-              <label className="block text-xs font-bold text-[#1B3B36]">Preferred Date</label>
+              <label className="block text-xs font-bold text-[#6B1D2F]">Preferred Date</label>
               <input
                 type="date"
                 required
@@ -858,7 +873,7 @@ export default function PlaceDetailPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#1B3B36]">Trip Notes</label>
+              <label className="block text-xs font-bold text-[#6B1D2F]">Trip Notes</label>
               <textarea
                 required
                 rows={3}
@@ -872,7 +887,7 @@ export default function PlaceDetailPage() {
               <button
                 type="button"
                 onClick={() => setSelectedGuide(null)}
-                className="rounded-lg border border-[#E8E0D4] bg-white px-4 py-2 text-xs font-bold text-[#1B3B36]"
+                className="rounded-lg border border-[#E8E0D4] bg-white px-4 py-2 text-xs font-bold text-[#6B1D2F]"
               >
                 Cancel
               </button>
@@ -885,75 +900,6 @@ export default function PlaceDetailPage() {
               </button>
             </div>
           </form>
-        </div>
-      )}
-
-      {/* Zero-Commission Direct UPI Pay Modal */}
-      {upiVendor && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setUpiVendor(null);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="upi-modal-title"
-            className="relative w-full max-w-sm space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 text-center shadow-2xl"
-          >
-            <button
-              type="button"
-              onClick={() => setUpiVendor(null)}
-              className="absolute right-4 top-4 rounded-full p-1 text-[#52635F] hover:bg-[#E8E0D4]"
-              aria-label="Close UPI payment dialog"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900">
-              0% Platform Commission · Direct to Local
-            </span>
-            <h3 id="upi-modal-title" className="font-display text-xl font-bold text-[#1B3B36]">
-              {upiVendor.name}
-            </h3>
-            <p className="text-xs text-[#52635F]">{upiVendor.specialty}</p>
-            <div className="rounded-xl border border-[#E8E0D4] bg-white p-3.5 text-left space-y-2">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#52635F]">
-                Verified Direct UPI ID
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-mono text-sm font-bold text-[#1B3B36]">
-                  {upiVendor.upiId}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (upiVendor.upiId) {
-                      void navigator.clipboard?.writeText(upiVendor.upiId);
-                      setCopiedUpi(true);
-                    }
-                  }}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#E8E0D4] bg-[#FAF7F2] px-2.5 py-1 text-xs font-bold text-[#1B3B36] hover:bg-[#E8E0D4]"
-                >
-                  {copiedUpi ? (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-emerald-700" /> Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" /> Copy
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-            <a
-              href={`upi://pay?pa=${encodeURIComponent(upiVendor.upiId || "")}&pn=${encodeURIComponent(upiVendor.name)}&cu=INR`}
-              className="block w-full rounded-xl bg-[#1B3B36] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#C85A32]"
-            >
-              Open in UPI App
-            </a>
-          </div>
         </div>
       )}
     </div>

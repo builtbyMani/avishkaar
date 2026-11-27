@@ -175,6 +175,10 @@ begin
     raise exception 'Place not found';
   end if;
 
+  if v_author_id = p_user_id then
+    raise exception 'You cannot check in to your own place';
+  end if;
+
   select * into v_existing from public.vouches where place_id = p_place_id and user_id = p_user_id;
 
   if v_existing.id is null then
@@ -226,6 +230,10 @@ begin
   select author_id into v_author_id from public.places where id = p_place_id;
   if v_author_id is null then
     raise exception 'Place not found';
+  end if;
+
+  if v_author_id = p_user_id then
+    raise exception 'You cannot vouch for your own place';
   end if;
 
   select * into v_existing from public.vouches where place_id = p_place_id and user_id = p_user_id;

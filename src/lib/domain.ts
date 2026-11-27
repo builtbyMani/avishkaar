@@ -15,6 +15,10 @@ export const REGIONS = [
   "Deccan & Western Ghats",
   "Kutch & Thar",
   "Malabar & Konkan",
+  "Western Himalaya",
+  "Gangetic Plains & Bundelkhand",
+  "Central India & Deccan",
+  "Bengal, Odisha & the East",
 ] as const;
 
 export const PLACE_CATEGORIES: readonly PlaceCategory[] = [
@@ -277,4 +281,163 @@ export function isDemoCheckInAllowed(env: {
   // In production it requires an explicit opt-in, e.g. on a judging deployment.
   if (env.NODE_ENV === "production") return env.ALLOW_DEMO_CHECKIN === "true";
   return true;
+}
+
+export const PLACE_CATEGORY_STYLES: Record<
+  PlaceCategory,
+  { pillIdle: string; pillActive: string; badge: string }
+> = {
+  "Hidden Village": {
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]",
+    pillActive: "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#2B141A]",
+  },
+  "Regional Cuisine": {
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]",
+    pillActive: "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#2B141A]",
+  },
+  "Living Heritage": {
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]",
+    pillActive: "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#2B141A]",
+  },
+  "Sacred & Craft": {
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]",
+    pillActive: "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#2B141A]",
+  },
+  "Nature & Trail": {
+    pillIdle: "border-black/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]",
+    pillActive: "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]",
+    badge: "border border-[#D9A12B]/40 bg-[#D9A12B]/15 text-[#2B141A]",
+  },
+};
+
+export const REGION_STYLES: Record<
+  string,
+  { cardBg: string; border: string; pill: string; dot: string }
+> = {
+  "Spiti & Kinnaur": {
+    cardBg: "bg-[#F7F4EC]",
+    border: "border-[#2B141A]/12",
+    pill: "bg-[#EAE5D8] text-[#2B141A]",
+    dot: "bg-[#6B1D2F]",
+  },
+  "Meghalaya & Northeast": {
+    cardBg: "bg-[#F3EAEB]",
+    border: "border-[#6B1D2F]/16",
+    pill: "bg-[#EAD9DC] text-[#2B141A]",
+    dot: "bg-[#6B1D2F]",
+  },
+  "Deccan & Western Ghats": {
+    cardBg: "bg-[#F5EDE1]",
+    border: "border-[#2B141A]/12",
+    pill: "bg-[#EAE0CE] text-[#2B141A]",
+    dot: "bg-[#D9A12B]",
+  },
+  "Kutch & Thar": {
+    cardBg: "bg-[#F7F0DE]",
+    border: "border-[#D9A12B]/28",
+    pill: "bg-[#EFE3C2] text-[#2B141A]",
+    dot: "bg-[#D9A12B]",
+  },
+  "Malabar & Konkan": {
+    cardBg: "bg-[#F4ECEE]",
+    border: "border-[#6B1D2F]/14",
+    pill: "bg-[#EBDCE0] text-[#2B141A]",
+    dot: "bg-[#6B1D2F]",
+  },
+};
+
+export function getRegionStyle(region: string) {
+  return (
+    REGION_STYLES[region] ?? {
+      cardBg: "bg-[#FAF7F0]",
+      border: "border-[#2B141A]/12",
+      pill: "bg-[#EBE4D5] text-[#2B141A]",
+      dot: "bg-[#6B1D2F]",
+    }
+  );
+}
+
+export const TIER_DISPLAY_LABELS: Record<TrailblazerTier, string> = {
+  Wanderer: "Explorer",
+  Pathfinder: "Field Scout",
+  "Local Legend": "Regional Steward",
+};
+
+export function getTierDisplayLabel(tier: TrailblazerTier): string {
+  return TIER_DISPLAY_LABELS[tier] ?? tier;
+}
+
+export const TRAILBLAZER_TIER_STYLES: Record<
+  TrailblazerTier,
+  { badge: string; progressFill: string; cardRing: string }
+> = {
+  Wanderer: {
+    badge: "border-[#2B141A]/15 bg-[#FAF7F0] text-[#61454D]",
+    progressFill: "bg-[#61454D]",
+    cardRing: "border-[#2B141A]/20",
+  },
+  Pathfinder: {
+    badge: "border-[#6B1D2F]/25 bg-[#EFE3E6] text-[#6B1D2F]",
+    progressFill: "bg-[#6B1D2F]",
+    cardRing: "border-[#6B1D2F]",
+  },
+  "Local Legend": {
+    badge: "border-[#D9A12B]/50 bg-[#D9A12B]/15 text-[#2B141A]",
+    progressFill: "bg-[#6B1D2F]",
+    cardRing: "border-[#D9A12B]",
+  },
+};
+
+export type FeedbackTone = "success" | "error" | "info";
+
+export interface FeedbackMessage {
+  kind: FeedbackTone;
+  text: string;
+}
+
+export const FEEDBACK_TONE_STYLES: Record<FeedbackTone, string> = {
+  success: "border-[#6B1D2F]/25 bg-[#F1E6E8] text-[#2B141A]",
+  error: "border-[#A63D2A]/35 bg-[#F8EAE6] text-[#A63D2A]",
+  info: "border-[#2B141A]/15 bg-[#FAF7F0] text-[#2B141A]",
+};
+
+export type GuideModuleKey = "commute" | "food" | "activities" | "livingHeritage";
+
+export const GUIDE_MODULE_STYLES: Record<
+  GuideModuleKey,
+  { card: string; offline: string; icon: string }
+> = {
+  commute: {
+    card: "border-l-4 border-l-slate-600",
+    offline: "border-l-2 border-l-slate-600 pl-3",
+    icon: "text-slate-700",
+  },
+  food: {
+    card: "border-l-4 border-l-[#C85A32]",
+    offline: "border-l-2 border-l-[#C85A32] pl-3",
+    icon: "text-[#C85A32]",
+  },
+  activities: {
+    card: "border-l-4 border-l-teal-700",
+    offline: "border-l-2 border-l-teal-700 pl-3",
+    icon: "text-teal-700",
+  },
+  livingHeritage: {
+    card: "border-l-4 border-l-amber-600",
+    offline: "border-l-2 border-l-amber-600 pl-3",
+    icon: "text-amber-700",
+  },
+};
+
+export function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }

@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import {
   SEED_BADGES,
   SEED_GUIDE_REQUESTS,
@@ -7,6 +8,13 @@ import {
 } from "../src/data/seed";
 import { toSupabasePlaceRow } from "../src/lib/store";
 import { getSupabaseServerClient } from "../src/lib/supabase";
+
+if (existsSync(".env.local")) {
+  process.loadEnvFile?.(".env.local");
+}
+if (existsSync(".env")) {
+  process.loadEnvFile?.(".env");
+}
 
 async function main() {
   const sb = getSupabaseServerClient();

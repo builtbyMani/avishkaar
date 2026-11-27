@@ -23,11 +23,50 @@
 
 .hero-64 .hero {
   position: relative;
-  min-height: clamp(460px, 64dvh, 620px);
+  min-height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+
+.hero-64 .nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(18px, 2.8vh, 32px) var(--pad-x) 0;
+  font-size: 14px;
+}
+
+.hero-64 .logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-64 .links {
+  display: flex;
+  gap: clamp(18px, 2.4vw, 36px);
+  color: var(--sub);
+}
+
+.hero-64 .links button,
+.hero-64 .links a {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.hero-64 .links .active,
+.hero-64 .links button:hover,
+.hero-64 .links a:hover {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .hero-64 .btn {
@@ -41,20 +80,16 @@
   font-weight: 600;
   line-height: 1.2;
   white-space: nowrap;
+  cursor: pointer;
   transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease;
 }
 .hero-64 .btn:hover {
   background: #2f4029;
   transform: translateY(-1px);
 }
-.hero-64 .btn-outline {
-  background: rgb(244 245 237 / 0.85);
-  color: var(--ink);
-  border-color: rgb(31 39 28 / 0.18);
-}
-.hero-64 .btn-outline:hover {
-  background: #f4f5ed;
-  border-color: var(--sage-deep);
+.hero-64 .btn-sm {
+  font-size: 13px;
+  padding: 10px 22px;
 }
 .hero-64 .btn-lg {
   font-size: 13px;
@@ -123,11 +158,11 @@
   pointer-events: none;
 }
 
-@media (max-width: 640px) {
-  .hero-64 .hero {
-    min-height: 440px;
+@media (max-width: 760px) {
+  .hero-64 .links {
+    display: none;
   }
   .hero-64 .scene {
-    height: 48%;
+    height: 52%;
   }
 }

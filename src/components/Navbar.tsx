@@ -21,7 +21,7 @@ import { ScrollProgressBar } from "./ScrollProgressBar";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { activeUser, offlineCards, openAuthModal, preloaderDone } = useApp();
+  const { activeUser, offlineCards, openAuthModal, preloaderDone, enteredHome } = useApp();
   const [impactOpen, setImpactOpen] = useState(false);
 
   useEffect(() => {
@@ -32,6 +32,10 @@ export function Navbar() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [impactOpen]);
+
+  if (pathname === "/" && !enteredHome) {
+    return null;
+  }
 
   const navItems = [
     { href: "/", label: "Discover", icon: Compass },

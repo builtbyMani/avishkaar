@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo_Black, Fraunces, Plus_Jakarta_Sans, Satisfy } from "next/font/google";
 import "./globals.css";
-import { AppProvider } from "@/components/AppProvider";
+import { AppProvider, MainShell } from "@/components/AppProvider";
 import { Navbar } from "@/components/Navbar";
 import Preloader from "@/components/Preloader";
 
@@ -47,9 +47,7 @@ export default function RootLayout({
         <AppProvider>
           <Preloader />
           <Navbar />
-          <main className="mx-auto max-w-[1440px] px-4 pb-16 pt-5 sm:px-6 md:pl-20 lg:px-8 lg:pl-24">
-            {children}
-          </main>
+          <MainShell>{children}</MainShell>
         </AppProvider>
       </body>
     </html>

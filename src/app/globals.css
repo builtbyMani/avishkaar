@@ -49,6 +49,15 @@ html {
   outline-offset: 2px;
 }
 
+.paper-bg {
+  background-color: var(--bg-parchment);
+  background-image:
+    linear-gradient(rgba(234, 236, 224, 0.58), rgba(234, 236, 224, 0.58)),
+    url("/images/paper-bg.jpg");
+  background-size: 480px 480px;
+  background-repeat: repeat;
+}
+
 /* Fix Leaflet container z-index inside sticky header layouts */
 .leaflet-container {
   z-index: 10;

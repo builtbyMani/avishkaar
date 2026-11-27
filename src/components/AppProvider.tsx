@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { LayoutGroup } from "motion/react";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import type { OfflinePocketCard, Profile } from "@/types/domain";
@@ -17,6 +18,8 @@ interface AppContextValue {
   offlineCards: OfflinePocketCard[];
   preloaderDone: boolean;
   markPreloaderDone: () => void;
+  enteredHome: boolean;
+  enterHome: () => void;
   switchDemoUser: (userId: string) => void;
   refreshProfiles: () => Promise<void>;
   openAuthModal: () => void;
@@ -37,7 +40,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [offlineCards, setOfflineCards] = useState<OfflinePocketCard[]>([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [preloaderDone, setPreloaderDone] = useState(false);
+  const [enteredHome, setEnteredHome] = useState(false);
   const markPreloaderDone = useCallback(() => setPreloaderDone(true), []);
+  const enterHome = useCallback(() => setEnteredHome(true), []);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -122,6 +127,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (mode === "demo" ? profiles[profiles.length - 1] : null) ??
     null;
 
+  const pathname = usePathname();
+  const isLanding = pathname === "/" && !enteredHome;
+
   return (
     <AppContext.Provider
       value={{
@@ -131,6 +139,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         offlineCards,
         preloaderDone,
         markPreloaderDone,
+        enteredHome,
+        enterHome,
         switchDemoUser,
         refreshProfiles,
         openAuthModal: () => setAuthModalOpen(true),
@@ -139,7 +149,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         isSavedOffline,
       }}
     >
-      <LayoutGroup>{children}</LayoutGroup>
+      <LayoutGroup>
+        <div className={isLanding ? "min-h-dvh w-full" : "paper-bg min-h-dvh w-full"}>
+          {children}
+        </div>
+      </LayoutGroup>
       <AuthModal open={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </AppContext.Provider>
   );
@@ -149,4 +163,21 @@ export function useApp() {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used inside AppProvider");
   return ctx;
+}
+
+export function MainShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const { enteredHome } = useApp();
+  const isLanding = pathname === "/" && !enteredHome;
+  return (
+    <main
+      className={
+        isLanding
+          ? "min-h-dvh w-full"
+          : "mx-auto max-w-[1440px] px-4 pb-16 pt-5 sm:px-6 md:pl-20 lg:px-8 lg:pl-24"
+      }
+    >
+      {children}
+    </main>
+  );
 }

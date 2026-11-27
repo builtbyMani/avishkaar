@@ -3,11 +3,60 @@
 // @ts-nocheck
 "use client";
 import Link from "next/link";
+import { motion } from "motion/react";
+import { useApp } from "@/components/AppProvider";
+import { AvishkaarLogo } from "@/components/AvishkaarLogo";
 import StillSunsetMeadow from "@/components/originkit/ui/hero-64/still-sunset-meadow";
 
 export default function Hero() {
+  const { enterHome, openAuthModal, activeUser, preloaderDone } = useApp();
+
   return (
     <section className="hero">
+      <header className="nav">
+        <a
+          className="logo"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            enterHome();
+          }}
+        >
+          {preloaderDone ? (
+            <motion.div
+              layoutId="avishkaar-brand-mark"
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-2"
+            >
+              <AvishkaarLogo size={24} />
+              <span className="font-display text-xl font-bold tracking-tight text-[#1F271C]">
+                Avishkaar
+              </span>
+            </motion.div>
+          ) : (
+            <div className="flex items-center gap-2 opacity-0" aria-hidden="true">
+              <AvishkaarLogo size={24} />
+              <span className="font-display text-xl font-bold tracking-tight">
+                Avishkaar
+              </span>
+            </div>
+          )}
+        </a>
+
+        <nav className="links" aria-label="Primary">
+          <button type="button" onClick={enterHome} className="active">
+            Discover
+          </button>
+          <Link href="/submit">Post Gem</Link>
+          <Link href="/offline">Saved</Link>
+          <Link href="/profile">Profile</Link>
+        </nav>
+
+        <button type="button" onClick={openAuthModal} className="btn btn-sm">
+          {activeUser ? activeUser.displayName.split(" ")[0] : "Sign In"}
+        </button>
+      </header>
+
       <div className="copy">
         <h1 className="font-display">
           Places <span className="font-script">off the</span> beaten path.
@@ -16,23 +65,18 @@ export default function Hero() {
           Community-verified villages, regional kitchens, and living heritage — ranked by
           Hidden Gem Score, never tourist traps.
         </p>
-        <div className="cta-row">
-          <a className="btn btn-lg" href="#discover-feed">
-            Explore Gems <span aria-hidden="true">→</span>
-          </a>
-          <Link className="btn btn-outline btn-lg" href="/submit">
-            Post a Gem
-          </Link>
-        </div>
+        <button type="button" onClick={enterHome} className="btn btn-lg">
+          Explore Gems <span aria-hidden="true">→</span>
+        </button>
       </div>
 
       <div className="scene" aria-hidden="true">
         <StillSunsetMeadow
-          sky={{ top: "#EAECE0", horizon: "#DDE3CB", glow: "#F2E2BA" }}
+          sky={{ top: "#EAECE0", horizon: "#F5DFC2", glow: "#FFD9A8" }}
           haze={4}
-          speed={16}
-          hover={16}
-          cloudSpeed={5}
+          speed={20}
+          hover={20}
+          cloudSpeed={6}
         />
         <div className="fade" />
       </div>

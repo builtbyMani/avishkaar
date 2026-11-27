@@ -54,7 +54,7 @@ const QUICK_DETOURS = ["Ooty", "Goa", "Hampi"];
 const CATEGORIES: Array<"All" | PlaceCategory> = ["All", ...PLACE_CATEGORIES];
 
 export default function DiscoverPage() {
-  const { activeUser, refreshProfiles } = useApp();
+  const { activeUser, refreshProfiles, enteredHome } = useApp();
   const [places, setPlaces] = useState<EnrichedPlace[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<"All" | PlaceCategory>("All");
@@ -166,12 +166,12 @@ export default function DiscoverPage() {
     }
   }
 
+  if (!enteredHome) {
+    return <Hero64 />;
+  }
+
   return (
     <div className="space-y-6">
-      <div className="overflow-hidden rounded-3xl border border-black/12 bg-[#EAECE0]">
-        <Hero64 />
-      </div>
-
       {/* Top Search & Action Strip */}
       <section id="discover-feed" className="scroll-mt-20 space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

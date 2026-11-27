@@ -126,7 +126,7 @@ export default function ProfilePage() {
           <button
             type="button"
             onClick={openAuthModal}
-            className="tactile-press min-h-10 rounded-full border border-black/12 bg-[#FAF7F2] px-4 py-2 text-xs font-bold text-[#1B3B36] hover:border-[#1B3B36]"
+            className="tactile-press min-h-10 rounded-full border border-black/12 bg-[#FAF7F2] px-4 py-2 text-xs font-bold text-[#6B1D2F] hover:border-[#6B1D2F]"
           >
             Account &amp; Profiles
           </button>
@@ -159,7 +159,7 @@ export default function ProfilePage() {
       <section className="rounded-2xl border border-black/12 bg-white p-5">
         <div className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-[#D97706]" strokeWidth={2} />
-          <h2 className="font-display text-2xl font-bold text-[#1B3B36]">Trophy Shelf</h2>
+          <h2 className="font-display text-2xl font-bold text-[#6B1D2F]">Trophy Shelf</h2>
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {[
@@ -196,7 +196,7 @@ export default function ProfilePage() {
               >
                 <div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-[#1B3B36]">{b.name}</span>
+                    <span className="font-bold text-[#6B1D2F]">{b.name}</span>
                     {unlocked ? (
                       <ShieldCheck className="h-5 w-5 text-amber-600" strokeWidth={2} />
                     ) : (
@@ -222,7 +222,7 @@ export default function ProfilePage() {
       <section className="rounded-2xl border border-[#E8E0D4] bg-white p-6">
         <div className="flex items-center gap-2">
           <UserCheck className="h-5 w-5 text-emerald-700" />
-          <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+          <h2 className="font-display text-2xl font-bold text-[#6B1D2F]">
             Volunteer as a Local Guide (Trust-Gated)
           </h2>
         </div>
@@ -239,12 +239,12 @@ export default function ProfilePage() {
           </div>
         ) : (
           <form onSubmit={handleSaveGuide} className="mt-4 grid gap-4 sm:grid-cols-3">
-            <label className="flex items-center gap-2.5 rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-3 text-sm font-bold text-[#1B3B36]">
+            <label className="flex items-center gap-2.5 rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-3 text-sm font-bold text-[#6B1D2F]">
               <input
                 type="checkbox"
                 checked={isGuide}
                 onChange={(e) => setIsGuide(e.target.checked)}
-                className="h-4 w-4 accent-[#1B3B36]"
+                className="h-4 w-4 accent-[#6B1D2F]"
               />
               Volunteer as Guide
             </label>
@@ -267,7 +267,7 @@ export default function ProfilePage() {
             />
             <button
               type="submit"
-              className="rounded-xl bg-[#1B3B36] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#C85A32] sm:col-span-3 sm:w-fit"
+              className="rounded-xl bg-[#6B1D2F] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#C85A32] sm:col-span-3 sm:w-fit"
             >
               Save Guide Preferences
             </button>
@@ -277,7 +277,7 @@ export default function ProfilePage() {
 
       {/* Guide Requests */}
       <section className="rounded-2xl border border-[#E8E0D4] bg-white p-6">
-        <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+        <h2 className="font-display text-2xl font-bold text-[#6B1D2F]">
           Guide Requests ({requests.length})
         </h2>
         {requests.length === 0 ? (
@@ -290,7 +290,7 @@ export default function ProfilePage() {
                 className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] p-4 text-sm"
               >
                 <div>
-                  <div className="font-bold text-[#1B3B36]">
+                  <div className="font-bold text-[#6B1D2F]">
                     Date: {r.preferredDate || "Flexible"} ·{" "}
                     <Link href={`/place/${r.placeId}`} className="text-[#C85A32] underline">
                       View Place
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => void handleAcceptRequest(r.id)}
-                      className="rounded-lg bg-[#1B3B36] px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
+                      className="rounded-lg bg-[#6B1D2F] px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-700"
                     >
                       Accept
                     </button>
@@ -326,7 +326,7 @@ export default function ProfilePage() {
 
       {/* Authored Destinations */}
       <section className="rounded-2xl border border-[#E8E0D4] bg-white p-6">
-        <h2 className="font-display text-xl font-bold text-[#1B3B36]">
+        <h2 className="font-display text-xl font-bold text-[#6B1D2F]">
           Your Discovered Spots ({authoredPlaces.length})
         </h2>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -334,7 +334,7 @@ export default function ProfilePage() {
             <Link
               key={p.id}
               href={`/place/${p.id}`}
-              className="rounded-full border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-1.5 text-xs font-semibold text-[#1B3B36] hover:border-[#C85A32]"
+              className="rounded-full border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-1.5 text-xs font-semibold text-[#6B1D2F] hover:border-[#C85A32]"
             >
               {p.title} · Gem {p.hiddenGemScore}
             </Link>

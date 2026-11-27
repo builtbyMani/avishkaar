@@ -1,12 +1,12 @@
 "use client";
 
 const MEMOJI_THEMES = [
-  { bg: "#FDE6D8", skin: "#D99B72", hair: "#2B1E1A", shirt: "#1B3B36", glasses: false, cap: false },
+  { bg: "#FDE6D8", skin: "#D99B72", hair: "#2B1E1A", shirt: "#6B1D2F", glasses: false, cap: false },
   { bg: "#DCECE7", skin: "#C6865C", hair: "#1C1917", shirt: "#C85A32", glasses: true, cap: false },
   { bg: "#E6E4F0", skin: "#E8B491", hair: "#4A2C20", shirt: "#334155", glasses: false, cap: true },
   { bg: "#F5E8C7", skin: "#B8744B", hair: "#1E1B18", shirt: "#0F766E", glasses: true, cap: false },
   { bg: "#E2ECE9", skin: "#E0AC8B", hair: "#2D232E", shirt: "#9A3412", glasses: false, cap: false },
-  { bg: "#FCE7F3", skin: "#C98C63", hair: "#3B2820", shirt: "#1B3B36", glasses: false, cap: true },
+  { bg: "#FCE7F3", skin: "#C98C63", hair: "#3B2820", shirt: "#6B1D2F", glasses: false, cap: true },
 ];
 
 function hashIndex(seed: string): number {
@@ -53,7 +53,7 @@ export function MemojiAvatar({
       {theme.cap ? (
         <>
           <path d="M10.5 15C10.5 9.5 14.5 7 20 7C25.5 7 29.5 9.5 29.5 15H10.5Z" fill={theme.shirt} />
-          <path d="M10 14.5H32.5C32.5 15.8 30.5 16.5 28 16.5H10V14.5Z" fill="#1B3B36" />
+          <path d="M10 14.5H32.5C32.5 15.8 30.5 16.5 28 16.5H10V14.5Z" fill="#6B1D2F" />
         </>
       ) : (
         <path

@@ -53,7 +53,7 @@ export default function RootLayout({
       lang="en"
       className={`${rozha.variable} ${modak.variable} ${display.variable} ${script.variable} ${preloader.variable}`}
     >
-      <body className="min-h-dvh antialiased selection:bg-[#D9A12B]/25 selection:text-[#1B2A22]">
+      <body className="min-h-dvh antialiased selection:bg-[#D9A12B]/25 selection:text-[#2B141A]">
         <AppProvider>
           <Preloader />
           <Navbar />

@@ -179,14 +179,14 @@ export default function DiscoverPage() {
               e.preventDefault();
               void handleDetourSearch(detourQuery);
             }}
-            className="flex flex-1 items-center gap-2 rounded-full border border-[#1B2A22]/12 bg-[#FAF7F0] px-4 py-1.5 transition focus-within:border-[#1F3D2E] focus-within:bg-white"
+            className="flex flex-1 items-center gap-2 rounded-full border border-[#2B141A]/12 bg-[#FAF7F0] px-4 py-1.5 transition focus-within:border-[#6B1D2F] focus-within:bg-white"
           >
-            <Search className="h-4 w-4 shrink-0 text-[#4B5C52]" strokeWidth={1.75} />
+            <Search className="h-4 w-4 shrink-0 text-[#61454D]" strokeWidth={1.75} />
             <input
               value={detourQuery}
               onChange={(e) => setDetourQuery(e.target.value)}
               placeholder="Skip crowded hubs (Ooty, Goa, Hampi, Manali)..."
-              className="min-h-8 w-full bg-transparent text-sm text-[#1B2A22] placeholder:text-[#4B5C52] outline-none"
+              className="min-h-8 w-full bg-transparent text-sm text-[#2B141A] placeholder:text-[#61454D] outline-none"
             />
             {detourQuery && (
               <button
@@ -195,7 +195,7 @@ export default function DiscoverPage() {
                   setDetourQuery("");
                   setDetourResult(null);
                 }}
-                className="rounded-full p-1 text-[#4B5C52] hover:bg-black/5 hover:text-[#1B2A22]"
+                className="rounded-full p-1 text-[#61454D] hover:bg-black/5 hover:text-[#2B141A]"
                 aria-label="Clear search"
               >
                 <X className="h-3.5 w-3.5" />
@@ -204,7 +204,7 @@ export default function DiscoverPage() {
             <button
               type="submit"
               disabled={detourLoading || !detourQuery.trim()}
-              className="shrink-0 rounded-full bg-[#D9A12B] px-4 py-1.5 text-xs font-bold text-[#1B2A22] transition hover:bg-[#c89122] disabled:opacity-45"
+              className="shrink-0 rounded-full bg-[#D9A12B] px-4 py-1.5 text-xs font-bold text-[#2B141A] transition hover:bg-[#c89122] disabled:opacity-45"
             >
               {detourLoading ? "Finding..." : "Detour"}
             </button>
@@ -213,7 +213,7 @@ export default function DiscoverPage() {
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/submit"
-              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#1F3D2E] px-4 py-2 text-xs font-bold text-[#F5F0E6] transition hover:bg-[#162c21]"
+              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full bg-[#6B1D2F] px-4 py-2 text-xs font-bold text-[#F5F0E6] transition hover:bg-[#521523]"
             >
               <PlusCircle className="h-4 w-4" strokeWidth={1.75} />
               Post Gem
@@ -221,7 +221,7 @@ export default function DiscoverPage() {
             <button
               type="button"
               onClick={() => setViewMode((m) => (m === "masonry" ? "map" : "masonry"))}
-              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#1B2A22]/12 bg-[#FAF7F0] px-4 py-2 text-xs font-semibold text-[#1B2A22] transition hover:border-[#1F3D2E]"
+              className="tactile-press inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#2B141A]/12 bg-[#FAF7F0] px-4 py-2 text-xs font-semibold text-[#2B141A] transition hover:border-[#6B1D2F]"
             >
               {viewMode === "masonry" ? (
                 <>
@@ -247,8 +247,8 @@ export default function DiscoverPage() {
                 onClick={() => setCategory(cat)}
                 className={`min-h-9 shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium transition whitespace-nowrap ${
                   active
-                    ? "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]"
-                    : "border-[#1B2A22]/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]"
+                    ? "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]"
+                    : "border-[#2B141A]/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]"
                 }`}
               >
                 {cat}
@@ -256,7 +256,7 @@ export default function DiscoverPage() {
             );
           })}
 
-          <span className="mx-1 h-4 w-px shrink-0 bg-[#1B2A22]/15" aria-hidden="true" />
+          <span className="mx-1 h-4 w-px shrink-0 bg-[#2B141A]/15" aria-hidden="true" />
 
           {regions.map((reg) => {
             const active = region === reg;
@@ -267,8 +267,8 @@ export default function DiscoverPage() {
                 onClick={() => setRegion(reg)}
                 className={`min-h-9 shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium transition whitespace-nowrap ${
                   active
-                    ? "border-[#1F3D2E] bg-[#1F3D2E] text-[#F5F0E6]"
-                    : "border-[#1B2A22]/12 bg-[#FAF7F0] text-[#1B2A22] hover:border-[#1F3D2E]"
+                    ? "border-[#6B1D2F] bg-[#6B1D2F] text-[#F5F0E6]"
+                    : "border-[#2B141A]/12 bg-[#FAF7F0] text-[#2B141A] hover:border-[#6B1D2F]"
                 }`}
               >
                 {reg === "All" ? "All Regions" : reg}
@@ -276,14 +276,14 @@ export default function DiscoverPage() {
             );
           })}
 
-          <span className="mx-1 h-4 w-px shrink-0 bg-[#1B2A22]/15" aria-hidden="true" />
+          <span className="mx-1 h-4 w-px shrink-0 bg-[#2B141A]/15" aria-hidden="true" />
 
           {QUICK_DETOURS.map((hub) => (
             <button
               key={hub}
               type="button"
               onClick={() => void handleDetourSearch(hub)}
-              className="min-h-9 shrink-0 rounded-full border border-[#1B2A22]/12 bg-[#FAF7F0] px-4 py-1.5 text-[13px] font-medium text-[#4B5C52] transition hover:border-[#D9A12B] hover:text-[#1B2A22] whitespace-nowrap"
+              className="min-h-9 shrink-0 rounded-full border border-[#2B141A]/12 bg-[#FAF7F0] px-4 py-1.5 text-[13px] font-medium text-[#61454D] transition hover:border-[#D9A12B] hover:text-[#2B141A] whitespace-nowrap"
             >
               Skip {hub}
             </button>
@@ -299,9 +299,9 @@ export default function DiscoverPage() {
             {toast.kind === "error" ? (
               <AlertTriangle className="h-4 w-4 shrink-0 text-[#A63D2A]" strokeWidth={1.75} />
             ) : toast.kind === "info" ? (
-              <Info className="h-4 w-4 shrink-0 text-[#4B5C52]" strokeWidth={1.75} />
+              <Info className="h-4 w-4 shrink-0 text-[#61454D]" strokeWidth={1.75} />
             ) : (
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#1F3D2E]" strokeWidth={1.75} />
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-[#6B1D2F]" strokeWidth={1.75} />
             )}
             {toast.text}
           </span>
@@ -324,11 +324,11 @@ export default function DiscoverPage() {
           className="rounded-2xl border border-black/12 bg-white p-4"
         >
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <span className="font-bold text-[#1B2A22]">
+            <span className="font-bold text-[#2B141A]">
               Top 3 Offbeat Detours for &ldquo;{detourResult.hotspot}&rdquo; (Crowd Index{" "}
               {detourResult.hotspotCrowdIndex})
             </span>
-            <span className="rounded-full border border-[#D9A12B]/40 bg-[#D9A12B]/15 px-2.5 py-0.5 font-semibold text-[#1B2A22]">
+            <span className="rounded-full border border-[#D9A12B]/40 bg-[#D9A12B]/15 px-2.5 py-0.5 font-semibold text-[#2B141A]">
               {detourResult.source === "gemini" ? "Gemini Vibe Match" : "Crowd + Vibe Engine"}
             </span>
           </div>
@@ -337,24 +337,24 @@ export default function DiscoverPage() {
               <Link
                 key={alt.place.id}
                 href={`/place/${alt.place.id}`}
-                className="flex h-full flex-col justify-between rounded-xl border border-[#1B2A22]/12 bg-[#FAF7F0] p-4 transition hover:border-[#1F3D2E] hover:bg-white"
+                className="flex h-full flex-col justify-between rounded-xl border border-[#2B141A]/12 bg-[#FAF7F0] p-4 transition hover:border-[#6B1D2F] hover:bg-white"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-full border border-[#1F3D2E]/20 bg-[#E6ECE5] px-2.5 py-0.5 text-[11px] font-semibold text-[#1F3D2E]">
+                    <span className="rounded-full border border-[#6B1D2F]/20 bg-[#EFE3E6] px-2.5 py-0.5 text-[11px] font-semibold text-[#6B1D2F]">
                       {alt.crowdReductionPercent}% Less Crowded
                     </span>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1B2A22] tabular-nums">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#2B141A] tabular-nums">
                       <ScoreFlameIcon className="h-3 w-3 text-[#D9A12B]" />
                       {alt.place.hiddenGemScore}
                     </span>
                   </div>
-                  <h3 className="mt-2 font-rozha text-base text-[#1B2A22]">
+                  <h3 className="mt-2 font-bold text-[15px] leading-snug tracking-[-0.01em] text-[#2B141A]">
                     {alt.place.title}
                   </h3>
-                  <p className="mt-1 text-xs text-[#4B5C52]">{alt.matchReason}</p>
+                  <p className="mt-1 text-xs text-[#61454D]">{alt.matchReason}</p>
                 </div>
-                <p className="mt-2 text-[11px] font-semibold text-[#1F3D2E]">
+                <p className="mt-2 text-[11px] font-semibold text-[#6B1D2F]">
                   Commute: {alt.commuteSummary}
                 </p>
               </Link>
@@ -387,11 +387,11 @@ export default function DiscoverPage() {
       ) : viewMode === "map" ? (
         <LeafletMap places={filtered} heightClass="h-[540px]" />
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#1B2A22]/15 bg-[#FAF7F0] p-12 text-center">
-          <p className="font-rozha text-2xl text-[#1B2A22]">
+        <div className="rounded-2xl border border-dashed border-[#2B141A]/15 bg-[#FAF7F0] p-12 text-center">
+          <p className="font-rozha text-2xl text-[#2B141A]">
             No hidden gems match those filters yet.
           </p>
-          <p className="mt-1 text-sm text-[#4B5C52]">
+          <p className="mt-1 text-sm text-[#61454D]">
             Clear active filters or post a verified offbeat spot to seed this region.
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
@@ -402,14 +402,14 @@ export default function DiscoverPage() {
                   setCategory("All");
                   setRegion("All");
                 }}
-                className="min-h-9 rounded-full border border-[#1B2A22]/12 bg-[#F5F0E6] px-4 py-1.5 text-xs font-bold text-[#1B2A22] hover:border-[#1F3D2E]"
+                className="min-h-9 rounded-full border border-[#2B141A]/12 bg-[#F5F0E6] px-4 py-1.5 text-xs font-bold text-[#2B141A] hover:border-[#6B1D2F]"
               >
                 Clear Filters
               </button>
             )}
             <Link
               href="/submit"
-              className="inline-flex min-h-9 items-center rounded-full bg-[#1F3D2E] px-4 py-1.5 text-xs font-bold text-[#F5F0E6] hover:bg-[#162c21]"
+              className="inline-flex min-h-9 items-center rounded-full bg-[#6B1D2F] px-4 py-1.5 text-xs font-bold text-[#F5F0E6] hover:bg-[#521523]"
             >
               Post a Hidden Gem
             </Link>
@@ -444,7 +444,7 @@ export default function DiscoverPage() {
                     />
 
                     {/* Hover Gist Overlay */}
-                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#1B2A22]/90 via-[#1B2A22]/40 to-transparent p-4 text-[#F5F0E6] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#2B141A]/90 via-[#2B141A]/40 to-transparent p-4 text-[#F5F0E6] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                       <div className="translate-y-2 space-y-2 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
                         {publicAlertCount > 0 && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-[#A63D2A] px-2.5 py-0.5 text-[11px] font-semibold text-[#F5F0E6]">
@@ -474,8 +474,8 @@ export default function DiscoverPage() {
                     }}
                     className={`tactile-press absolute right-2.5 top-2.5 z-10 inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition ${
                       place.userHasVouched
-                        ? "bg-[#1F3D2E] text-[#F5F0E6]"
-                        : "bg-[#1B2A22]/85 text-[#F5F0E6] hover:bg-[#1F3D2E] sm:opacity-0 sm:group-hover:opacity-100"
+                        ? "bg-[#6B1D2F] text-[#F5F0E6]"
+                        : "bg-[#2B141A]/85 text-[#F5F0E6] hover:bg-[#6B1D2F] sm:opacity-0 sm:group-hover:opacity-100"
                     }`}
                   >
                     <HandHeart className="h-3.5 w-3.5" strokeWidth={1.75} />
@@ -500,7 +500,7 @@ export default function DiscoverPage() {
                         e.stopPropagation();
                         setOpenScoreId((prev) => (prev === place.id ? null : place.id));
                       }}
-                      className="inline-flex items-center gap-1 rounded-full border border-[#D9A12B]/40 bg-[#D9A12B]/15 px-2.5 py-0.5 text-xs font-semibold text-[#1B2A22] tabular-nums transition hover:border-[#D9A12B]"
+                      className="inline-flex items-center gap-1 rounded-full border border-[#D9A12B]/40 bg-[#D9A12B]/15 px-2.5 py-0.5 text-xs font-semibold text-[#2B141A] tabular-nums transition hover:border-[#D9A12B]"
                       title="Gem Score breakdown"
                     >
                       <ScoreFlameIcon className="h-3.5 w-3.5 text-[#D9A12B]" />
@@ -510,15 +510,15 @@ export default function DiscoverPage() {
 
                   <Link
                     href={`/place/${place.id}`}
-                    className="block font-rozha text-xl leading-snug text-[#1B2A22] hover:text-[#1F3D2E]"
+                    className="block text-[19px] font-bold leading-snug tracking-[-0.015em] text-[#2B141A] hover:text-[#6B1D2F]"
                   >
                     {place.title}
                   </Link>
 
                   <div className="flex items-center justify-between gap-2 pt-0.5">
-                    <div className="flex items-center gap-2 text-xs text-[#4B5C52]">
+                    <div className="flex items-center gap-2 text-xs text-[#61454D]">
                       <MemojiAvatar id={place.author.id} name={place.author.displayName} size={22} />
-                      <span className="font-medium text-[#1B2A22]">{place.author.displayName}</span>
+                      <span className="font-medium text-[#2B141A]">{place.author.displayName}</span>
                       {place.author.tier === "Local Legend" && (
                         <ShieldCheck
                           className="h-3.5 w-3.5 text-[#D9A12B]"
@@ -527,8 +527,8 @@ export default function DiscoverPage() {
                       )}
                     </div>
                     {place.localVendors.length > 0 && (
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#4B5C52]">
-                        <Store className="h-3.5 w-3.5 text-[#1F3D2E]" />
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#61454D]">
+                        <Store className="h-3.5 w-3.5 text-[#6B1D2F]" />
                         {place.localVendors.length}
                       </span>
                     )}

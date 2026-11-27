@@ -14,7 +14,7 @@ export default function OfflinePocketPage() {
     <div className="space-y-6">
       <div className="no-print flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-[#1B3B36]">
+          <h1 className="font-display text-3xl font-bold text-[#6B1D2F]">
             Offline Pocket Cards
           </h1>
           <p className="mt-1 text-sm text-[#52635F]">
@@ -27,7 +27,7 @@ export default function OfflinePocketPage() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="tactile-press inline-flex min-h-10 items-center gap-2 rounded-full bg-[#1B3B36] px-4 py-2 text-xs font-bold text-white hover:bg-[#C85A32]"
+            className="tactile-press inline-flex min-h-10 items-center gap-2 rounded-full bg-[#6B1D2F] px-4 py-2 text-xs font-bold text-white hover:bg-[#C85A32]"
           >
             <Printer className="h-4 w-4" strokeWidth={2} />
             Print / Save as PDF
@@ -38,7 +38,7 @@ export default function OfflinePocketPage() {
       {offlineCards.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-black/15 bg-white p-12 text-center">
           <WifiOff className="mx-auto h-10 w-10 text-[#C85A32]" strokeWidth={1.75} />
-          <h2 className="mt-3 font-display text-xl font-bold text-[#1B3B36]">
+          <h2 className="mt-3 font-display text-xl font-bold text-[#6B1D2F]">
             No offline pocket cards saved yet
           </h2>
           <p className="mt-1 text-sm text-[#52635F]">
@@ -46,7 +46,7 @@ export default function OfflinePocketPage() {
           </p>
           <Link
             href="/"
-            className="mt-5 inline-flex min-h-10 items-center rounded-full bg-[#1B3B36] px-5 py-2 text-xs font-bold text-white hover:bg-[#C85A32]"
+            className="mt-5 inline-flex min-h-10 items-center rounded-full bg-[#6B1D2F] px-5 py-2 text-xs font-bold text-white hover:bg-[#C85A32]"
           >
             Browse Destinations
           </Link>
@@ -71,14 +71,14 @@ export default function OfflinePocketPage() {
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                         PLACE_CATEGORY_STYLES[card.category as PlaceCategory]?.badge ??
-                        "border border-black/12 bg-[#FAF7F2] text-[#1B3B36]"
+                        "border border-black/12 bg-[#FAF7F2] text-[#6B1D2F]"
                       }`}
                     >
                       {card.category}
                     </span>
                   </div>
                   <Link href={`/place/${card.placeId}`} className="block">
-                    <h2 className="font-display text-xl font-bold text-[#1B3B36] hover:text-[#C85A32]">
+                    <h2 className="font-display text-xl font-bold text-[#6B1D2F] hover:text-[#C85A32]">
                       {card.title}
                     </h2>
                   </Link>
@@ -94,7 +94,7 @@ export default function OfflinePocketPage() {
               </div>
 
               <div className={GUIDE_MODULE_STYLES.commute.offline}>
-                <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+                <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
                   <Bus className={`h-3.5 w-3.5 ${GUIDE_MODULE_STYLES.commute.icon}`} strokeWidth={2} /> Last-Mile Commute
                 </h3>
                 <ul className="mt-1.5 space-y-1 text-xs text-[#52635F]">
@@ -107,7 +107,7 @@ export default function OfflinePocketPage() {
               </div>
 
               <div className={GUIDE_MODULE_STYLES.food.offline}>
-                <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+                <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
                   <Utensils className={`h-3.5 w-3.5 ${GUIDE_MODULE_STYLES.food.icon}`} strokeWidth={2} /> Must-Try Food
                 </h3>
                 <ul className="mt-1.5 space-y-1 text-xs text-[#52635F]">
@@ -121,7 +121,7 @@ export default function OfflinePocketPage() {
 
               {card.livingHeritage && card.livingHeritage.length > 0 && (
                 <div className={GUIDE_MODULE_STYLES.livingHeritage.offline}>
-                  <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+                  <h3 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
                     <Landmark className={`h-3.5 w-3.5 ${GUIDE_MODULE_STYLES.livingHeritage.icon}`} strokeWidth={2} /> Living Heritage &amp; Etiquette
                   </h3>
                   <ul className="mt-1.5 space-y-1 text-xs text-[#52635F]">

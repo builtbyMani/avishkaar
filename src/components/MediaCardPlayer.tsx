@@ -7,7 +7,7 @@ import type { MediaItem } from "@/types/domain";
 const FALLBACK_SVG =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" fill="none"><rect width="600" height="720" fill="#EAE2D6"/><path d="M0 540L160 360L290 480L430 300L600 500V720H0V540Z" fill="#1B3B36" fill-opacity="0.22"/><circle cx="450" cy="170" r="52" fill="#C85A32" fill-opacity="0.35"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" fill="none"><rect width="600" height="720" fill="#EAE2D6"/><path d="M0 540L160 360L290 480L430 300L600 500V720H0V540Z" fill="#6B1D2F" fill-opacity="0.22"/><circle cx="450" cy="170" r="52" fill="#C85A32" fill-opacity="0.35"/></svg>`,
   );
 
 export function extractYouTubeEmbedId(url: string): string | null {

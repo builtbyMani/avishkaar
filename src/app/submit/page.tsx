@@ -158,7 +158,7 @@ export default function SubmitGemPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-bold text-[#1B3B36]">Post a Hidden Gem</h1>
+        <h1 className="font-display text-3xl font-bold text-[#6B1D2F]">Post a Hidden Gem</h1>
         <p className="mt-1 text-sm text-[#52635F]">
           Image, &lt;8 MB MP4, or YouTube Short · Auto-extracts Commute, Food, Activity, Heritage &amp; Safety
         </p>
@@ -174,7 +174,7 @@ export default function SubmitGemPage() {
       <form onSubmit={handlePublish} className="space-y-6 rounded-2xl border border-black/12 bg-white p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Destination Title
             </label>
             <input
@@ -187,7 +187,7 @@ export default function SubmitGemPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Region
             </label>
             <select
@@ -204,7 +204,7 @@ export default function SubmitGemPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Category
             </label>
             <select
@@ -221,7 +221,7 @@ export default function SubmitGemPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Latitude
             </label>
             <input
@@ -234,7 +234,7 @@ export default function SubmitGemPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Longitude
             </label>
             <input
@@ -251,10 +251,10 @@ export default function SubmitGemPage() {
         {/* Media upload */}
         <div className="space-y-3 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Photo, Short Clip (&lt;8 MB Hover-Play), or YouTube Short URL
             </span>
-            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#1B3B36] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-[#C85A32]">
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#6B1D2F] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-[#C85A32]">
               <UploadCloud className="h-3.5 w-3.5" />
               {uploading ? "Uploading..." : "Upload File"}
               <input
@@ -286,7 +286,7 @@ export default function SubmitGemPage() {
         {/* Raw Field Notes + Gemini Extraction */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+            <label className="text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
               Multilingual Field Notes (English, Hindi, Telugu, Tamil, or Hinglish)
             </label>
             <button
@@ -312,13 +312,13 @@ export default function SubmitGemPage() {
         {structured && (
           <div className="animate-panel-in space-y-3 rounded-2xl border border-black/12 bg-[#FAF7F2] p-4 text-xs">
             <div className="flex items-center justify-between">
-              <strong className="text-[#1B3B36]">
+              <strong className="text-[#6B1D2F]">
                 Structured Preview ({aiSource === "gemini" ? "Gemini JSON" : "Fallback Extractor"})
               </strong>
               <span className="text-[#52635F]">Editable before publish</span>
             </div>
             <div>
-              <span className="font-bold text-[#1B3B36]">Last-Mile Commute:</span>
+              <span className="font-bold text-[#6B1D2F]">Last-Mile Commute:</span>
               <textarea
                 rows={2}
                 value={structured.commute.join("\n")}
@@ -329,7 +329,7 @@ export default function SubmitGemPage() {
               />
             </div>
             <div>
-              <span className="font-bold text-[#1B3B36]">Living Heritage &amp; Etiquette:</span>
+              <span className="font-bold text-[#6B1D2F]">Living Heritage &amp; Etiquette:</span>
               <textarea
                 rows={2}
                 value={(structured.livingHeritage ?? []).join("\n")}
@@ -343,7 +343,7 @@ export default function SubmitGemPage() {
               />
             </div>
             <div>
-              <span className="font-bold text-[#1B3B36]">Safety Tags:</span>
+              <span className="font-bold text-[#6B1D2F]">Safety Tags:</span>
               <div className="mt-1 flex flex-wrap gap-2">
                 {safetyAlerts.map((a, idx) => (
                   <span key={idx} className="rounded-full bg-red-600 px-2.5 py-0.5 text-[10px] font-bold text-white">
@@ -357,7 +357,7 @@ export default function SubmitGemPage() {
 
         {/* Support Local Tagging */}
         <div className="space-y-3 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-4">
-          <span className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
+          <span className="block text-xs font-bold uppercase tracking-wider text-[#6B1D2F]">
             Support Local Spotlight (Optional Vendor / Artisan / Homestay)
           </span>
           <div className="grid gap-3 sm:grid-cols-3">

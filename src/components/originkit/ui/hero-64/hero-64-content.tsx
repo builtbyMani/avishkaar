@@ -29,7 +29,7 @@ export default function Hero() {
               className="flex items-center gap-2"
             >
               <AvishkaarLogo size={24} />
-              <span className="font-display text-xl font-bold tracking-tight text-[#1B2A22]">
+              <span className="font-display text-xl font-bold tracking-tight text-[#2B141A]">
                 Avishkaar
               </span>
             </motion.div>
@@ -59,7 +59,7 @@ export default function Hero() {
 
       <div className="copy">
         <h1 className="font-display">
-          Places <span className="font-script text-[#1F3D2E]">off the</span> beaten path.
+          Places <span className="font-script text-[#6B1D2F]">off the</span> beaten path.
         </h1>
         <p className="hero-lead">
           Community-verified villages, regional kitchens, and living heritage — ranked by

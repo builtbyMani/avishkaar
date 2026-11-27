@@ -172,7 +172,7 @@ export function AuthModal({
         )}
 
         <div className="mt-5">
-          <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#4B5C52]">
+          <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#61454D]">
             <Shield className="h-3.5 w-3.5 text-[#D9A12B]" />
             Traveler Profiles
           </div>
@@ -190,14 +190,14 @@ export function AuthModal({
                   className={`flex min-h-12 w-full items-center justify-between rounded-xl border p-3 text-left transition ${
                     selected
                       ? `${TRAILBLAZER_TIER_STYLES[p.tier].cardRing} bg-white`
-                      : "border-[#1B2A22]/12 bg-[#FAF7F0] hover:border-[#1F3D2E]"
+                      : "border-[#2B141A]/12 bg-[#FAF7F0] hover:border-[#6B1D2F]"
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <MemojiAvatar id={p.id} name={p.displayName} size={34} />
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-[#1B2A22]">{p.displayName}</span>
+                        <span className="text-sm font-bold text-[#2B141A]">{p.displayName}</span>
                         <span
                           className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
                             TRAILBLAZER_TIER_STYLES[p.tier].badge
@@ -206,12 +206,12 @@ export function AuthModal({
                           {getTierDisplayLabel(p.tier)}
                         </span>
                         {p.isGuide && (
-                          <span className="rounded-full border border-[#1F3D2E]/20 bg-[#E6ECE5] px-2 py-0.5 text-[11px] font-medium text-[#1F3D2E]">
+                          <span className="rounded-full border border-[#6B1D2F]/20 bg-[#EFE3E6] px-2 py-0.5 text-[11px] font-medium text-[#6B1D2F]">
                             Local Guide
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-[#4B5C52]">
+                      <p className="mt-0.5 text-xs text-[#61454D]">
                         {getTierDisplayLabel(p.tier)} · {p.trailblazerScore} pts
                         {p.guideRegion ? ` · ${p.guideRegion}` : ""}
                       </p>
@@ -219,7 +219,7 @@ export function AuthModal({
                   </div>
                   <div className="flex items-center gap-2">
                     <Award className="h-4 w-4 text-[#D9A12B]" />
-                    {selected && <Check className="h-4 w-4 text-[#1F3D2E]" />}
+                    {selected && <Check className="h-4 w-4 text-[#6B1D2F]" />}
                   </div>
                 </button>
               );

@@ -60,7 +60,7 @@ export function LeafletMap({
         bounds.push([p.lat, p.lng]);
         const pinIcon = L.divIcon({
           className: "avishkaar-pin",
-          html: `<div style="width:28px;height:28px;border-radius:9999px;background:#1B3B36;color:#fff;border:2px solid #FAF7F2;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>`,
+          html: `<div style="width:28px;height:28px;border-radius:9999px;background:#6B1D2F;color:#fff;border:2px solid #FAF7F2;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>`,
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         });
@@ -69,7 +69,7 @@ export function LeafletMap({
           .addTo(mapInstance)
           .bindPopup(
             `<div style="min-width:170px">
-              <strong style="color:#1B3B36;font-size:13px">${escapeHtml(p.title)}</strong>
+              <strong style="color:#6B1D2F;font-size:13px">${escapeHtml(p.title)}</strong>
               <div style="color:#52635F;font-size:11px;margin-top:2px">${escapeHtml(p.region)}${
                 p.hiddenGemScore ? ` · Gem Score ${p.hiddenGemScore}` : ""
               }</div>
@@ -115,9 +115,9 @@ export function LeafletMap({
           .bindPopup(
             `<div style="min-width:170px">
               <span style="display:inline-block;background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 6px;border-radius:9999px">${escapeHtml(v.category)}</span>
-              <div style="font-weight:700;color:#1B3B36;font-size:12px;margin-top:4px">${escapeHtml(v.name)}</div>
+              <div style="font-weight:700;color:#6B1D2F;font-size:12px;margin-top:4px">${escapeHtml(v.name)}</div>
               <div style="font-size:11px;color:#52635F;margin-top:2px">${escapeHtml(v.specialty)}</div>
-              <div style="font-size:11px;color:#1B3B36;font-weight:600;margin-top:4px">${escapeHtml(v.contact)}</div>
+              <div style="font-size:11px;color:#6B1D2F;font-weight:600;margin-top:4px">${escapeHtml(v.contact)}</div>
             </div>`,
           );
       }
@@ -142,7 +142,7 @@ export function LeafletMap({
       <div ref={containerRef} className={`w-full ${heightClass}`} />
       <div className="flex flex-wrap items-center gap-4 border-t border-[#E8E0D4] bg-[#FAF7F2] px-4 py-2 text-xs text-[#52635F]">
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-[#1B3B36]" /> Destination Pin
+          <span className="inline-block h-3 w-3 rounded-full bg-[#6B1D2F]" /> Destination Pin
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block h-3 w-3 rounded-full bg-[#D97706]" /> Support Local Vendor

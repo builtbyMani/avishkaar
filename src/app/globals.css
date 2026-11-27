@@ -3,16 +3,16 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  /* 60% Neutral warm off-white · 30% Deep green / ink · 10% Turmeric accent */
+  /* 60% Neutral warm off-white · 30% Wine Red / deep burgundy · 10% Turmeric accent */
   --bg-parchment: #f5f0e6;
   --bg-surface: #faf7f0;
   --bg-well: #ebe4d5;
-  --ink-forest: #1b2a22;
-  --ink-muted: #4b5c52;
-  --sage-deep: #1f3d2e;
+  --ink-forest: #2b141a;
+  --ink-muted: #61454d;
+  --sage-deep: #6b1d2f;
   --accent-turmeric: #d9a12b;
   --alert-brick: #a63d2a;
-  --border-warm: rgb(27 42 34 / 0.12);
+  --border-warm: rgb(43 20 26 / 0.12);
   --font-sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
 }
 
@@ -25,7 +25,7 @@ body {
 
 html {
   scroll-behavior: smooth;
-  scrollbar-color: rgb(31 61 46 / 0.35) var(--bg-parchment);
+  scrollbar-color: rgb(107 29 47 / 0.35) var(--bg-parchment);
 }
 
 @media (prefers-reduced-motion: reduce) {

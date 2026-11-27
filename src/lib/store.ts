@@ -62,11 +62,23 @@ function buildInitialDemoState(): DemoState {
   };
 }
 
+// Demo Mode store: a single JSON file with an in-memory cache.
+// Writes are atomic (write temp file, then rename over the target) so a
+// crash mid-write cannot corrupt the store. NOTE: this store is ephemeral
+// by design — on serverless hosts it lives in /tmp and is lost on cold
+// start. It is a hackathon demo store, not production persistence.
+let demoCache: { state: DemoState; mtimeMs: number } | null = null;
+
 function readDemoState(): DemoState {
   try {
     if (fs.existsSync(DEMO_STORE_PATH)) {
+      const mtimeMs = fs.statSync(DEMO_STORE_PATH).mtimeMs;
+      if (demoCache && demoCache.mtimeMs === mtimeMs) return demoCache.state;
       const parsed = JSON.parse(fs.readFileSync(DEMO_STORE_PATH, "utf8")) as DemoState;
-      if (parsed.profiles && parsed.places) return parsed;
+      if (parsed.profiles && parsed.places) {
+        demoCache = { state: parsed, mtimeMs };
+        return parsed;
+      }
     }
   } catch {
     // Recreate clean state if cache file is unreadable
@@ -78,7 +90,14 @@ function readDemoState(): DemoState {
 
 function writeDemoState(state: DemoState): void {
   fs.mkdirSync(path.dirname(DEMO_STORE_PATH), { recursive: true });
-  fs.writeFileSync(DEMO_STORE_PATH, JSON.stringify(state, null, 2), "utf8");
+  const tmpPath = `${DEMO_STORE_PATH}.${process.pid}.tmp`;
+  fs.writeFileSync(tmpPath, JSON.stringify(state, null, 2), "utf8");
+  fs.renameSync(tmpPath, DEMO_STORE_PATH);
+  try {
+    demoCache = { state, mtimeMs: fs.statSync(DEMO_STORE_PATH).mtimeMs };
+  } catch {
+    demoCache = { state, mtimeMs: 0 };
+  }
 }
 
 function mapSupabaseProfile(row: Record<string, unknown>): Profile {
@@ -227,7 +246,10 @@ export async function getProfileById(userId: string): Promise<Profile | null> {
   return readDemoState().profiles.find((p) => p.id === userId) ?? null;
 }
 
-export async function listPlaces(viewerId?: string): Promise<EnrichedPlace[]> {
+export async function listPlaces(
+  viewerId?: string,
+  options?: { limit?: number; offset?: number },
+): Promise<EnrichedPlace[]> {
   const sb = requireSupabase();
   if (sb) {
     const [placesRes, profilesRes, vouchesRes] = await Promise.all([
@@ -249,7 +271,9 @@ export async function listPlaces(viewerId?: string): Promise<EnrichedPlace[]> {
         return [mapped.placeId, mapped];
       }),
     );
-    return sortFeedPlaces((placesRes.data ?? []).map(mapSupabasePlace), profilesMap, vouchesMap);
+    const sortedSb = sortFeedPlaces((placesRes.data ?? []).map(mapSupabasePlace), profilesMap, vouchesMap);
+    const offSb = options?.offset ?? 0;
+    return options?.limit !== undefined ? sortedSb.slice(offSb, offSb + options.limit) : sortedSb.slice(offSb);
   }
 
   const state = readDemoState();
@@ -257,7 +281,9 @@ export async function listPlaces(viewerId?: string): Promise<EnrichedPlace[]> {
   const vouchesMap = new Map(
     state.vouches.filter((v) => !viewerId || v.userId === viewerId).map((v) => [v.placeId, v]),
   );
-  return sortFeedPlaces(state.places, profilesMap, viewerId ? vouchesMap : new Map());
+  const sortedDemo = sortFeedPlaces(state.places, profilesMap, viewerId ? vouchesMap : new Map());
+  const offDemo = options?.offset ?? 0;
+  return options?.limit !== undefined ? sortedDemo.slice(offDemo, offDemo + options.limit) : sortedDemo.slice(offDemo);
 }
 
 export async function getPlaceDetail(
@@ -298,7 +324,9 @@ export async function getPlaceDetail(
     return {
       place: enriched,
       matchingGuides,
-      guideRequests: (requestsRes.data ?? []).map(mapSupabaseGuideRequest),
+      guideRequests: (requestsRes.data ?? [])
+        .map(mapSupabaseGuideRequest)
+        .filter((r) => viewerId !== undefined && (r.requesterId === viewerId || r.guideId === viewerId)),
     };
   }
 
@@ -324,7 +352,9 @@ export async function getPlaceDetail(
         (!p.guideRegion || p.guideRegion === rawPlace.region),
     )
     .sort((a, b) => b.trailblazerScore - a.trailblazerScore);
-  const guideRequests = state.guideRequests.filter((r) => r.placeId === placeId);
+  const guideRequests = state.guideRequests.filter(
+    (r) => r.placeId === placeId && viewerId !== undefined && (r.requesterId === viewerId || r.guideId === viewerId),
+  );
   return { place, matchingGuides, guideRequests };
 }
 
@@ -364,7 +394,7 @@ export async function createPlace(input: {
     localVendors: input.localVendors,
     safetyAlerts: taggedAlerts,
     mainstreamPopularityIndex: 5,
-    vouchesCount: 1,
+    vouchesCount: 0,
     verifiedCheckinsCount: 0,
     createdAt: new Date().toISOString(),
   };
@@ -394,11 +424,23 @@ export async function createPlace(input: {
   return { place: newPlace, unlockedBadges };
 }
 
+async function getPlaceAuthorId(placeId: string): Promise<string | null> {
+  const sb = requireSupabase();
+  if (sb) {
+    const { data } = await sb.from("places").select("author_id").eq("id", placeId).maybeSingle();
+    return data ? String(data.author_id) : null;
+  }
+  return readDemoState().places.find((p) => p.id === placeId)?.authorId ?? null;
+}
+
 export async function performCheckIn(placeId: string, userId: string): Promise<{
   checkedIn: boolean;
   bonusDelta: number;
   verifiedCheckinsCount: number;
 }> {
+  if ((await getPlaceAuthorId(placeId)) === userId) {
+    throw new Error("You cannot check in to your own place.");
+  }
   const sb = requireSupabase();
   if (sb) {
     const { data, error } = await sb.rpc("check_in_place", {
@@ -468,6 +510,9 @@ export async function performVouch(placeId: string, userId: string): Promise<{
   authorTier: Profile["tier"];
   unlockedBadges: UserBadge[];
 }> {
+  if ((await getPlaceAuthorId(placeId)) === userId) {
+    throw new Error("You cannot vouch for your own place.");
+  }
   const sb = requireSupabase();
   if (sb) {
     const beforeKeys = new Set((await listUserBadges(userId)).map((b) => b.badgeKey));

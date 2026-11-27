@@ -57,6 +57,16 @@
 - [x] **SAFE-01**: Safety advisories support 1-click **Verify / Flag** votes inside `places.safety_alerts` JSONB and stay hidden publicly unless posted by `Pathfinder+` or verified by `2+` users (with seeded alerts backfilled)
 - [x] **DEMO-01**: Seed dataset includes *Pandavula Gutta* & *Ziro Valley* (18 places total), toggle reads **"Simulate GPS Check-In"**, and Navbar offers an **Impact & Stack** drawer (67.4% stat + Swadesh Darshan 2.0 / CBDD + 4-box stack)
 
+## v1.2 Phase 7 Requirements (Planned)
+
+### UI Alignment, Surface Restraint & Functional Semantics
+
+- [ ] **UI-01**: Line up Discovery feed, Detour cards, Place detail modules, and Offline/Profile cards on consistent CSS Grids with equal card heights, pinned footers, uniform aspect frames (`compact`), and unified section spacing (`space-y-6` / `gap-5`)
+- [ ] **UI-02**: Strip all CSS gradients (`bg-gradient-to-*`), backdrop blurs (`backdrop-blur-*`), glowing RGBA leaflet marker shadows, and ambient modal/hover elevation shadows in favor of flat solid palette surfaces and hairline borders
+- [ ] **UI-03**: Replace raw Unicode symbols (`✓`, `•`, `★`, `→`) and decorative `<Sparkles>` icons across pages and Leaflet map markers with clean semantic vector icons (`lucide-react` / crisp inline SVG paths)
+- [ ] **UI-04**: Assign purposeful, non-overlapping semantic colors via a shared domain/style token helper to distinguish Categories, Trailblazer Tiers, Guide Modules, Safety Warnings, and Verified Visit / 0%-Commission actions
+- [ ] **UI-05**: Replace decorative header taglines and promotional hero copy in `Navbar`, `/` Discovery, `/submit`, and `/offline` with compact operational telemetry (verified gem count, regions covered, active filter/offline status, tier score, and concise format specs)
+
 ## v2 Requirements
 
 ### Geospatial & Caching Scale
@@ -102,10 +112,16 @@
 | VEND-01 | Phase 6 | Complete |
 | SAFE-01 | Phase 6 | Complete |
 | DEMO-01 | Phase 6 | Complete |
+| UI-01 | Phase 7 | Planned |
+| UI-02 | Phase 7 | Planned |
+| UI-03 | Phase 7 | Planned |
+| UI-04 | Phase 7 | Planned |
+| UI-05 | Phase 7 | Planned |
 
 **Coverage:**
 - v1 requirements: 18/18 complete
 - v1.1 (Phase 6) requirements: 8/8 complete ✓
+- v1.2 (Phase 7) requirements: 5/5 planned
 
 ---
 *Requirements defined: 2026-11-27*

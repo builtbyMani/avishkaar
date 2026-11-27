@@ -12,6 +12,7 @@ Avishkaar ships all features from the 48-hour hackathon blueprint in 5 Vertical 
 - [x] **Phase 4: Check-ins, Badges & Volunteer Guides** - Geolocation + Demo Check-in toggle, Verified Visit Vouch (+25), auto-awarded badges + trophy shelf, and trust-gated Volunteer Guides
 - [x] **Phase 5: Polish, Deploy & Demo Readiness** - Mobile pass, loading skeletons, zero console errors, production build verified, and 3-minute live demo flow tested end-to-end
 - [x] **Phase 6: Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety** - Detour Bar, clickable Gem Score math popover, <8 MB hover clips & YouTube Shorts, multilingual AI + Living Heritage card, zero-commission vendor actions, 1-click safety verify/flag gate, and demo script polish (completed 2026-11-27)
+- [ ] **Phase 7: UI Alignment, Surface Restraint & Functional Semantics** - Consistent card grid & spacing, stripped gradients/glows/blurs, vector icons replacing Unicode glyphs/sparkles, purposeful color encoding by category/tier/module, and telemetry-first header/subheaders
 
 ## Phase Details
 
@@ -103,6 +104,29 @@ Plans:
 - [x] 06-02: Multilingual Gemini + Living Heritage card + Zero-Commission Vendor Actions (Navigate, WhatsApp/Call, Direct UPI QR)
 - [x] 06-03: Community Safety Verify/Flag gate, Pandavula Gutta & Ziro Valley seeds, Simulate GPS label, Impact drawer & E2E verification
 
+### Phase 7: UI Alignment, Surface Restraint & Functional Semantics
+
+**Goal**: Deliver an intentional, crisp field-guide UI pass across all pages: line up cards and gutters cleanly, strip visual gradients/glows/blurs, replace raw Unicode symbols/sparkle filler with vector icons, assign semantic jobs to color tokens across categories/tiers/guide modules, and replace header filler with high-signal live metrics.
+**Mode:** mvp
+**Depends on**: Phase 6
+**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05
+**UI hint**: yes
+**Success Criteria** (what must be TRUE):
+  1. Discovery feed, Detour Bar, `/place/[id]` cards, and `/offline` / `/profile` cards align on consistent grids, equal-height card shells, pinned footers, and uniform gaps
+  2. Zero gradient fills (`bg-gradient-to-*`), backdrop blurs, hover elevation shadows, or glowing RGBA shadows remain on UI surfaces
+  3. Zero raw Unicode symbols (`✓`, `•`, `★`, `→`) or generic `<Sparkles>` icons remain where crisp icons belong
+  4. Colors perform distinct functional jobs (Categories vs Trailblazer Tiers vs 4 Guide Modules vs Safety Red vs Verified Emerald) via a shared token helper
+  5. Navbar and Discover header replace decorative taglines/marketing blurbs with compact live telemetry and direct controls without hiding or removing existing features
+
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+- [ ] 07-01: Shared semantic tokens (`src/lib/domain.ts`) + unit tests + restrained shell (`Navbar`, `AuthModal`, `MediaCardPlayer`, `LeafletMap`)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 07-02: Route page grid/skeleton alignment, surface restraint, vector icons, semantic tokens & telemetry headers (`page`, `place/[id]`, `profile`, `offline`, `submit`, `not-found`)
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -113,3 +137,4 @@ Plans:
 | 4. Check-ins, Badges & Volunteer Guides | 2/2 | Complete | 2026-11-27 |
 | 5. Polish, Deploy & Demo Readiness | 2/2 | Complete | 2026-11-27 |
 | 6. Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety | 3/3 | Complete    | 2026-11-27 |
+| 7. UI Alignment, Surface Restraint & Functional Semantics | 0/2 | Ready to execute | — |

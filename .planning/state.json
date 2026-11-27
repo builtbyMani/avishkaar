@@ -32,12 +32,17 @@
       "number": "6",
       "name": "Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety",
       "status": "complete"
+    },
+    {
+      "number": "7",
+      "name": "UI Alignment, Surface Restraint & Functional Semantics",
+      "status": "pending"
     }
   ],
   "next": {
-    "command": "/gsd-new-milestone",
-    "label": "Start a new milestone",
-    "reason": "All phases complete — start a new milestone"
+    "command": "/gsd-progress",
+    "label": "Show progress",
+    "reason": "Unsure of state — showing progress"
   },
-  "updated_at": "2026-11-27T09:48:01.042Z"
+  "updated_at": "2026-11-27T13:15:38.160Z"
 }

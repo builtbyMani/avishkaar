@@ -46,6 +46,7 @@ const CATEGORIES: Array<"All" | PlaceCategory> = ["All", ...PLACE_CATEGORIES];
 export default function DiscoverPage() {
   const { activeUser, refreshProfiles } = useApp();
   const [places, setPlaces] = useState<EnrichedPlace[]>([]);
+  const [feedError, setFeedError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<"All" | PlaceCategory>("All");
   const [region, setRegion] = useState<string>("All");
@@ -59,13 +60,18 @@ export default function DiscoverPage() {
 
   const loadFeed = useCallback(async () => {
     setLoading(true);
+    setFeedError(null);
     try {
       const qs = activeUser ? `?viewerId=${encodeURIComponent(activeUser.id)}` : "";
-      const res = await fetch(`/api/places${qs}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = (await res.json()) as { places: EnrichedPlace[] };
-        setPlaces(data.places ?? []);
-      }
+      const res = await fetch(`/api/places${qs}`, {
+        cache: "no-store",
+        headers: { ...(await getAuthHeaders()) },
+      });
+      if (!res.ok) throw new Error(`Feed request failed (${res.status})`);
+      const data = (await res.json()) as { places: EnrichedPlace[] };
+      setPlaces(data.places ?? []);
+    } catch {
+      setFeedError("Could not load the discovery feed. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -142,6 +148,9 @@ export default function DiscoverPage() {
       if (res.ok) {
         const data = (await res.json()) as DetourResponseView;
         setDetourResult(data);
+      } else {
+        const data = (await res.json().catch(() => ({}))) as { error?: string };
+        setToast(data.error || "Detour lookup failed. Please try again.");
       }
     } finally {
       setDetourLoading(false);
@@ -307,6 +316,15 @@ export default function DiscoverPage() {
           </div>
         )}
       </section>
+
+      {feedError && (
+        <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900">
+          <span>{feedError}</span>
+          <button type="button" onClick={() => void loadFeed()} className="font-bold underline">
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* Filter Pills */}
       <section className="space-y-3">

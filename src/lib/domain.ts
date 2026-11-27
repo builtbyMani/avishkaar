@@ -15,6 +15,10 @@ export const REGIONS = [
   "Deccan & Western Ghats",
   "Kutch & Thar",
   "Malabar & Konkan",
+  "Western Himalaya",
+  "Gangetic Plains & Bundelkhand",
+  "Central India & Deccan",
+  "Bengal, Odisha & the East",
 ] as const;
 
 export const PLACE_CATEGORIES: readonly PlaceCategory[] = [

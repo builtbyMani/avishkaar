@@ -138,7 +138,7 @@
 }
 .hero-64 .copy p.hero-hindi {
   margin: 4px 0 0;
-  font-family: var(--font-modak), sans-serif;
+  font-family: var(--font-rozha), Georgia, serif;
   font-size: clamp(24px, 2.2vw, 34px);
   line-height: 1.25;
   color: var(--sage-deep);

@@ -764,8 +764,8 @@ export default function PlaceDetailPage() {
                 Trust-Gated Volunteer Local Guides
               </h2>
             </div>
-            <p className="mt-1 text-sm text-[#52635F]">
-              Only Pathfinder (100+ pts), Local Legend (300+ pts), or verified locals can guide in {place.region}.
+            <p className="mt-1 text-sm text-[#566151]">
+              Only Field Scouts (100+ pts), Regional Stewards (300+ pts), or verified locals can guide in {place.region}.
             </p>
           </div>
           <Link

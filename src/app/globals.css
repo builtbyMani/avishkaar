@@ -36,7 +36,7 @@ html {
 
 .font-display {
   font-family: var(--font-display), Georgia, serif;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
 }
 
@@ -52,7 +52,7 @@ html {
 .paper-bg {
   background-color: var(--bg-parchment);
   background-image:
-    linear-gradient(rgba(234, 236, 224, 0.58), rgba(234, 236, 224, 0.58)),
+    linear-gradient(rgba(234, 236, 224, 0.72), rgba(234, 236, 224, 0.72)),
     url("/images/paper-bg.jpg");
   background-size: 480px 480px;
   background-repeat: repeat;

@@ -7,15 +7,14 @@ import {
   AlertTriangle,
   ArrowRight,
   CheckCircle2,
-  Crown,
-  Flame,
+  Gem,
   HandHeart,
   Info,
   LayoutGrid,
   Map as MapIcon,
-  MapPin,
   PlusCircle,
   Search,
+  ShieldCheck,
   Store,
   X,
 } from "lucide-react";
@@ -27,9 +26,9 @@ import Hero64 from "@/components/originkit/hero-64";
 import {
   FEEDBACK_TONE_STYLES,
   getGemScoreBreakdown,
+  getRegionStyle,
   isSafetyAlertPublic,
   PLACE_CATEGORIES,
-  PLACE_CATEGORY_STYLES,
   type FeedbackMessage,
 } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
@@ -237,24 +236,20 @@ export default function DiscoverPage() {
           </div>
         </div>
 
-        {/* Horizontal Category & Region Filter Strip (Pinterest-style) */}
+        {/* Unified Neutral Filter Strip (one neutral pill, one forest-sage accent) */}
         <div className="scroll-fade-x flex items-center gap-2 overflow-x-auto pb-1">
           {CATEGORIES.map((cat) => {
             const active = category === cat;
-            const cls =
-              cat === "All"
-                ? active
-                  ? "border-[#1B3B36] bg-[#1B3B36] text-white"
-                  : "border-black/12 bg-white text-[#1B3B36] hover:border-[#1B3B36]"
-                : active
-                  ? PLACE_CATEGORY_STYLES[cat].pillActive
-                  : PLACE_CATEGORY_STYLES[cat].pillIdle;
             return (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setCategory(cat)}
-                className={`min-h-8 shrink-0 rounded-full border px-3.5 py-1 text-xs font-semibold transition whitespace-nowrap ${cls}`}
+                className={`min-h-9 shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium transition whitespace-nowrap ${
+                  active
+                    ? "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]"
+                    : "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]"
+                }`}
               >
                 {cat}
               </button>
@@ -263,20 +258,23 @@ export default function DiscoverPage() {
 
           <span className="mx-1 h-4 w-px shrink-0 bg-black/15" aria-hidden="true" />
 
-          {regions.map((reg) => (
-            <button
-              key={reg}
-              type="button"
-              onClick={() => setRegion(reg)}
-              className={`min-h-8 shrink-0 rounded-full px-3 py-1 text-xs font-medium transition whitespace-nowrap ${
-                region === reg
-                  ? "bg-[#C85A32] text-white"
-                  : "bg-[#EAE2D6]/60 text-[#1B3B36] hover:bg-[#EAE2D6]"
-              }`}
-            >
-              {reg === "All" ? "All Regions" : reg}
-            </button>
-          ))}
+          {regions.map((reg) => {
+            const active = region === reg;
+            return (
+              <button
+                key={reg}
+                type="button"
+                onClick={() => setRegion(reg)}
+                className={`min-h-9 shrink-0 rounded-full border px-4 py-1.5 text-[13px] font-medium transition whitespace-nowrap ${
+                  active
+                    ? "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]"
+                    : "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]"
+                }`}
+              >
+                {reg === "All" ? "All Regions" : reg}
+              </button>
+            );
+          })}
 
           <span className="mx-1 h-4 w-px shrink-0 bg-black/15" aria-hidden="true" />
 
@@ -285,7 +283,7 @@ export default function DiscoverPage() {
               key={hub}
               type="button"
               onClick={() => void handleDetourSearch(hub)}
-              className="min-h-8 shrink-0 rounded-full border border-black/12 bg-white px-3 py-1 text-xs font-medium text-[#52635F] transition hover:border-[#C85A32] hover:text-[#1B3B36] whitespace-nowrap"
+              className="min-h-9 shrink-0 rounded-full border border-black/12 bg-[#F4F5ED] px-4 py-1.5 text-[13px] font-medium text-[#566151] transition hover:border-[#3D5236] hover:text-[#1F271C] whitespace-nowrap"
             >
               Skip {hub}
             </button>
@@ -421,6 +419,7 @@ export default function DiscoverPage() {
           {filtered.map((place, idx) => {
             const publicAlertCount = place.safetyAlerts.filter(isSafetyAlertPublic).length;
             const gemBreakdown = getGemScoreBreakdown(place);
+            const regionStyle = getRegionStyle(place.region);
             return (
               <motion.article
                 key={place.id}
@@ -432,10 +431,10 @@ export default function DiscoverPage() {
                   delay: Math.min(idx % 4, 3) * 0.04,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="group relative break-inside-avoid"
+                className={`group break-inside-avoid overflow-hidden rounded-2xl border ${regionStyle.border} ${regionStyle.cardBg}`}
               >
-                {/* Visual Pin Card with Hover Gist Overlay */}
-                <div className="relative overflow-hidden rounded-2xl border border-black/12 bg-[#EAE2D6]">
+                {/* Media Frame with Clean Gist Hover Overlay (no duplicate title or pill collision) */}
+                <div className="relative overflow-hidden bg-[#DDE1D2]">
                   <Link href={`/place/${place.id}`} className="block">
                     <MediaCardPlayer
                       media={place.media[0]}
@@ -444,41 +443,26 @@ export default function DiscoverPage() {
                     />
 
                     {/* Hover Gist Overlay */}
-                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/85 via-black/40 to-black/25 p-3.5 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
-                      <div className="flex items-start justify-between gap-2 pr-20">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${PLACE_CATEGORY_STYLES[place.category].badge}`}
-                        >
-                          {place.category}
-                        </span>
-                      </div>
-
-                      <div className="translate-y-2 space-y-1.5 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
-                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/85">
-                          <MapPin className="h-3 w-3 text-amber-300" strokeWidth={2} />
-                          {place.region}
-                          {publicAlertCount > 0 && (
-                            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">
-                              <AlertTriangle className="h-3 w-3" />
-                              {publicAlertCount}
-                            </span>
-                          )}
-                        </div>
-                        <h2 className="font-display text-base font-bold leading-snug text-white line-clamp-2">
-                          {place.title}
-                        </h2>
-                        <p className="line-clamp-2 text-xs leading-relaxed text-white/85">
+                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/35 to-transparent p-4 text-[#F4F5ED] opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+                      <div className="translate-y-2 space-y-2 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
+                        {publicAlertCount > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-700 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                            <AlertTriangle className="h-3 w-3" />
+                            {publicAlertCount} local advisory
+                          </span>
+                        )}
+                        <p className="line-clamp-3 text-[13px] leading-relaxed text-[#F4F5ED]/95">
                           {place.rawDescription}
                         </p>
-                        <div className="flex items-center justify-between pt-1 text-[11px] font-bold text-amber-200">
-                          <span>View full guide</span>
+                        <div className="flex items-center justify-between pt-1 text-xs font-semibold text-[#EAECE0]">
+                          <span>Read field guide</span>
                           <ArrowRight className="h-3.5 w-3.5" />
                         </div>
                       </div>
                     </div>
                   </Link>
 
-                  {/* Top-Right Quick Vouch Pill (Pinterest Save style) */}
+                  {/* Top-Right Quick Vouch Action */}
                   <button
                     type="button"
                     disabled={vouchingId === place.id}
@@ -487,85 +471,100 @@ export default function DiscoverPage() {
                       e.stopPropagation();
                       void handleVouch(place.id);
                     }}
-                    className={`tactile-press absolute right-2.5 top-2.5 z-10 inline-flex min-h-8 items-center gap-1 rounded-full px-3 py-1 text-xs font-bold transition ${
+                    className={`tactile-press absolute right-2.5 top-2.5 z-10 inline-flex min-h-8 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition ${
                       place.userHasVouched
-                        ? "bg-emerald-700 text-white"
-                        : "bg-[#C85A32] text-white opacity-95 hover:bg-[#b24d28] sm:opacity-0 sm:group-hover:opacity-100"
+                        ? "bg-[#3D5236] text-[#F4F5ED]"
+                        : "bg-[#1F271C]/85 text-[#F4F5ED] hover:bg-[#3D5236] sm:opacity-0 sm:group-hover:opacity-100"
                     }`}
                   >
                     <HandHeart className="h-3.5 w-3.5" strokeWidth={2} />
                     {place.vouchesCount}
                   </button>
-
-                  {/* Bottom-Left Compact Gem Score Trigger (visible idle + clickable for formula) */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setOpenScoreId((prev) => (prev === place.id ? null : place.id));
-                    }}
-                    className="absolute bottom-2.5 left-2.5 z-10 inline-flex items-center gap-1 rounded-full bg-[#1B3B36] px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-[#C85A32] group-hover:opacity-0"
-                    title="Gem Score breakdown"
-                  >
-                    <Flame className="h-3 w-3 text-amber-300" strokeWidth={2} />
-                    {place.hiddenGemScore}
-                  </button>
                 </div>
 
-                {openScoreId === place.id && (
-                  <div className="mt-2 rounded-xl border border-black/12 bg-white p-3 text-[11px] text-[#1B3B36]">
-                    <div className="flex items-center justify-between font-bold">
-                      <span>Gem Score Math</span>
-                      <button
-                        type="button"
-                        onClick={() => setOpenScoreId(null)}
-                        className="text-[#C85A32] hover:underline"
-                      >
-                        Close
-                      </button>
-                    </div>
-                    <div className="mt-1.5 space-y-1 text-[#52635F]">
-                      <div className="flex justify-between">
-                        <span>Vouches ({place.vouchesCount} × 2)</span>
-                        <strong className="text-[#1B3B36]">+{gemBreakdown.vouchesPoints}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Check-ins ({place.verifiedCheckinsCount} × 5)</span>
-                        <strong className="text-[#1B3B36]">+{gemBreakdown.checkinsPoints}</strong>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Crowd log10({place.mainstreamPopularityIndex} + 10)</span>
-                        <strong className="text-[#1B3B36]">÷ {gemBreakdown.crowdPenalty.toFixed(2)}</strong>
-                      </div>
-                      <div className="flex justify-between border-t border-black/10 pt-1 font-bold text-[#1B3B36]">
-                        <span>Score</span>
-                        <span>{gemBreakdown.score}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* Region-Tinted Card Body (Single Complete Title, Un-truncated) */}
+                <div className="space-y-2.5 p-3.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${regionStyle.pill}`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${regionStyle.dot}`} />
+                      {place.region}
+                    </span>
 
-                {/* Minimal Pinterest-style Footer Row */}
-                <div className="mt-2 flex items-center justify-between gap-2 px-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpenScoreId((prev) => (prev === place.id ? null : place.id));
+                      }}
+                      className="inline-flex items-center gap-1 rounded-full border border-black/12 bg-white/75 px-2.5 py-0.5 text-xs font-semibold text-[#1F271C] tabular-nums transition hover:border-[#3D5236]"
+                      title="Gem Score breakdown"
+                    >
+                      <Gem className="h-3 w-3 text-[#3D5236]" strokeWidth={2} />
+                      {place.hiddenGemScore}
+                    </button>
+                  </div>
+
                   <Link
                     href={`/place/${place.id}`}
-                    className="truncate text-xs font-semibold text-[#1B3B36] hover:text-[#C85A32]"
+                    className="block font-display text-xl leading-snug text-[#1F271C] hover:text-[#3D5236]"
                   >
                     {place.title}
                   </Link>
-                  <div className="flex shrink-0 items-center gap-1.5">
+
+                  <div className="flex items-center justify-between gap-2 pt-0.5">
+                    <div className="flex items-center gap-2 text-xs text-[#566151]">
+                      <MemojiAvatar id={place.author.id} name={place.author.displayName} size={22} />
+                      <span className="font-medium text-[#1F271C]">{place.author.displayName}</span>
+                      {place.author.tier === "Local Legend" && (
+                        <ShieldCheck
+                          className="h-3.5 w-3.5 text-[#3D5236]"
+                          aria-label="Regional Steward"
+                        />
+                      )}
+                    </div>
                     {place.localVendors.length > 0 && (
-                      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#52635F]">
-                        <Store className="h-3 w-3 text-[#D97706]" />
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#566151]">
+                        <Store className="h-3.5 w-3.5 text-[#3D5236]" />
                         {place.localVendors.length}
                       </span>
                     )}
-                    {place.author.tier === "Local Legend" && (
-                      <Crown className="h-3.5 w-3.5 text-amber-600" aria-label="Local Legend" />
-                    )}
-                    <MemojiAvatar id={place.author.id} name={place.author.displayName} size={20} />
                   </div>
+
+                  {openScoreId === place.id && (
+                    <div className="rounded-xl border border-black/12 bg-[#F4F5ED] p-3 text-xs text-[#1F271C]">
+                      <div className="flex items-center justify-between font-semibold">
+                        <span>Gem Score Formula</span>
+                        <button
+                          type="button"
+                          onClick={() => setOpenScoreId(null)}
+                          className="text-[#3D5236] hover:underline"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      <div className="mt-1.5 space-y-1 text-[#566151] tabular-nums">
+                        <div className="flex justify-between">
+                          <span>Vouches ({place.vouchesCount} × 2)</span>
+                          <strong className="text-[#1F271C]">+{gemBreakdown.vouchesPoints}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Check-ins ({place.verifiedCheckinsCount} × 5)</span>
+                          <strong className="text-[#1F271C]">+{gemBreakdown.checkinsPoints}</strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Crowd log10({place.mainstreamPopularityIndex} + 10)</span>
+                          <strong className="text-[#1F271C]">÷ {gemBreakdown.crowdPenalty.toFixed(2)}</strong>
+                        </div>
+                        <div className="flex justify-between border-t border-black/10 pt-1 font-bold text-[#1F271C]">
+                          <span>Score</span>
+                          <span>{gemBreakdown.score}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </motion.article>
             );

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Award, Check, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
 import { MemojiAvatar } from "@/components/MemojiAvatar";
-import { canVolunteerAsGuide, REGIONS, TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
+import { canVolunteerAsGuide, getTierDisplayLabel, REGIONS, TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, Profile, UserBadge } from "@/types/domain";
 
@@ -108,18 +108,18 @@ export default function ProfilePage() {
             <MemojiAvatar id={profile.id} name={profile.displayName} size={56} />
             <div>
               <span
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
                   TRAILBLAZER_TIER_STYLES[profile.tier].badge
                 }`}
               >
                 <Award className="h-3.5 w-3.5" strokeWidth={2} />
-                {profile.tier} Tier
+                {getTierDisplayLabel(profile.tier)}
               </span>
-              <h1 className="mt-1.5 font-display text-3xl font-bold text-[#1B3B36]">
+              <h1 className="mt-1.5 font-display text-4xl text-[#1F271C]">
                 {profile.displayName}
               </h1>
-              <p className="text-sm text-[#52635F]">
-                @{profile.username} · {profile.trailblazerScore} Trailblazer Points
+              <p className="text-sm text-[#566151]">
+                @{profile.username} · {profile.trailblazerScore} Community Points
               </p>
             </div>
           </div>
@@ -134,10 +134,10 @@ export default function ProfilePage() {
 
         {/* Tier progress */}
         <div className="mt-6 space-y-2">
-          <div className="flex justify-between text-xs font-semibold text-[#52635F]">
-            <span>Wanderer (0)</span>
-            <span>Pathfinder (100)</span>
-            <span>Local Legend (300+)</span>
+          <div className="flex justify-between text-xs font-semibold text-[#566151]">
+            <span>Explorer (0)</span>
+            <span>Field Scout (100)</span>
+            <span>Regional Steward (300+)</span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-[#EAE2D6]">
             <div
@@ -177,8 +177,8 @@ export default function ProfilePage() {
             },
             {
               key: "local_legend",
-              name: "Local Legend",
-              desc: "Reach 300+ Trailblazer Points for priority curation.",
+              name: "Regional Steward",
+              desc: "Reach 300+ community points for priority regional curation.",
               span: true,
             },
           ].map((b) => {
@@ -226,14 +226,14 @@ export default function ProfilePage() {
             Volunteer as a Local Guide (Trust-Gated)
           </h2>
         </div>
-        <p className="mt-1 text-sm text-[#52635F]">
-          To prevent spam, only <strong>Pathfinder (100+ pts)</strong>,{" "}
-          <strong>Local Legend (300+ pts)</strong>, or verified locals can enable guide status.
+        <p className="mt-1 text-sm text-[#566151]">
+          To prevent spam, only <strong>Field Scouts (100+ pts)</strong>,{" "}
+          <strong>Regional Stewards (300+ pts)</strong>, or verified locals can enable guide status.
         </p>
 
         {!guideEligible ? (
           <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-            You currently have <strong>{profile.trailblazerScore} pts</strong> ({profile.tier}). Earn{" "}
+            You currently have <strong>{profile.trailblazerScore} pts</strong> ({getTierDisplayLabel(profile.tier)}). Earn{" "}
             <strong>{100 - profile.trailblazerScore} more points</strong> via discoveries &amp; vouches
             (or switch to Ananya/Biju/Kavya in Persona Switcher) to unlock Guide mode.
           </div>

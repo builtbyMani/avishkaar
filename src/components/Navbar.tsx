@@ -10,10 +10,10 @@ import {
   Compass,
   Layers,
   PlusCircle,
-  Trophy,
+  User,
   X,
 } from "lucide-react";
-import { TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
+import { getTierDisplayLabel } from "@/lib/domain";
 import { useApp } from "./AppProvider";
 import { AvishkaarLogo } from "./AvishkaarLogo";
 import { MemojiAvatar } from "./MemojiAvatar";
@@ -38,22 +38,22 @@ export function Navbar() {
   }
 
   const navItems = [
-    { href: "/", label: "Discover", icon: Compass },
+    { href: "/", label: "Explore", icon: Compass },
     { href: "/submit", label: "Post", icon: PlusCircle },
     {
       href: "/offline",
-      label: `Saved (${offlineCards.length})`,
+      label: offlineCards.length > 0 ? `Saved (${offlineCards.length})` : "Saved",
       icon: BookmarkCheck,
       badge: offlineCards.length > 0 ? offlineCards.length : null,
     },
-    { href: "/profile", label: "Profile", icon: Trophy },
+    { href: "/profile", label: "Profile", icon: User },
   ];
 
   return (
     <>
-      {/* Desktop Left Slim Rail (Pinterest-style) */}
-      <aside className="no-print fixed inset-y-0 left-0 z-40 hidden w-16 flex-col items-center justify-between border-r border-black/12 bg-[#EAECE0] py-4 md:flex">
-        <div className="flex flex-col items-center gap-4">
+      {/* Desktop Left Rail with clear labels */}
+      <aside className="no-print fixed inset-y-0 left-0 z-40 hidden w-20 flex-col items-center justify-between border-r border-black/12 bg-[#EAECE0] py-4 md:flex">
+        <div className="flex w-full flex-col items-center gap-4 px-1.5">
           <Link
             href="/"
             aria-label="Avishkaar Home"
@@ -62,7 +62,7 @@ export function Navbar() {
             <AvishkaarLogo size={26} />
           </Link>
 
-          <nav className="flex flex-col items-center gap-2" aria-label="Primary rail">
+          <nav className="flex w-full flex-col items-center gap-1.5" aria-label="Primary rail">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = pathname === item.href;
@@ -70,8 +70,8 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  aria-label={item.label}
-                  className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition ${
+                  title={item.label}
+                  className={`group relative flex w-full flex-col items-center justify-center gap-1 rounded-xl py-2 transition ${
                     active ? "text-[#EAECE0]" : "text-[#1F271C] hover:bg-black/5"
                   }`}
                 >
@@ -82,9 +82,12 @@ export function Navbar() {
                       className="absolute inset-0 rounded-xl bg-[#3D5236]"
                     />
                   )}
-                  <Icon className="relative z-10 h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
+                  <Icon className="relative z-10 h-[18px] w-[18px]" strokeWidth={active ? 2 : 1.75} />
+                  <span className="relative z-10 text-[11px] font-medium leading-none">
+                    {item.href === "/offline" ? "Saved" : item.label}
+                  </span>
                   {item.badge !== null && item.badge !== undefined && (
-                    <span className="absolute -right-0.5 -top-0.5 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#667D5C] px-1 text-[10px] font-bold text-white">
+                    <span className="absolute right-2 top-1.5 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#667D5C] px-1 text-[10px] font-bold text-white">
                       {item.badge}
                     </span>
                   )}
@@ -97,15 +100,16 @@ export function Navbar() {
         <button
           type="button"
           onClick={() => setImpactOpen(true)}
-          aria-label="Impact & Stack"
-          className="flex h-11 w-11 items-center justify-center rounded-xl text-[#566151] transition hover:bg-black/5 hover:text-[#1F271C]"
+          title="Platform Impact & Architecture"
+          className="flex w-16 flex-col items-center justify-center gap-1 rounded-xl py-2 text-[#566151] transition hover:bg-black/5 hover:text-[#1F271C]"
         >
-          <BarChart3 className="h-5 w-5" strokeWidth={1.75} />
+          <BarChart3 className="h-[18px] w-[18px]" strokeWidth={1.75} />
+          <span className="text-[11px] font-medium leading-none">Impact</span>
         </button>
       </aside>
 
       {/* Top Sticky Bar */}
-      <header className="no-print sticky top-0 z-30 border-b border-black/12 bg-[#EAECE0] md:pl-16">
+      <header className="no-print sticky top-0 z-30 border-b border-black/12 bg-[#EAECE0] md:pl-20">
         <ScrollProgressBar />
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
@@ -117,14 +121,14 @@ export function Navbar() {
                   className="flex items-center gap-2"
                 >
                   <AvishkaarLogo size={24} />
-                  <span className="font-display text-lg font-bold tracking-tight text-[#1F271C]">
+                  <span className="font-display text-2xl tracking-tight text-[#1F271C]">
                     Avishkaar
                   </span>
                 </motion.div>
               ) : (
                 <div className="flex items-center gap-2 opacity-0" aria-hidden="true">
                   <AvishkaarLogo size={24} />
-                  <span className="font-display text-lg font-bold tracking-tight">
+                  <span className="font-display text-2xl tracking-tight">
                     Avishkaar
                   </span>
                 </div>
@@ -141,46 +145,39 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap ${
-                    active ? "bg-[#1B3B36] text-white" : "text-[#1B3B36] hover:bg-black/5"
+                  className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition whitespace-nowrap ${
+                    active ? "bg-[#3D5236] text-[#F4F5ED]" : "text-[#1F271C] hover:bg-black/5"
                   }`}
                 >
-                  <Icon className="h-3.5 w-3.5" strokeWidth={active ? 2.25 : 1.75} />
+                  <Icon className="h-3.5 w-3.5" strokeWidth={active ? 2 : 1.75} />
                   {item.label}
                 </Link>
               );
             })}
           </nav>
 
-          <button
-            type="button"
-            onClick={openAuthModal}
-            aria-label="Account"
-            className="tactile-press inline-flex min-h-9 items-center gap-2 rounded-full border border-black/12 bg-white py-1 pl-1.5 pr-3 text-left transition hover:border-[#C85A32]"
-          >
-            <MemojiAvatar
-              id={activeUser?.id}
-              name={activeUser?.displayName || "Guest"}
-              size={28}
-            />
-            {activeUser ? (
-              <div className="flex items-center gap-2">
-                <span className="max-w-[110px] truncate text-xs font-semibold text-[#1B3B36]">
-                  {activeUser.displayName.split(" ")[0]}
-                </span>
-                <span
-                  className={`hidden rounded-full border px-2 py-0.5 text-[10px] font-bold sm:inline-block ${
-                    TRAILBLAZER_TIER_STYLES[activeUser.tier]?.badge ??
-                    TRAILBLAZER_TIER_STYLES.Wanderer.badge
-                  }`}
-                >
-                  {activeUser.tier} · {activeUser.trailblazerScore}
-                </span>
-              </div>
-            ) : (
-              <span className="text-xs font-semibold text-[#1B3B36]">Sign In</span>
+          <div className="flex items-center gap-3">
+            {activeUser && (
+              <span className="hidden text-[13px] font-medium text-[#566151] tabular-nums sm:inline">
+                {getTierDisplayLabel(activeUser.tier)} · {activeUser.trailblazerScore} pts
+              </span>
             )}
-          </button>
+            <button
+              type="button"
+              onClick={openAuthModal}
+              aria-label="Account"
+              className="tactile-press inline-flex min-h-10 items-center gap-2.5 rounded-full border border-black/12 bg-[#F4F5ED] py-1 pl-1.5 pr-4 text-left transition hover:border-[#3D5236]"
+            >
+              <MemojiAvatar
+                id={activeUser?.id}
+                name={activeUser?.displayName || "Guest"}
+                size={30}
+              />
+              <span className="max-w-[130px] truncate text-sm font-semibold text-[#1F271C]">
+                {activeUser ? activeUser.displayName.split(" ")[0] : "Sign In"}
+              </span>
+            </button>
+          </div>
         </div>
       </header>
 

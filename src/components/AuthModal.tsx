@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Award, Check, LogOut, Mail, Shield, X } from "lucide-react";
-import { TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
+import { TRAILBLAZER_TIER_STYLES, getTierDisplayLabel } from "@/lib/domain";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import { useApp } from "./AppProvider";
 import { MemojiAvatar } from "./MemojiAvatar";
@@ -199,20 +199,20 @@ export function AuthModal({
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-bold text-[#1B3B36]">{p.displayName}</span>
                         <span
-                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                          className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
                             TRAILBLAZER_TIER_STYLES[p.tier].badge
                           }`}
                         >
-                          {p.tier}
+                          {getTierDisplayLabel(p.tier)}
                         </span>
                         {p.isGuide && (
-                          <span className="rounded-full border border-teal-300 bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-900">
-                            Guide
+                          <span className="rounded-full border border-black/12 bg-[#EAECE0] px-2 py-0.5 text-[11px] font-medium text-[#3D5236]">
+                            Local Guide
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-[#52635F]">
-                        {p.tier} · {p.trailblazerScore} Trailblazer pts
+                      <p className="mt-0.5 text-xs text-[#566151]">
+                        {getTierDisplayLabel(p.tier)} · {p.trailblazerScore} pts
                         {p.guideRegion ? ` · ${p.guideRegion}` : ""}
                       </p>
                     </div>

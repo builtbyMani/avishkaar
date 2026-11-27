@@ -28,6 +28,12 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  background-color: var(--canvas);
+  background-image:
+    linear-gradient(rgba(234, 236, 224, 0.74), rgba(234, 236, 224, 0.74)),
+    url("/images/paper-bg.jpg");
+  background-size: 480px 480px;
+  background-repeat: repeat;
 }
 
 .hero-64 .nav {

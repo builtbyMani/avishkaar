@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
-import { Archivo_Black, Fraunces, Plus_Jakarta_Sans, Satisfy } from "next/font/google";
+import { Archivo_Black, Hind, Instrument_Serif, Satisfy } from "next/font/google";
 import "./globals.css";
 import { AppProvider, MainShell } from "@/components/AppProvider";
 import { Navbar } from "@/components/Navbar";
 import Preloader from "@/components/Preloader";
 
-const sans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
+const sans = Hind({
+  subsets: ["latin", "devanagari"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-sans",
 });
 
-const display = Fraunces({
+const display = Instrument_Serif({
   subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
   variable: "--font-display",
 });
 

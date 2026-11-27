@@ -127,9 +127,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     (mode === "demo" ? profiles[profiles.length - 1] : null) ??
     null;
 
-  const pathname = usePathname();
-  const isLanding = pathname === "/" && !enteredHome;
-
   return (
     <AppContext.Provider
       value={{
@@ -150,7 +147,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       <LayoutGroup>
-        <div className={isLanding ? "min-h-dvh w-full" : "paper-bg min-h-dvh w-full"}>
+        <div className="min-h-dvh w-full bg-[#EAECE0]">
           {children}
         </div>
       </LayoutGroup>
@@ -174,7 +171,7 @@ export function MainShell({ children }: { children: React.ReactNode }) {
       className={
         isLanding
           ? "min-h-dvh w-full"
-          : "mx-auto max-w-[1440px] px-4 pb-16 pt-5 sm:px-6 md:pl-20 lg:px-8 lg:pl-24"
+          : "mx-auto max-w-[1440px] px-4 pb-16 pt-6 sm:px-6 md:pl-24 lg:px-8 lg:pl-28"
       }
     >
       {children}

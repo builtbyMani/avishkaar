@@ -284,50 +284,107 @@ export const PLACE_CATEGORY_STYLES: Record<
   { pillIdle: string; pillActive: string; badge: string }
 > = {
   "Hidden Village": {
-    pillIdle: "border-slate-300 bg-slate-50 text-slate-800 hover:border-slate-500",
-    pillActive: "border-slate-800 bg-slate-800 text-white",
-    badge: "border border-slate-300 bg-slate-100 text-slate-800",
+    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
+    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
+    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
   },
   "Regional Cuisine": {
-    pillIdle: "border-orange-300 bg-orange-50 text-[#9A3412] hover:border-orange-500",
-    pillActive: "border-[#C85A32] bg-[#C85A32] text-white",
-    badge: "border border-orange-300 bg-orange-50 text-[#9A3412]",
+    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
+    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
+    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
   },
   "Living Heritage": {
-    pillIdle: "border-amber-300 bg-amber-50 text-amber-900 hover:border-amber-500",
-    pillActive: "border-amber-800 bg-amber-800 text-white",
-    badge: "border border-amber-300 bg-amber-50 text-amber-900",
+    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
+    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
+    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
   },
   "Sacred & Craft": {
-    pillIdle: "border-stone-400 bg-stone-100 text-stone-900 hover:border-stone-600",
-    pillActive: "border-stone-800 bg-stone-800 text-white",
-    badge: "border border-stone-400 bg-stone-200 text-stone-900",
+    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
+    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
+    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
   },
   "Nature & Trail": {
-    pillIdle: "border-teal-300 bg-teal-50 text-teal-900 hover:border-teal-500",
-    pillActive: "border-teal-800 bg-teal-800 text-white",
-    badge: "border border-teal-300 bg-teal-50 text-teal-900",
+    pillIdle: "border-black/12 bg-[#F4F5ED] text-[#1F271C] hover:border-[#3D5236]",
+    pillActive: "border-[#3D5236] bg-[#3D5236] text-[#F4F5ED]",
+    badge: "border border-black/12 bg-[#F4F5ED] text-[#1F271C]",
   },
 };
+
+export const REGION_STYLES: Record<
+  string,
+  { cardBg: string; border: string; pill: string; dot: string }
+> = {
+  "Spiti & Kinnaur": {
+    cardBg: "bg-[#E9ECEF]",
+    border: "border-[#64748B]/25",
+    pill: "bg-[#DCE3E8] text-[#26323F]",
+    dot: "bg-[#4A6074]",
+  },
+  "Meghalaya & Northeast": {
+    cardBg: "bg-[#E3ECE3]",
+    border: "border-[#3D5236]/25",
+    pill: "bg-[#D3E2D4] text-[#1F3422]",
+    dot: "bg-[#3D5236]",
+  },
+  "Deccan & Western Ghats": {
+    cardBg: "bg-[#EFE6DC]",
+    border: "border-[#7C4D34]/22",
+    pill: "bg-[#E7D8C8] text-[#452819]",
+    dot: "bg-[#7C4D34]",
+  },
+  "Kutch & Thar": {
+    cardBg: "bg-[#F3ECD9]",
+    border: "border-[#8A6D2F]/24",
+    pill: "bg-[#EAE0C3] text-[#463612]",
+    dot: "bg-[#8A6D2F]",
+  },
+  "Malabar & Konkan": {
+    cardBg: "bg-[#E2ECEA]",
+    border: "border-[#2D615B]/24",
+    pill: "bg-[#D1E3DF] text-[#183834]",
+    dot: "bg-[#2D615B]",
+  },
+};
+
+export function getRegionStyle(region: string) {
+  return (
+    REGION_STYLES[region] ?? {
+      cardBg: "bg-[#F4F5ED]",
+      border: "border-black/12",
+      pill: "bg-[#E0E3D3] text-[#1F271C]",
+      dot: "bg-[#667D5C]",
+    }
+  );
+}
+
+export const TIER_DISPLAY_LABELS: Record<TrailblazerTier, string> = {
+  Wanderer: "Explorer",
+  Pathfinder: "Field Scout",
+  "Local Legend": "Regional Steward",
+};
+
+export function getTierDisplayLabel(tier: TrailblazerTier): string {
+  return TIER_DISPLAY_LABELS[tier] ?? tier;
+}
 
 export const TRAILBLAZER_TIER_STYLES: Record<
   TrailblazerTier,
   { badge: string; progressFill: string; cardRing: string }
 > = {
   Wanderer: {
-    badge: "border-stone-300 bg-stone-100 text-stone-700",
-    progressFill: "bg-[#52635F]",
-    cardRing: "border-stone-400",
+    badge: "border-black/12 bg-[#F4F5ED] text-[#566151]",
+    progressFill: "bg-[#667D5C]",
+    cardRing: "border-black/20",
   },
   Pathfinder: {
-    badge: "border-teal-300 bg-teal-50 text-teal-900",
-    progressFill: "bg-teal-700",
-    cardRing: "border-teal-500",
+    badge: "border-[#3D5236]/25 bg-[#E3ECE3] text-[#283B23]",
+    progressFill: "bg-[#4A6443]",
+    cardRing: "border-[#4A6443]",
   },
   "Local Legend": {
-    badge: "border-amber-400 bg-[#1B3B36] text-amber-200 ring-1 ring-amber-400",
-    progressFill: "bg-[#1B3B36]",
-    cardRing: "border-amber-500 ring-1 ring-amber-400",
+    badge: "border-[#3D5236]/30 bg-[#DCE5D5] text-[#1F271C]",
+    progressFill: "bg-[#3D5236]",
+    cardRing: "border-[#3D5236]",
   },
 };
 

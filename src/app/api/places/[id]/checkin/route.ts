@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { haversineDistanceKm } from "@/lib/domain";
+import { haversineDistanceKm, isDemoCheckInAllowed } from "@/lib/domain";
 import { getPlaceDetail, performCheckIn } from "@/lib/store";
 import { resolveActorId } from "@/lib/supabase";
 
@@ -26,6 +26,13 @@ export async function POST(
     const { place } = await getPlaceDetail(id, actorId);
     if (!place) {
       return NextResponse.json({ error: "Place not found" }, { status: 404 });
+    }
+
+    if (body.demoCheckIn && !isDemoCheckInAllowed(process.env)) {
+      return NextResponse.json(
+        { error: "Demo Check-in is disabled in production. Set ALLOW_DEMO_CHECKIN=true on a judging deployment, or check in with real geolocation." },
+        { status: 403 },
+      );
     }
 
     if (!body.demoCheckIn) {
@@ -55,9 +62,10 @@ export async function POST(
     const result = await performCheckIn(id, actorId);
     return NextResponse.json(result);
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Check-in failed";
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Check-in failed" },
-      { status: 500 },
+      { error: message },
+      { status: message.includes("your own place") ? 403 : 500 },
     );
   }
 }

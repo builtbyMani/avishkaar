@@ -16,9 +16,10 @@ export async function POST(
     const result = await performVouch(id, actorId);
     return NextResponse.json(result);
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Vouch failed";
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Vouch failed" },
-      { status: 500 },
+      { error: message },
+      { status: message.includes("your own place") ? 403 : 500 },
     );
   }
 }

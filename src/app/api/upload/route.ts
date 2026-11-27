@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase";
+import { getSupabaseServerClient, isSupabaseConfigured, resolveActorId } from "@/lib/supabase";
+import { detectFileKind } from "@/lib/upload-validation";
 
 const MAX_IMAGE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB for photos
 const MAX_VIDEO_SIZE_BYTES = 8 * 1024 * 1024; // <8 MB for short hover clips
@@ -16,14 +17,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const isVideo = file.type.startsWith("video/");
-    const isImage = file.type.startsWith("image/");
-    if (!isVideo && !isImage) {
+    // Auth required (Issues 2/11). In Demo Mode the fallback id is the
+    // form's userId field; in Supabase mode it is the verified Bearer token.
+    const actorId = await resolveActorId(request, String(formData.get("userId") ?? ""));
+    if (!actorId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    const bytes = Buffer.from(await file.arrayBuffer());
+
+    // Real type comes from magic bytes — never from file.type or file.name.
+    // SVG/HTML and every other active/unknown format is rejected here.
+    const detected = detectFileKind(bytes);
+    if (!detected) {
       return NextResponse.json(
-        { error: "Only image and short video files are supported" },
+        { error: "Only JPEG, PNG, WebP or GIF images and MP4/WebM short videos are supported" },
         { status: 400 },
       );
     }
+    const isVideo = detected.kind === "video";
 
     if (isVideo && file.size > MAX_VIDEO_SIZE_BYTES) {
       return NextResponse.json(
@@ -31,16 +43,15 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    if (isImage && file.size > MAX_IMAGE_SIZE_BYTES) {
+    if (!isVideo && file.size > MAX_IMAGE_SIZE_BYTES) {
       return NextResponse.json(
         { error: "Photo exceeds 25 MB limit" },
         { status: 400 },
       );
     }
 
-    const ext = path.extname(file.name) || (isVideo ? ".mp4" : ".jpg");
-    const safeName = `${crypto.randomUUID()}${ext}`;
-    const bytes = Buffer.from(await file.arrayBuffer());
+    // Extension is derived from the detected type, never the uploaded name.
+    const safeName = `${crypto.randomUUID()}${detected.ext}`;
 
     if (isSupabaseConfigured()) {
       const sb = getSupabaseServerClient();
@@ -49,7 +60,7 @@ export async function POST(request: NextRequest) {
       }
       const { error } = await sb.storage
         .from("place-media")
-        .upload(safeName, bytes, { contentType: file.type, upsert: false });
+        .upload(safeName, bytes, { contentType: detected.contentType, upsert: false });
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }

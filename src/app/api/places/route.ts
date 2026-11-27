@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createPlace, listPlaces } from "@/lib/store";
 import { resolveActorId } from "@/lib/supabase";
 import type { LocalVendor, MediaItem, PlaceCategory, SafetyAlert, StructuredCards } from "@/types/domain";
+import { validatePlaceInput } from "@/lib/validation";
 
 export async function GET(request: NextRequest) {
-  const viewerId = request.nextUrl.searchParams.get("viewerId") || undefined;
+  const viewerId = (await resolveActorId(request, request.nextUrl.searchParams.get("viewerId") || undefined)) || undefined;
   const category = request.nextUrl.searchParams.get("category") || undefined;
   const region = request.nextUrl.searchParams.get("region") || undefined;
 
@@ -40,21 +41,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    if (!body.title?.trim() || !body.region?.trim() || !body.rawDescription?.trim()) {
-      return NextResponse.json(
-        { error: "title, region, and rawDescription are required." },
-        { status: 400 },
-      );
+    const validation = validatePlaceInput(body);
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
     }
 
+    // Validation above guarantees these are present and within limits.
+    const title = (body.title ?? "").trim();
     const result = await createPlace({
       authorId: actorId,
-      title: body.title.trim(),
-      region: body.region.trim(),
-      category: body.category || "Hidden Village",
-      rawDescription: body.rawDescription.trim(),
-      lat: Number.isFinite(body.lat) ? Number(body.lat) : 20.5937,
-      lng: Number.isFinite(body.lng) ? Number(body.lng) : 78.9629,
+      title,
+      region: validation.region,
+      category: validation.category,
+      rawDescription: (body.rawDescription ?? "").trim(),
+      lat: validation.lat,
+      lng: validation.lng,
       media: body.media?.length
         ? body.media
         : [
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
               type: "image",
               url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
               aspect: "portrait",
-              caption: body.title.trim(),
+              caption: title,
             },
           ],
       structuredCards: body.structuredCards ?? { commute: [], food: [], activities: [] },

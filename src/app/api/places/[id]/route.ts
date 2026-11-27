@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPlaceDetail } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
-  const viewerId = request.nextUrl.searchParams.get("viewerId") || undefined;
+  const viewerId = (await resolveActorId(request, request.nextUrl.searchParams.get("viewerId") || undefined)) || undefined;
   const detail = await getPlaceDetail(id, viewerId);
 
   if (!detail.place) {

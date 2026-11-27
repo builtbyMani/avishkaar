@@ -9,6 +9,13 @@ export async function POST(request: NextRequest) {
       viewerId?: string;
     };
 
+    if (body.query && body.query.trim().length > 100) {
+      return NextResponse.json(
+        { error: "Detour query is limited to 100 characters" },
+        { status: 400 },
+      );
+    }
+
     if (!body.query?.trim()) {
       return NextResponse.json(
         { error: "Enter a crowded destination (e.g. Ooty, Goa, Hampi)." },

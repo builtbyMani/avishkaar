@@ -8,8 +8,12 @@ import { resolveActorId } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const placeId = request.nextUrl.searchParams.get("placeId") || undefined;
-  const userId = request.nextUrl.searchParams.get("userId") || undefined;
-  const guideRequests = await listGuideRequests({ placeId, userId });
+  const actorId = await resolveActorId(request, request.nextUrl.searchParams.get("userId") || undefined);
+  if (!actorId) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+  // Callers can only ever see requests they are a party to, whatever they ask for.
+  const guideRequests = await listGuideRequests({ placeId, userId: actorId });
   return NextResponse.json({ guideRequests });
 }
 

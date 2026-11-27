@@ -17,14 +17,19 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ profiles });
   }
 
-  const profile = (await getProfileById(userId)) ?? profiles[0] ?? null;
+  const profile = await getProfileById(userId);
   if (!profile) {
     return NextResponse.json({ error: "Profile not found" }, { status: 404 });
   }
 
+  // Privacy: guide requests (which contain private trip notes) are only
+  // returned when the caller is authenticated as the profile owner.
+  const actorId = await resolveActorId(request, request.nextUrl.searchParams.get("requesterId") || undefined);
+  const isOwner = actorId === profile.id;
+
   const [badges, guideRequests, places] = await Promise.all([
     listUserBadges(profile.id),
-    listGuideRequests({ userId: profile.id }),
+    isOwner ? listGuideRequests({ userId: profile.id }) : Promise.resolve([]),
     listPlaces(profile.id),
   ]);
 
@@ -61,9 +66,8 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ profile: updated });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to update guide profile" },
-      { status: 403 },
-    );
+    const message = error instanceof Error ? error.message : "Failed to update guide profile";
+    const status = message === "Profile not found" ? 404 : message.startsWith("Trust gate:") ? 403 : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

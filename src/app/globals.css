@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --bg-parchment: #faf7f2;
+  --bg-surface: #ffffff;
+  --ink-forest: #1b3b36;
+  --ink-muted: #52635f;
+  --accent-terracotta: #c85a32;
+  --accent-amber: #d97706;
+  --border-warm: #e8e0d4;
+}
+
+body {
+  background-color: var(--bg-parchment);
+  color: var(--ink-forest);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* Fix Leaflet container z-index inside sticky header layouts */
+.leaflet-container {
+  z-index: 10;
+  font-family: inherit;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print-card {
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}

@@ -1,12 +1,12 @@
 ---
 gsd_state_version: '1.0'
-status: executing
+status: complete
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 5
   total_plans: 13
-  completed_plans: 0
-  percent: 0
+  completed_plans: 13
+  percent: 100
 ---
 
 # Project State
@@ -16,38 +16,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-11-27)
 
 **Core value:** Surface lesser-known destinations, regional cuisines, and local heritage through community-verified **Vouches** and **Hidden Gem Score** ranking instead of mainstream popularity clickbait.
-**Current focus:** Phase 1 — Foundation, 5-Table Schema & Seed Data
+**Current focus:** v1.0 Complete — Ready for live demo or Supabase/Vercel deployment
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation, 5-Table Schema & Seed Data)
-Plan: 0 of 3 in current phase
-Status: Ready to execute Phase 1
-Last activity: 2026-11-27 — Initialized GSD project from final_approach.md
+Phase: 5 of 5 (Polish, Deploy & Demo Readiness)
+Plan: 2 of 2 in current phase
+Status: Complete
+Last activity: 2026-11-27 — Completed all 5 phases, unit tests, production build, and live E2E HTTP smoke verification
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0.0 hours
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| - | - | - | - |
+- Total plans completed: 13
+- Total phases completed: 5
 
 ## Accumulated Context
 
 ### Decisions
 
-- [Init]: Aligned 5 GSD Vertical MVP phases to the 48-hour hackathon schedule.
-- [Init]: Check-in timestamps/flags live on `vouches` (`checked_in_at`, `vouched_at`, `is_verified_visit`) so schema stays strictly at 5 tables (`profiles`, `places`, `vouches`, `user_badges`, `guide_requests`).
-- [Init]: `is_guide` unlocked for `Pathfinder` (100+ pts), `Local Legend` (300+ pts), and seeded verified locals; `Local Legend` gets priority visibility.
-- [Init]: Dual-mode data repository supports full Supabase + Gemini API via env vars plus full local/demo mode fallback so judging never blocks on missing keys.
+- [Phase 1]: Used `next build --turbopack` in `package.json` to avoid a `next@15.5.29` webpack `app-paths-manifest.json` issue.
+- [Phase 1]: Built dual-mode store (`src/lib/store.ts`) supporting Supabase Postgres/Storage/RPCs via env vars and persistent `.data/demo-store.json` locally.
 
 ### Pending Todos
 
@@ -55,10 +46,10 @@ None yet.
 
 ### Blockers/Concerns
 
-None yet.
+- Configure `.env.local` with Supabase (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) and `GEMINI_API_KEY` when moving from Demo Mode to live hosted Supabase + Gemini.
 
 ## Session Continuity
 
-Last session: 2026-11-27 14:17
-Stopped at: Project initialized; starting Phase 1 execution
+Last session: 2026-11-27 14:43
+Stopped at: All 5 GSD phases implemented, tested, built, and committed
 Resume file: None

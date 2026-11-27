@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Award, Check, LogIn, Shield, X } from "lucide-react";
+import { TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import { useApp } from "./AppProvider";
+import { MemojiAvatar } from "./MemojiAvatar";
 
 export function AuthModal({
   open,
@@ -85,12 +87,12 @@ export function AuthModal({
         </button>
 
         <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#1B3B36]">
-          Traveler Account &amp; Demo Personas
+          Account &amp; Profiles
         </h2>
         <p className="mt-1 text-sm text-[#52635F]">
           {mode === "supabase"
-            ? "Sign in with Email or Google via Supabase Auth."
-            : "Running in Local Demo Mode — switch between Wanderer, Pathfinder, and Local Legend accounts in 1 click."}
+            ? "Sign in with Email or Google."
+            : "Choose a traveler profile to browse, vouch, or guide."}
         </p>
 
         {supabaseEnabled && (
@@ -150,7 +152,7 @@ export function AuthModal({
         <div className="mt-5">
           <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#52635F]">
             <Shield className="h-3.5 w-3.5 text-[#C85A32]" />
-            Quick Persona Switcher (Test Tiers, Guides &amp; Vouches)
+            Traveler Profiles
           </div>
           <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
             {profiles.map((p) => {
@@ -163,25 +165,35 @@ export function AuthModal({
                     switchDemoUser(p.id);
                     onClose();
                   }}
-                  className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition ${
+                  className={`flex min-h-12 w-full items-center justify-between rounded-xl border p-3 text-left transition ${
                     selected
-                      ? "border-[#C85A32] bg-white shadow-xs"
-                      : "border-[#E8E0D4] bg-white/70 hover:bg-white"
+                      ? `${TRAILBLAZER_TIER_STYLES[p.tier].cardRing} bg-white`
+                      : "border-black/12 bg-white hover:border-[#1B3B36]"
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-[#1B3B36]">{p.displayName}</span>
-                      {p.isGuide && (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                          Guide
+                  <div className="flex items-center gap-3">
+                    <MemojiAvatar id={p.id} name={p.displayName} size={34} />
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-bold text-[#1B3B36]">{p.displayName}</span>
+                        <span
+                          className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${
+                            TRAILBLAZER_TIER_STYLES[p.tier].badge
+                          }`}
+                        >
+                          {p.tier}
                         </span>
-                      )}
+                        {p.isGuide && (
+                          <span className="rounded-full border border-teal-300 bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-900">
+                            Guide
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-xs text-[#52635F]">
+                        {p.tier} · {p.trailblazerScore} Trailblazer pts
+                        {p.guideRegion ? ` · ${p.guideRegion}` : ""}
+                      </p>
                     </div>
-                    <p className="mt-0.5 text-xs text-[#52635F]">
-                      {p.tier} · {p.trailblazerScore} Trailblazer pts
-                      {p.guideRegion ? ` · ${p.guideRegion}` : ""}
-                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Award className="h-4 w-4 text-[#D97706]" />

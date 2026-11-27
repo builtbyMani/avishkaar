@@ -73,7 +73,7 @@ export function MediaCardPlayer({
           allowFullScreen
           className="h-full w-full border-0"
         />
-        <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-red-600/90 px-2.5 py-1 text-[10px] font-bold text-white">
+        <span className="pointer-events-none absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-stone-950/90 px-2.5 py-1 text-[10px] font-bold text-white">
           <Youtube className="h-3 w-3" />
           YouTube Short
         </span>

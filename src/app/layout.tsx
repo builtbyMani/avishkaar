@@ -27,10 +27,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sans.variable} ${display.variable}`}>
-      <body className="min-h-screen antialiased selection:bg-[#C85A32]/20">
+      <body className="min-h-dvh antialiased selection:bg-[#C85A32]/20">
         <AppProvider>
           <Navbar />
-          <main className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+          <main className="mx-auto max-w-[1440px] px-4 pb-16 pt-5 sm:px-6 md:pl-20 lg:px-8 lg:pl-24">
             {children}
           </main>
         </AppProvider>

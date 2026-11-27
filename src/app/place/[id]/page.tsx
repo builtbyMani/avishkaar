@@ -12,7 +12,6 @@ import {
   Check,
   CheckCircle2,
   Compass,
-  Copy,
   Flag,
   HandHeart,
   Landmark,
@@ -27,14 +26,13 @@ import {
   UserCheck,
   Utensils,
   WifiOff,
-  X,
 } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import { formatUpiHandle, isSafetyAlertPublic } from "@/lib/domain";
+import { isSafetyAlertPublic } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
-import type { EnrichedPlace, GuideRequest, LocalVendor, Profile, SafetyAlert, UserBadge } from "@/types/domain";
+import type { EnrichedPlace, GuideRequest, Profile, SafetyAlert, UserBadge } from "@/types/domain";
 
 export default function PlaceDetailPage() {
   const params = useParams<{ id: string }>();
@@ -57,9 +55,7 @@ export default function PlaceDetailPage() {
   const [preferredDate, setPreferredDate] = useState("2026-12-10");
   const [requestNotes, setRequestNotes] = useState("");
   const [submittingGuide, setSubmittingGuide] = useState(false);
-  const [upiVendor, setUpiVendor] = useState<LocalVendor | null>(null);
   const [activeMediaIdx, setActiveMediaIdx] = useState(0);
-  const [copiedUpi, setCopiedUpi] = useState(false);
 
   const loadPlace = useCallback(async () => {
     if (!placeId) return;
@@ -88,16 +84,15 @@ export default function PlaceDetailPage() {
   }, [loadPlace]);
 
   useEffect(() => {
-    if (!selectedGuide && !upiVendor) return;
+    if (!selectedGuide) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setSelectedGuide(null);
-        setUpiVendor(null);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedGuide, upiVendor]);
+  }, [selectedGuide]);
 
   async function handleVouch() {
     if (!activeUser || !place) return;
@@ -663,7 +658,6 @@ export default function PlaceDetailPage() {
             {place.localVendors.map((v) => {
               const phoneDigits = (v.whatsapp || v.contact).replace(/[^\d+]/g, "");
               const waDigits = phoneDigits.replace(/^\+/, "");
-              const upiHandle = formatUpiHandle(v.name, v.upiId);
               return (
                 <div
                   key={v.id}
@@ -708,16 +702,6 @@ export default function PlaceDetailPage() {
                         <Phone className="h-3 w-3" /> Call
                       </a>
                     ) : null}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setCopiedUpi(false);
-                        setUpiVendor({ ...v, upiId: upiHandle });
-                      }}
-                      className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-bold text-amber-950 hover:bg-amber-100"
-                    >
-                      <Copy className="h-3 w-3" /> Direct UPI Pay
-                    </button>
                   </div>
                 </div>
               );
@@ -885,75 +869,6 @@ export default function PlaceDetailPage() {
               </button>
             </div>
           </form>
-        </div>
-      )}
-
-      {/* Zero-Commission Direct UPI Pay Modal */}
-      {upiVendor && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setUpiVendor(null);
-          }}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="upi-modal-title"
-            className="relative w-full max-w-sm space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 text-center shadow-2xl"
-          >
-            <button
-              type="button"
-              onClick={() => setUpiVendor(null)}
-              className="absolute right-4 top-4 rounded-full p-1 text-[#52635F] hover:bg-[#E8E0D4]"
-              aria-label="Close UPI payment dialog"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900">
-              0% Platform Commission · Direct to Local
-            </span>
-            <h3 id="upi-modal-title" className="font-display text-xl font-bold text-[#1B3B36]">
-              {upiVendor.name}
-            </h3>
-            <p className="text-xs text-[#52635F]">{upiVendor.specialty}</p>
-            <div className="rounded-xl border border-[#E8E0D4] bg-white p-3.5 text-left space-y-2">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-[#52635F]">
-                Verified Direct UPI ID
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-mono text-sm font-bold text-[#1B3B36]">
-                  {upiVendor.upiId}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (upiVendor.upiId) {
-                      void navigator.clipboard?.writeText(upiVendor.upiId);
-                      setCopiedUpi(true);
-                    }
-                  }}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#E8E0D4] bg-[#FAF7F2] px-2.5 py-1 text-xs font-bold text-[#1B3B36] hover:bg-[#E8E0D4]"
-                >
-                  {copiedUpi ? (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-emerald-700" /> Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" /> Copy
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-            <a
-              href={`upi://pay?pa=${encodeURIComponent(upiVendor.upiId || "")}&pn=${encodeURIComponent(upiVendor.name)}&cu=INR`}
-              className="block w-full rounded-xl bg-[#1B3B36] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#C85A32]"
-            >
-              Open in UPI App
-            </a>
-          </div>
         </div>
       )}
     </div>

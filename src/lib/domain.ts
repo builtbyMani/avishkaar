@@ -278,3 +278,68 @@ export function isDemoCheckInAllowed(env: {
   if (env.NODE_ENV === "production") return env.ALLOW_DEMO_CHECKIN === "true";
   return true;
 }
+
+export const PLACE_CATEGORY_STYLES: Record<
+  PlaceCategory,
+  { pillIdle: string; pillActive: string; badge: string }
+> = {
+  "Hidden Village": {
+    pillIdle: "border-slate-300 bg-slate-50 text-slate-800 hover:border-slate-500",
+    pillActive: "border-slate-800 bg-slate-800 text-white",
+    badge: "border border-slate-300 bg-slate-100 text-slate-800",
+  },
+  "Regional Cuisine": {
+    pillIdle: "border-orange-300 bg-orange-50 text-[#9A3412] hover:border-orange-500",
+    pillActive: "border-[#C85A32] bg-[#C85A32] text-white",
+    badge: "border border-orange-300 bg-orange-50 text-[#9A3412]",
+  },
+  "Living Heritage": {
+    pillIdle: "border-amber-300 bg-amber-50 text-amber-900 hover:border-amber-500",
+    pillActive: "border-amber-800 bg-amber-800 text-white",
+    badge: "border border-amber-300 bg-amber-50 text-amber-900",
+  },
+  "Sacred & Craft": {
+    pillIdle: "border-stone-400 bg-stone-100 text-stone-900 hover:border-stone-600",
+    pillActive: "border-stone-800 bg-stone-800 text-white",
+    badge: "border border-stone-400 bg-stone-200 text-stone-900",
+  },
+  "Nature & Trail": {
+    pillIdle: "border-teal-300 bg-teal-50 text-teal-900 hover:border-teal-500",
+    pillActive: "border-teal-800 bg-teal-800 text-white",
+    badge: "border border-teal-300 bg-teal-50 text-teal-900",
+  },
+};
+
+export const TRAILBLAZER_TIER_STYLES: Record<
+  TrailblazerTier,
+  { badge: string; progressFill: string; cardRing: string }
+> = {
+  Wanderer: {
+    badge: "border-stone-300 bg-stone-100 text-stone-700",
+    progressFill: "bg-[#52635F]",
+    cardRing: "border-stone-400",
+  },
+  Pathfinder: {
+    badge: "border-teal-300 bg-teal-50 text-teal-900",
+    progressFill: "bg-teal-700",
+    cardRing: "border-teal-500",
+  },
+  "Local Legend": {
+    badge: "border-amber-400 bg-[#1B3B36] text-amber-200 ring-1 ring-amber-400",
+    progressFill: "bg-[#1B3B36]",
+    cardRing: "border-amber-500 ring-1 ring-amber-400",
+  },
+};
+
+export type FeedbackTone = "success" | "error" | "info";
+
+export interface FeedbackMessage {
+  kind: FeedbackTone;
+  text: string;
+}
+
+export const FEEDBACK_TONE_STYLES: Record<FeedbackTone, string> = {
+  success: "border-emerald-300 bg-emerald-50 text-emerald-900",
+  error: "border-red-300 bg-red-50 text-red-900",
+  info: "border-black/15 bg-[#FAF7F2] text-[#1B3B36]",
+};

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Loader2, Sparkles, UploadCloud } from "lucide-react";
+import { AlertTriangle, FileCheck2, Loader2, UploadCloud } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
 import { PLACE_CATEGORIES, REGIONS } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
@@ -160,18 +160,18 @@ export default function SubmitGemPage() {
       <div>
         <h1 className="font-display text-3xl font-bold text-[#1B3B36]">Post a Hidden Gem</h1>
         <p className="mt-1 text-sm text-[#52635F]">
-          Drop messy field notes, photos, or a short vertical clip—Gemini API turns them into
-          structured Commute, Must-Try Food, Activity, and Safety cards (with manual fallback).
+          Image, &lt;8 MB MP4, or YouTube Short · Auto-extracts Commute, Food, Activity, Heritage &amp; Safety
         </p>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-900">
-          {error}
+        <div className="flex items-center gap-2 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm font-medium text-red-900">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" strokeWidth={2} />
+          <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handlePublish} className="space-y-6 rounded-3xl border border-[#E8E0D4] bg-white p-6 shadow-xs">
+      <form onSubmit={handlePublish} className="space-y-6 rounded-2xl border border-black/12 bg-white p-5">
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <label className="block text-xs font-bold uppercase tracking-wider text-[#1B3B36]">
@@ -295,8 +295,8 @@ export default function SubmitGemPage() {
               onClick={() => void runGeminiStructuring()}
               className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3.5 py-1.5 text-xs font-bold text-amber-950 hover:bg-amber-200 disabled:opacity-50"
             >
-              {structuring ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-              Auto-Structure with Gemini AI
+              {structuring ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileCheck2 className="h-3.5 w-3.5" strokeWidth={2} />}
+              Auto-Structure Notes
             </button>
           </div>
           <textarea
@@ -305,17 +305,17 @@ export default function SubmitGemPage() {
             value={rawDescription}
             onChange={(e) => setRawDescription(e.target.value)}
             placeholder="Example (Hinglish/English): Subah 6 AM local bus lo Reckong Peo se Sangla, phir 3km walk to wooden bridge. Try buckwheat chilta aur apricot chai. Raat ko cliff path avoid karo, network zero hai, temple me chappal bahar utaro."
-            className="w-full rounded-xl border border-[#E8E0D4] p-3.5 text-sm outline-none focus:border-[#C85A32]"
+            className="w-full rounded-xl border border-black/12 p-3.5 text-sm outline-none focus:border-[#C85A32]"
           />
         </div>
 
         {structured && (
-          <div className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 text-xs">
+          <div className="animate-panel-in space-y-3 rounded-2xl border border-black/12 bg-[#FAF7F2] p-4 text-xs">
             <div className="flex items-center justify-between">
-              <strong className="text-emerald-950">
-                Structured Preview ({aiSource === "gemini" ? "Gemini Multilingual JSON Mode" : "Manual Fallback Extractor"})
+              <strong className="text-[#1B3B36]">
+                Structured Preview ({aiSource === "gemini" ? "Gemini JSON" : "Fallback Extractor"})
               </strong>
-              <span className="text-emerald-800">Editable before publish</span>
+              <span className="text-[#52635F]">Editable before publish</span>
             </div>
             <div>
               <span className="font-bold text-[#1B3B36]">Last-Mile Commute:</span>
@@ -325,7 +325,7 @@ export default function SubmitGemPage() {
                 onChange={(e) =>
                   setStructured({ ...structured, commute: e.target.value.split("\n").filter(Boolean) })
                 }
-                className="mt-1 w-full rounded-lg border border-emerald-200 bg-white p-2"
+                className="mt-1 w-full rounded-lg border border-black/12 bg-white p-2"
               />
             </div>
             <div>
@@ -339,7 +339,7 @@ export default function SubmitGemPage() {
                     livingHeritage: e.target.value.split("\n").filter(Boolean),
                   })
                 }
-                className="mt-1 w-full rounded-lg border border-emerald-200 bg-white p-2"
+                className="mt-1 w-full rounded-lg border border-black/12 bg-white p-2"
               />
             </div>
             <div>
@@ -385,7 +385,7 @@ export default function SubmitGemPage() {
         <button
           type="submit"
           disabled={publishing}
-          className="w-full rounded-xl bg-[#C85A32] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#b24d28] disabled:opacity-60"
+          className="tactile-press min-h-11 w-full rounded-xl bg-[#C85A32] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#b24d28] disabled:opacity-60"
         >
           {publishing ? "Structuring & Publishing..." : "Publish Hidden Gem"}
         </button>

@@ -343,3 +343,40 @@ export const FEEDBACK_TONE_STYLES: Record<FeedbackTone, string> = {
   error: "border-red-300 bg-red-50 text-red-900",
   info: "border-black/15 bg-[#FAF7F2] text-[#1B3B36]",
 };
+
+export type GuideModuleKey = "commute" | "food" | "activities" | "livingHeritage";
+
+export const GUIDE_MODULE_STYLES: Record<
+  GuideModuleKey,
+  { card: string; offline: string; icon: string }
+> = {
+  commute: {
+    card: "border-l-4 border-l-slate-600",
+    offline: "border-l-2 border-l-slate-600 pl-3",
+    icon: "text-slate-700",
+  },
+  food: {
+    card: "border-l-4 border-l-[#C85A32]",
+    offline: "border-l-2 border-l-[#C85A32] pl-3",
+    icon: "text-[#C85A32]",
+  },
+  activities: {
+    card: "border-l-4 border-l-teal-700",
+    offline: "border-l-2 border-l-teal-700 pl-3",
+    icon: "text-teal-700",
+  },
+  livingHeritage: {
+    card: "border-l-4 border-l-amber-600",
+    offline: "border-l-2 border-l-amber-600 pl-3",
+    icon: "text-amber-700",
+  },
+};
+
+export function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}

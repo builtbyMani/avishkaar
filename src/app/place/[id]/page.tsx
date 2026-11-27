@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   AlertTriangle,
   ArrowLeft,
+  ArrowRight,
   BookmarkCheck,
   BookmarkPlus,
   Bus,
@@ -14,6 +16,7 @@ import {
   Compass,
   Flag,
   HandHeart,
+  Info,
   Landmark,
   MapPin,
   MessageCircle,
@@ -30,7 +33,14 @@ import {
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import { isSafetyAlertPublic } from "@/lib/domain";
+import {
+  FEEDBACK_TONE_STYLES,
+  GUIDE_MODULE_STYLES,
+  isSafetyAlertPublic,
+  PLACE_CATEGORY_STYLES,
+  TRAILBLAZER_TIER_STYLES,
+  type FeedbackMessage,
+} from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, Profile, SafetyAlert, UserBadge } from "@/types/domain";
 
@@ -272,8 +282,9 @@ export default function PlaceDetailPage() {
     return (
       <div className="animate-pulse space-y-6">
         <div className="h-8 w-40 rounded bg-[#EAE2D6]" />
-        <div className="h-80 rounded-3xl bg-[#EAE2D6]" />
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="h-80 rounded-2xl bg-[#EAE2D6]" />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
           <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
           <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
           <div className="h-44 rounded-2xl bg-[#EAE2D6]" />
@@ -347,13 +358,23 @@ export default function PlaceDetailPage() {
       )}
 
       {/* Hero Header + Media */}
-      <section className="print-card overflow-hidden rounded-3xl border border-[#E8E0D4] bg-white shadow-xs">
+      <section className="print-card overflow-hidden rounded-2xl border border-black/12 bg-white">
         <div className="grid gap-0 lg:grid-cols-12">
           <div className="lg:col-span-7 space-y-2.5">
-            <MediaCardPlayer
-              media={place.media[activeMediaIdx] ?? place.media[0]}
-              title={place.title}
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeMediaIdx}
+                initial={{ opacity: 0.5, scale: 0.99 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0.5 }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <MediaCardPlayer
+                  media={place.media[activeMediaIdx] ?? place.media[0]}
+                  title={place.title}
+                />
+              </motion.div>
+            </AnimatePresence>
             {place.media.length > 1 && (
               <div className="no-print flex flex-wrap items-center gap-2 px-3 pb-2">
                 {place.media.map((item, idx) => (
@@ -380,7 +401,9 @@ export default function PlaceDetailPage() {
                 <span className="rounded-full bg-[#1B3B36] px-3 py-1 text-xs font-bold text-white">
                   Gem Score {place.hiddenGemScore}
                 </span>
-                <span className="rounded-full bg-[#FAF7F2] px-3 py-1 text-xs font-semibold text-[#1B3B36]">
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${PLACE_CATEGORY_STYLES[place.category].badge}`}
+                >
                   {place.category}
                 </span>
                 <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#52635F]">
@@ -436,8 +459,15 @@ export default function PlaceDetailPage() {
                       : "border border-[#1B3B36] bg-white text-[#1B3B36] hover:bg-[#1B3B36] hover:text-white"
                   }`}
                 >
-                  <Navigation className="h-4 w-4" />
-                  {place.userHasCheckedIn ? "Checked In ✓" : "Check In"}
+                  {place.userHasCheckedIn ? (
+                    <>
+                      <Check className="h-4 w-4" strokeWidth={2.25} /> Checked In
+                    </>
+                  ) : (
+                    <>
+                      <Navigation className="h-4 w-4" strokeWidth={2} /> Check In
+                    </>
+                  )}
                 </button>
               </div>
 
@@ -740,9 +770,10 @@ export default function PlaceDetailPage() {
           </div>
           <Link
             href="/profile"
-            className="text-xs font-bold text-[#C85A32] hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-bold text-[#C85A32] hover:underline"
           >
-            Volunteer as a Guide →
+            Volunteer as a Guide
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
           </Link>
         </div>
 
@@ -813,7 +844,7 @@ export default function PlaceDetailPage() {
       {/* Request Guide Modal */}
       {selectedGuide && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setSelectedGuide(null);
           }}
@@ -823,7 +854,7 @@ export default function PlaceDetailPage() {
             aria-modal="true"
             aria-labelledby="guide-modal-title"
             onSubmit={handleGuideRequestSubmit}
-            className="w-full max-w-md space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl"
+            className="animate-panel-in w-full max-w-md space-y-4 rounded-2xl border border-black/20 bg-[#FAF7F2] p-6 shadow-none"
           >
             <h3 id="guide-modal-title" className="font-display text-xl font-bold text-[#1B3B36]">
               Request Guide: {selectedGuide.displayName}

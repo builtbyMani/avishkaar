@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import {
   BarChart3,
   BookmarkCheck,
@@ -16,6 +17,7 @@ import { TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
 import { useApp } from "./AppProvider";
 import { AvishkaarLogo } from "./AvishkaarLogo";
 import { MemojiAvatar } from "./MemojiAvatar";
+import { ScrollProgressBar } from "./ScrollProgressBar";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -66,14 +68,19 @@ export function Navbar() {
                   href={item.href}
                   aria-label={item.label}
                   className={`group relative flex h-11 w-11 items-center justify-center rounded-xl transition ${
-                    active
-                      ? "bg-[#1B3B36] text-white"
-                      : "text-[#1B3B36] hover:bg-black/5"
+                    active ? "text-white" : "text-[#1B3B36] hover:bg-black/5"
                   }`}
                 >
-                  <Icon className="h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
+                  {active && (
+                    <motion.span
+                      layoutId="rail-active"
+                      transition={{ type: "spring", stiffness: 320, damping: 28 }}
+                      className="absolute inset-0 rounded-xl bg-[#1B3B36]"
+                    />
+                  )}
+                  <Icon className="relative z-10 h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
                   {item.badge !== null && item.badge !== undefined && (
-                    <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#C85A32] px-1 text-[10px] font-bold text-white">
+                    <span className="absolute -right-0.5 -top-0.5 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#C85A32] px-1 text-[10px] font-bold text-white">
                       {item.badge}
                     </span>
                   )}
@@ -95,6 +102,7 @@ export function Navbar() {
 
       {/* Top Sticky Bar */}
       <header className="no-print sticky top-0 z-30 border-b border-black/12 bg-[#FAF7F2] md:pl-16">
+        <ScrollProgressBar />
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 group">

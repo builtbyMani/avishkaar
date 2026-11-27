@@ -131,7 +131,7 @@ export function MediaCardPlayer({
           className="h-full w-full object-cover"
         />
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between p-2.5">
-          <span className="inline-flex items-center gap-1 rounded-full bg-black/65 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-xs">
+          <span className="inline-flex items-center gap-1 rounded-full bg-stone-950/90 px-2.5 py-1 text-[11px] font-bold text-white">
             <Film className="h-3 w-3 text-amber-300" />
             {playing ? "Playing" : "Hover Clip"}{" "}
             {media.durationSec ? `· 0:${String(media.durationSec).padStart(2, "0")}` : ""}

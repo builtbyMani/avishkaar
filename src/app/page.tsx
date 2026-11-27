@@ -362,18 +362,23 @@ export default function DiscoverPage() {
       {/* Feed Content */}
       {loading ? (
         <div className="columns-1 gap-4 space-y-4 sm:columns-2 md:columns-3 lg:columns-4">
-          {Array.from({ length: 8 }).map((_, idx) => (
-            <div
-              key={idx}
-              className="break-inside-avoid animate-pulse overflow-hidden rounded-2xl border border-black/12 bg-white"
-            >
-              <div className="aspect-[3/4] w-full bg-[#EAE2D6]" />
-              <div className="space-y-2 p-3">
-                <div className="h-3.5 w-3/4 rounded bg-[#EAE2D6]" />
-                <div className="h-3 w-1/2 rounded bg-[#EAE2D6]" />
+          {Array.from({ length: 8 }).map((_, idx) => {
+            const aspect = ["aspect-[3/4]", "aspect-square", "aspect-[4/3]", "aspect-[3/4]"][
+              idx % 4
+            ];
+            return (
+              <div
+                key={idx}
+                className="break-inside-avoid animate-pulse overflow-hidden rounded-2xl border border-black/12 bg-white"
+              >
+                <div className={`${aspect} w-full bg-[#EAE2D6]`} />
+                <div className="space-y-2 p-3">
+                  <div className="h-3.5 w-3/4 rounded bg-[#EAE2D6]" />
+                  <div className="h-3 w-1/2 rounded bg-[#EAE2D6]" />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : viewMode === "map" ? (
         <LeafletMap places={filtered} heightClass="h-[540px]" />
@@ -434,7 +439,7 @@ export default function DiscoverPage() {
                     />
 
                     {/* Hover Gist Overlay */}
-                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/85 via-black/40 to-black/25 p-3.5 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/85 via-black/40 to-black/25 p-3.5 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
                       <div className="flex items-start justify-between gap-2 pr-20">
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${PLACE_CATEGORY_STYLES[place.category].badge}`}
@@ -443,7 +448,7 @@ export default function DiscoverPage() {
                         </span>
                       </div>
 
-                      <div className="space-y-1.5">
+                      <div className="translate-y-2 space-y-1.5 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
                         <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white/85">
                           <MapPin className="h-3 w-3 text-amber-300" strokeWidth={2} />
                           {place.region}

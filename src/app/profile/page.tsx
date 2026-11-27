@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Award, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "lucide-react";
+import { Award, Check, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
-import { canVolunteerAsGuide, REGIONS } from "@/lib/domain";
+import { MemojiAvatar } from "@/components/MemojiAvatar";
+import { canVolunteerAsGuide, REGIONS, TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, Profile, UserBadge } from "@/types/domain";
 
@@ -99,28 +100,35 @@ export default function ProfilePage() {
   const progressPercent = Math.min(100, Math.round((profile.trailblazerScore / 300) * 100));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header Card */}
-      <section className="rounded-3xl border border-[#E8E0D4] bg-white p-6 shadow-xs">
+      <section className="rounded-2xl border border-black/12 bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">
-              <Award className="h-3.5 w-3.5" />
-              {profile.tier} Tier
-            </span>
-            <h1 className="mt-2 font-display text-3xl font-bold text-[#1B3B36]">
-              {profile.displayName}
-            </h1>
-            <p className="text-sm text-[#52635F]">
-              @{profile.username} · {profile.trailblazerScore} Trailblazer Points
-            </p>
+          <div className="flex items-center gap-4">
+            <MemojiAvatar id={profile.id} name={profile.displayName} size={56} />
+            <div>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${
+                  TRAILBLAZER_TIER_STYLES[profile.tier].badge
+                }`}
+              >
+                <Award className="h-3.5 w-3.5" strokeWidth={2} />
+                {profile.tier} Tier
+              </span>
+              <h1 className="mt-1.5 font-display text-3xl font-bold text-[#1B3B36]">
+                {profile.displayName}
+              </h1>
+              <p className="text-sm text-[#52635F]">
+                @{profile.username} · {profile.trailblazerScore} Trailblazer Points
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={openAuthModal}
-            className="rounded-full border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-2 text-xs font-bold text-[#1B3B36] hover:border-[#C85A32]"
+            className="tactile-press min-h-10 rounded-full border border-black/12 bg-[#FAF7F2] px-4 py-2 text-xs font-bold text-[#1B3B36] hover:border-[#1B3B36]"
           >
-            Switch Persona / Auth
+            Account &amp; Profiles
           </button>
         </div>
 
@@ -133,7 +141,7 @@ export default function ProfilePage() {
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-[#EAE2D6]">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#C85A32] to-amber-500 transition-all"
+              className={`h-full rounded-full transition-all duration-300 ${TRAILBLAZER_TIER_STYLES[profile.tier].progressFill}`}
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -147,52 +155,63 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Trophy Shelf */}
-      <section className="rounded-2xl border border-[#E8E0D4] bg-white p-6">
+      {/* Trophy Shelf (Asymmetric Bento) */}
+      <section className="rounded-2xl border border-black/12 bg-white p-5">
         <div className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-[#D97706]" />
+          <Trophy className="h-5 w-5 text-[#D97706]" strokeWidth={2} />
           <h2 className="font-display text-2xl font-bold text-[#1B3B36]">Trophy Shelf</h2>
         </div>
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           {[
             {
               key: "first_discovery",
               name: "First Discovery",
               desc: "Publish your first hidden gem.",
+              span: false,
             },
             {
               key: "foodie_scout",
               name: "Foodie Scout",
               desc: "Vouch for 2+ regional food spots.",
+              span: false,
             },
             {
               key: "local_legend",
               name: "Local Legend",
-              desc: "Reach 300+ Trailblazer Points.",
+              desc: "Reach 300+ Trailblazer Points for priority curation.",
+              span: true,
             },
           ].map((b) => {
             const unlocked = badges.find((ub) => ub.badgeKey === b.key);
             return (
               <div
                 key={b.key}
-                className={`rounded-2xl border p-4 ${
+                className={`flex flex-col justify-between rounded-2xl border p-4 ${
+                  b.span ? "md:col-span-2" : ""
+                } ${
                   unlocked
                     ? "border-amber-300 bg-amber-50/70"
-                    : "border-[#E8E0D4] bg-[#FAF7F2] opacity-60"
+                    : "border-black/12 bg-[#FAF7F2] opacity-65"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#1B3B36]">{b.name}</span>
-                  {unlocked ? (
-                    <ShieldCheck className="h-5 w-5 text-amber-600" />
-                  ) : (
-                    <Lock className="h-4 w-4 text-[#52635F]" />
-                  )}
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#1B3B36]">{b.name}</span>
+                    {unlocked ? (
+                      <ShieldCheck className="h-5 w-5 text-amber-600" strokeWidth={2} />
+                    ) : (
+                      <Lock className="h-4 w-4 text-[#52635F]" strokeWidth={1.75} />
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-[#52635F]">{b.desc}</p>
                 </div>
-                <p className="mt-1 text-xs text-[#52635F]">{b.desc}</p>
-                <p className="mt-2 text-[11px] font-bold text-[#C85A32]">
-                  {unlocked ? "Unlocked ✓" : "Locked"}
-                </p>
+                {unlocked ? (
+                  <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                    <Check className="h-3.5 w-3.5" strokeWidth={2.25} /> Unlocked
+                  </span>
+                ) : (
+                  <span className="mt-2 text-[11px] font-bold text-[#52635F]">Locked</span>
+                )}
               </div>
             );
           })}

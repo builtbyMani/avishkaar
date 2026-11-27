@@ -66,7 +66,7 @@ export function AuthModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -75,7 +75,7 @@ export function AuthModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-modal-title"
-        className="relative w-full max-w-lg rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl"
+        className="animate-panel-in relative w-full max-w-lg rounded-2xl border border-black/20 bg-[#FAF7F2] p-6 shadow-none"
       >
         <button
           type="button"

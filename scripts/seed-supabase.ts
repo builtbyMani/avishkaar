@@ -67,7 +67,7 @@ async function main() {
       place_id: g.placeId,
       guide_id: g.guideId,
       requester_id: g.requesterId,
-      preferred_date: g.preferredDate,
+      preferred_date: g.preferredDate ? g.preferredDate : null,
       notes: g.notes,
       status: g.status,
       created_at: g.createdAt,

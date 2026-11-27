@@ -11,7 +11,7 @@ Avishkaar ships all features from the 48-hour hackathon blueprint in 5 Vertical 
 - [x] **Phase 3: Location Detail, Gemini AI, Support Local, Offline & Map** - `/place/[id]` with Gemini strict JSON extraction + fallback, Support Local, Safety banners, Offline Pocket Card, and Leaflet + OSM map
 - [x] **Phase 4: Check-ins, Badges & Volunteer Guides** - Geolocation + Demo Check-in toggle, Verified Visit Vouch (+25), auto-awarded badges + trophy shelf, and trust-gated Volunteer Guides
 - [x] **Phase 5: Polish, Deploy & Demo Readiness** - Mobile pass, loading skeletons, zero console errors, production build verified, and 3-minute live demo flow tested end-to-end
-- [ ] **Phase 6: Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety** - Detour Bar, clickable Gem Score math popover, <8 MB hover clips & YouTube Shorts, multilingual AI + Living Heritage card, zero-commission vendor actions, 1-click safety verify/flag gate, and demo script polish
+- [x] **Phase 6: Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety** - Detour Bar, clickable Gem Score math popover, <8 MB hover clips & YouTube Shorts, multilingual AI + Living Heritage card, zero-commission vendor actions, 1-click safety verify/flag gate, and demo script polish (completed 2026-11-27)
 
 ## Phase Details
 
@@ -96,12 +96,12 @@ Plans:
   5. Support Local cards include Navigate, WhatsApp/Call, and Direct UPI QR actions; Safety Advisories enforce `Pathfinder+` / `2+` verify gate inside `places.safety_alerts` JSONB
   6. Dataset has 18 destinations (including Pandavula Gutta & Ziro Valley), `"Simulate GPS Check-In"` label, and Impact/Architecture drawer
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 - [x] 06-01: Detour Bar, Explainable Gem Score popover, hover video (<8 MB) & YouTube Shorts
 - [x] 06-02: Multilingual Gemini + Living Heritage card + Zero-Commission Vendor Actions (Navigate, WhatsApp/Call, Direct UPI QR)
-- [ ] 06-03: Community Safety Verify/Flag gate, Pandavula Gutta & Ziro Valley seeds, Simulate GPS label, Impact drawer & E2E verification
+- [x] 06-03: Community Safety Verify/Flag gate, Pandavula Gutta & Ziro Valley seeds, Simulate GPS label, Impact drawer & E2E verification
 
 ## Progress
 
@@ -112,4 +112,4 @@ Plans:
 | 3. Location Detail, Gemini AI, Support Local, Offline & Map | 3/3 | Complete | 2026-11-27 |
 | 4. Check-ins, Badges & Volunteer Guides | 2/2 | Complete | 2026-11-27 |
 | 5. Polish, Deploy & Demo Readiness | 2/2 | Complete | 2026-11-27 |
-| 6. Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety | 2/3 | In Progress|  |
+| 6. Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety | 3/3 | Complete    | 2026-11-27 |

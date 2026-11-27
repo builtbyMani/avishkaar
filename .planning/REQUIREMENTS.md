@@ -44,18 +44,18 @@
 
 - [x] **SCAL-01**: 5-table schema (`profiles`, `places`, `vouches`, `user_badges`, `guide_requests`), CDN media URLs, coordinates ready for PostGIS/H3, and stateless Next.js API routes
 
-## v1.1 Phase 6 Requirements (Planned — Pending Authorization)
+## v1.1 Phase 6 Requirements (Complete)
 
 ### Anti-Overtourism Upgrades (`f2.md`)
 
-- [ ] **DETR-01**: User can enter an overcrowded destination (e.g., Ooty, Goa, Hampi) in the top-of-feed Detour Bar to reveal top 3 lower-crowd alternatives with vibe & commute comparisons
-- [ ] **DETR-02**: Detour matching works via Gemini API with deterministic local tag/crowd fallback when rate-limited or unconfigured
-- [ ] **GEMX-01**: Clicking any feed card's `Gem Score` badge opens a live math breakdown popover (`Community Vouches`, `Verified Check-ins`, `Crowd Penalty`) without navigating away
-- [ ] **SHRT-01**: Video clips play muted on hover (capped at `<8 MB` on upload) and YouTube Shorts embed URLs render cleanly
-- [ ] **MULT-01**: Multilingual write-time Gemini extraction supports English, Hindi, Telugu, Tamil, and Hinglish notes and adds a 4th **Living Heritage & Etiquette** card
-- [ ] **VEND-01**: Zero-commission Support Local cards expose **Navigate to Pin**, **WhatsApp / Call**, and **Direct UPI QR** preview actions
-- [ ] **SAFE-01**: Safety advisories support 1-click **Verify / Flag** votes inside `places.safety_alerts` JSONB and stay hidden publicly unless posted by `Pathfinder+` or verified by `2+` users (with seeded alerts backfilled)
-- [ ] **DEMO-01**: Seed dataset includes *Pandavula Gutta* & *Ziro Valley* (18 places total), toggle reads **"Simulate GPS Check-In"**, and Navbar offers an **Impact & Stack** drawer (67.4% stat + Swadesh Darshan 2.0 / CBDD + 4-box stack)
+- [x] **DETR-01**: User can enter an overcrowded destination (e.g., Ooty, Goa, Hampi) in the top-of-feed Detour Bar to reveal top 3 lower-crowd alternatives with vibe & commute comparisons
+- [x] **DETR-02**: Detour matching works via Gemini API with deterministic local tag/crowd fallback when rate-limited or unconfigured
+- [x] **GEMX-01**: Clicking any feed card's `Gem Score` badge opens a live math breakdown popover (`Community Vouches`, `Verified Check-ins`, `Crowd Penalty`) without navigating away
+- [x] **SHRT-01**: Video clips play muted on hover (capped at `<8 MB` on upload) and YouTube Shorts embed URLs render cleanly
+- [x] **MULT-01**: Multilingual write-time Gemini extraction supports English, Hindi, Telugu, Tamil, and Hinglish notes and adds a 4th **Living Heritage & Etiquette** card
+- [x] **VEND-01**: Zero-commission Support Local cards expose **Navigate to Pin**, **WhatsApp / Call**, and **Direct UPI QR** preview actions
+- [x] **SAFE-01**: Safety advisories support 1-click **Verify / Flag** votes inside `places.safety_alerts` JSONB and stay hidden publicly unless posted by `Pathfinder+` or verified by `2+` users (with seeded alerts backfilled)
+- [x] **DEMO-01**: Seed dataset includes *Pandavula Gutta* & *Ziro Valley* (18 places total), toggle reads **"Simulate GPS Check-In"**, and Navbar offers an **Impact & Stack** drawer (67.4% stat + Swadesh Darshan 2.0 / CBDD + 4-box stack)
 
 ## v2 Requirements
 
@@ -94,18 +94,18 @@
 | CHKN-02 | Phase 4 | Complete |
 | GUID-01 | Phase 4 | Complete |
 | GUID-02 | Phase 4 | Complete |
-| DETR-01 | Phase 6 | Planned |
-| DETR-02 | Phase 6 | Planned |
-| GEMX-01 | Phase 6 | Planned |
-| SHRT-01 | Phase 6 | Planned |
-| MULT-01 | Phase 6 | Planned |
-| VEND-01 | Phase 6 | Planned |
-| SAFE-01 | Phase 6 | Planned |
-| DEMO-01 | Phase 6 | Planned |
+| DETR-01 | Phase 6 | Complete |
+| DETR-02 | Phase 6 | Complete |
+| GEMX-01 | Phase 6 | Complete |
+| SHRT-01 | Phase 6 | Complete |
+| MULT-01 | Phase 6 | Complete |
+| VEND-01 | Phase 6 | Complete |
+| SAFE-01 | Phase 6 | Complete |
+| DEMO-01 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 18/18 complete
-- v1.1 (Phase 6) requirements: 8 mapped, 0 unmapped ✓
+- v1.1 (Phase 6) requirements: 8/8 complete ✓
 
 ---
 *Requirements defined: 2026-11-27*

@@ -21,6 +21,7 @@ import {
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
+import { isSafetyAlertPublic } from "@/lib/domain";
 import type { EnrichedPlace, PlaceCategory, UserBadge } from "@/types/domain";
 
 interface DetourAlternativeView {
@@ -404,10 +405,11 @@ export default function DiscoverPage() {
                     <Flame className="h-3 w-3 text-amber-300" />
                     Gem {place.hiddenGemScore}
                   </button>
-                  {place.safetyAlerts.length > 0 && (
+                  {place.safetyAlerts.filter(isSafetyAlertPublic).length > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-red-600/90 px-2 py-1 text-[10px] font-bold text-white">
                       <AlertTriangle className="h-3 w-3" />
-                      {place.safetyAlerts.length} Alert{place.safetyAlerts.length > 1 ? "s" : ""}
+                      {place.safetyAlerts.filter(isSafetyAlertPublic).length} Alert
+                      {place.safetyAlerts.filter(isSafetyAlertPublic).length > 1 ? "s" : ""}
                     </span>
                   )}
                 </div>

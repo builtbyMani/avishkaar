@@ -9,6 +9,7 @@ import {
   SEED_VOUCHES,
 } from "../data/seed";
 import {
+  applySafetyVote,
   canVolunteerAsGuide,
   computeCheckInUpgradeDelta,
   computeVouchPointsDelta,
@@ -224,6 +225,15 @@ export async function createPlace(input: {
   localVendors: LocalVendor[];
   safetyAlerts: SafetyAlert[];
 }): Promise<{ place: Place; unlockedBadges: UserBadge[] }> {
+  const authorProfile = await getProfileById(input.authorId);
+  const authorTier = authorProfile?.tier ?? "Wanderer";
+  const taggedAlerts: SafetyAlert[] = input.safetyAlerts.map((a) => ({
+    ...a,
+    authorTier: a.authorTier ?? authorTier,
+    verifiedBy: a.verifiedBy ?? [],
+    flaggedBy: a.flaggedBy ?? [],
+  }));
+
   const newPlace: Place = {
     id: crypto.randomUUID(),
     authorId: input.authorId,
@@ -236,7 +246,7 @@ export async function createPlace(input: {
     media: input.media,
     structuredCards: input.structuredCards,
     localVendors: input.localVendors,
-    safetyAlerts: input.safetyAlerts,
+    safetyAlerts: taggedAlerts,
     mainstreamPopularityIndex: 5,
     vouchesCount: 1,
     verifiedCheckinsCount: 0,
@@ -660,4 +670,54 @@ export async function acceptGuideRequest(requestId: string, guideId: string): Pr
   req.status = "Accepted";
   writeDemoState(state);
   return req;
+}
+
+export async function verifyOrFlagSafetyAlert(
+  placeId: string,
+  alertIndex: number,
+  userId: string,
+  action: "verify" | "flag",
+): Promise<SafetyAlert[]> {
+  const voter = await getProfileById(userId);
+  const voterTier = voter?.tier ?? "Wanderer";
+
+  if (isSupabaseConfigured()) {
+    const sb = getSupabaseServerClient();
+    if (sb) {
+      const { data: placeRow, error: fetchErr } = await sb
+        .from("places")
+        .select("safety_alerts")
+        .eq("id", placeId)
+        .single();
+      if (!fetchErr && placeRow) {
+        const alerts = Array.isArray(placeRow.safety_alerts)
+          ? (placeRow.safety_alerts as SafetyAlert[])
+          : [];
+        if (alertIndex < 0 || alertIndex >= alerts.length) {
+          throw new Error("Safety alert not found");
+        }
+        const updated = alerts.map((a, idx) =>
+          idx === alertIndex ? applySafetyVote(a, userId, action, voterTier) : a,
+        );
+        const { error: updErr } = await sb
+          .from("places")
+          .update({ safety_alerts: updated })
+          .eq("id", placeId);
+        if (!updErr) return updated;
+      }
+    }
+  }
+
+  const state = readDemoState();
+  const place = state.places.find((p) => p.id === placeId);
+  if (!place) throw new Error("Place not found");
+  if (alertIndex < 0 || alertIndex >= place.safetyAlerts.length) {
+    throw new Error("Safety alert not found");
+  }
+
+  place.safetyAlerts = place.safetyAlerts.map((a, idx) =>
+    idx === alertIndex ? applySafetyVote(a, userId, action, voterTier) : a,
+  );
+  writeDemoState(state);
+  return place.safetyAlerts;
 }

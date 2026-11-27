@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { SEED_PLACES, SEED_PROFILES } from "../src/data/seed";
+import { extractYouTubeEmbedId } from "../src/components/MediaCardPlayer";
+import { findDetourAlternativesFallback } from "../src/lib/detour";
 import {
+  applySafetyVote,
   canVolunteerAsGuide,
   computeCheckInUpgradeDelta,
   computeHiddenGemScore,
   computeVouchPointsDelta,
   evaluateNewBadges,
   getTierFromScore,
+  isSafetyAlertPublic,
   sortFeedPlaces,
 } from "../src/lib/domain";
 import { extractStructuredPlaceFallback } from "../src/lib/gemini";
@@ -59,31 +63,85 @@ test("Milestone badges auto-award for First Discovery, Foodie Scout, and Local L
   const unlocked = evaluateNewBadges({
     profile,
     authoredPlacesCount: 1,
-    vouchedPlaces: [SEED_PLACES[4], SEED_PLACES[7]], // Regional Cuisine places
+    vouchedPlaces: [SEED_PLACES[4], SEED_PLACES[7]],
     existingBadges: [],
   });
   const keys = unlocked.map((b) => b.badgeKey).sort();
   assert.deepEqual(keys, ["first_discovery", "foodie_scout", "local_legend"]);
 });
 
-test("Gemini fallback extractor structures commute, food, activities, and safety tags", () => {
+test("Multilingual Hinglish/English fallback extracts 4 cards including Living Heritage & safety tags", () => {
   const result = extractStructuredPlaceFallback(
-    "Take the 6 AM bus to Sangla and walk 2 km. Try buckwheat thali and apricot tea. Avoid cliff road after dark and expect low mobile network.",
+    "Subah 6 AM local bus lo Sangla se aur walk 2 km. Try buckwheat khana aur chai. Mandir me respect local parampara. Raat ko cliff road avoid karo, network zero hai.",
     "Chitkul",
     "Spiti & Kinnaur",
   );
   assert.equal(result.source, "fallback");
   assert.ok(result.structuredCards.commute.length >= 1);
   assert.ok(result.structuredCards.food.length >= 1);
+  assert.ok((result.structuredCards.livingHeritage ?? []).length >= 1);
   assert.ok(result.safetyAlerts.some((a) => a.tag === "Avoid After Dark"));
   assert.ok(result.safetyAlerts.some((a) => a.tag === "Low Network"));
+  assert.ok(result.safetyAlerts.some((a) => a.tag === "Cultural Etiquette"));
 });
 
-test("Seed dataset meets 15-20 destinations, video clips, vendors, and Local Legend priority tie-break", () => {
-  assert.ok(SEED_PLACES.length >= 15 && SEED_PLACES.length <= 20);
+test("Detour Bar finds top 3 lower-crowd alternatives for Ooty, Goa, and Hampi", () => {
+  const profilesMap = new Map(SEED_PROFILES.map((p) => [p.id, p]));
+  const enriched = sortFeedPlaces(SEED_PLACES, profilesMap, new Map());
+
+  for (const hub of ["Ooty", "Goa", "Hampi"]) {
+    const res = findDetourAlternativesFallback(hub, enriched);
+    assert.equal(res.alternatives.length, 3);
+    assert.ok(res.alternatives.every((alt) => alt.crowdReductionPercent >= 35));
+    assert.ok(res.alternatives.every((alt) => alt.commuteSummary.length > 0));
+  }
+});
+
+test("YouTube Shorts URL parser handles Shorts, youtu.be, and non-YouTube URLs", () => {
+  assert.equal(extractYouTubeEmbedId("https://www.youtube.com/shorts/abc123XYZ"), "abc123XYZ");
+  assert.equal(extractYouTubeEmbedId("https://youtu.be/xyz987"), "xyz987");
+  assert.equal(extractYouTubeEmbedId("https://example.com/clip.mp4"), null);
+});
+
+test("Community Safety Verify/Flag gate enforces Pathfinder+ or 2+ user verification", () => {
+  const wandererAlert = {
+    tag: "Scam Alert" as const,
+    message: "Watch out for fake boat touts.",
+    authorTier: "Wanderer" as const,
+    verifiedBy: [],
+    flaggedBy: [],
+  };
+  assert.equal(isSafetyAlertPublic(wandererAlert), false);
+
+  // 1 Wanderer verify is not enough
+  const oneVerify = applySafetyVote(wandererAlert, "u1", "verify", "Wanderer");
+  assert.equal(isSafetyAlertPublic(oneVerify), false);
+
+  // 2nd Wanderer verify publishes publicly
+  const twoVerifies = applySafetyVote(oneVerify, "u2", "verify", "Wanderer");
+  assert.equal(isSafetyAlertPublic(twoVerifies), true);
+
+  // 1 Pathfinder verify immediately publishes publicly
+  const pathfinderVerified = applySafetyVote(wandererAlert, "p1", "verify", "Pathfinder");
+  assert.equal(isSafetyAlertPublic(pathfinderVerified), true);
+
+  // 2 flags hide an unverified/outnumbered alert
+  const flaggedOnce = applySafetyVote(wandererAlert, "f1", "flag", "Wanderer");
+  const flaggedTwice = applySafetyVote(flaggedOnce, "f2", "flag", "Wanderer");
+  assert.equal(isSafetyAlertPublic(flaggedTwice), false);
+});
+
+test("Seed dataset has 18 destinations including Pandavula Gutta, Chettinad, Ziro Valley & public alerts", () => {
+  assert.equal(SEED_PLACES.length, 18);
+  const titles = SEED_PLACES.map((p) => p.title);
+  assert.ok(titles.some((t) => t.includes("Pandavula Gutta")));
+  assert.ok(titles.some((t) => t.includes("Chettinad")));
+  assert.ok(titles.some((t) => t.includes("Ziro Valley")));
+
   const videoCount = SEED_PLACES.flatMap((p) => p.media).filter((m) => m.type === "video").length;
   assert.ok(videoCount >= 2);
-  assert.ok(SEED_PLACES.every((p) => p.localVendors.length >= 1 && p.safetyAlerts.length >= 1));
+  assert.ok(SEED_PLACES.every((p) => (p.structuredCards.livingHeritage ?? []).length >= 1));
+  assert.ok(SEED_PLACES.every((p) => p.safetyAlerts.every(isSafetyAlertPublic)));
 
   const profilesMap = new Map(SEED_PROFILES.map((p) => [p.id, p]));
   const sorted = sortFeedPlaces(SEED_PLACES, profilesMap, new Map());

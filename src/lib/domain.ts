@@ -2,6 +2,7 @@ import type {
   EnrichedPlace,
   Place,
   Profile,
+  SafetyAlert,
   TrailblazerTier,
   UserBadge,
   VouchRecord,
@@ -179,4 +180,44 @@ export function haversineDistanceKm(
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+export function isSafetyAlertPublic(alert: SafetyAlert): boolean {
+  const verifies = alert.verifiedBy?.length ?? 0;
+  const flags = alert.flaggedBy?.length ?? 0;
+  if (flags >= 2 && flags > verifies) return false;
+  if (alert.authorTier === "Pathfinder" || alert.authorTier === "Local Legend") return true;
+  if (verifies >= 2) return true;
+  // Backwards compatibility for legacy untagged alerts without explicit authorTier
+  return alert.authorTier === undefined;
+}
+
+export function applySafetyVote(
+  alert: SafetyAlert,
+  userId: string,
+  action: "verify" | "flag",
+  voterTier: TrailblazerTier = "Wanderer",
+): SafetyAlert {
+  const verifiedSet = new Set(alert.verifiedBy ?? []);
+  const flaggedSet = new Set(alert.flaggedBy ?? []);
+
+  if (action === "verify") {
+    flaggedSet.delete(userId);
+    verifiedSet.add(userId);
+  } else {
+    verifiedSet.delete(userId);
+    flaggedSet.add(userId);
+  }
+
+  const nextTier =
+    action === "verify" && (voterTier === "Pathfinder" || voterTier === "Local Legend")
+      ? voterTier
+      : alert.authorTier;
+
+  return {
+    ...alert,
+    authorTier: nextTier,
+    verifiedBy: Array.from(verifiedSet),
+    flaggedBy: Array.from(flaggedSet),
+  };
 }

@@ -27,6 +27,11 @@
       "number": "5",
       "name": "Polish, Deploy & Demo Readiness",
       "status": "complete"
+    },
+    {
+      "number": "6",
+      "name": "Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety",
+      "status": "complete"
     }
   ],
   "next": {
@@ -34,5 +39,5 @@
     "label": "Start a new milestone",
     "reason": "All phases complete — start a new milestone"
   },
-  "updated_at": "2026-11-27T09:35:27.530Z"
+  "updated_at": "2026-11-27T09:48:01.042Z"
 }

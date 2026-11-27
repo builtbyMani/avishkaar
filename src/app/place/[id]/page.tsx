@@ -11,6 +11,7 @@ import {
   Bus,
   CheckCircle2,
   Compass,
+  Flag,
   HandHeart,
   Landmark,
   MapPin,
@@ -20,6 +21,7 @@ import {
   Printer,
   QrCode,
   ShieldAlert,
+  ShieldCheck,
   Store,
   UserCheck,
   Utensils,
@@ -29,7 +31,8 @@ import {
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import type { EnrichedPlace, GuideRequest, LocalVendor, Profile, UserBadge } from "@/types/domain";
+import { isSafetyAlertPublic } from "@/lib/domain";
+import type { EnrichedPlace, GuideRequest, LocalVendor, Profile, SafetyAlert, UserBadge } from "@/types/domain";
 
 export default function PlaceDetailPage() {
   const params = useParams<{ id: string }>();
@@ -187,6 +190,26 @@ export default function PlaceDetailPage() {
     setFeedback("Saved for Offline! Accessible anytime in Offline Pocket without signal.");
   }
 
+  async function handleSafetyVote(alertIndex: number, action: "verify" | "flag") {
+    if (!activeUser || !place) return;
+    const res = await fetch(`/api/places/${place.id}/safety-verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: activeUser.id, alertIndex, action }),
+    });
+    const data = (await res.json()) as { safetyAlerts?: SafetyAlert[]; error?: string };
+    if (!res.ok || !data.safetyAlerts) {
+      setFeedback(data.error || "Could not record safety vote");
+      return;
+    }
+    setPlace({ ...place, safetyAlerts: data.safetyAlerts });
+    setFeedback(
+      action === "verify"
+        ? "Safety advisory verified! Pathfinder+ or 2+ votes publish advisories publicly."
+        : "Safety advisory flagged for review.",
+    );
+  }
+
   async function handleGuideRequestSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!activeUser || !place || !selectedGuide) return;
@@ -244,6 +267,13 @@ export default function PlaceDetailPage() {
   }
 
   const savedOffline = isSavedOffline(place.id);
+  const indexedAlerts = place.safetyAlerts.map((alert, idx) => ({ alert, idx }));
+  const publicAlerts = indexedAlerts.filter(({ alert }) => isSafetyAlertPublic(alert));
+  const pendingAlerts = indexedAlerts.filter(({ alert }) => !isSafetyAlertPublic(alert));
+  const canModerateSafety =
+    activeUser?.tier === "Pathfinder" ||
+    activeUser?.tier === "Local Legend" ||
+    activeUser?.id === place.authorId;
 
   return (
     <div className="space-y-8">
@@ -364,7 +394,7 @@ export default function PlaceDetailPage() {
 
               <label className="flex cursor-pointer items-center justify-between rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] px-3 py-2 text-xs">
                 <span className="font-semibold text-[#1B3B36]">
-                  Demo Check-in Toggle (Bypass GPS radius for live judging)
+                  Simulate GPS Check-In (Bypass radius for live judging)
                 </span>
                 <input
                   type="checkbox"
@@ -378,33 +408,104 @@ export default function PlaceDetailPage() {
         </div>
       </section>
 
-      {/* High-Contrast Safety & Do Not Do Banner */}
-      {place.safetyAlerts.length > 0 && (
-        <section className="print-card rounded-2xl border-2 border-red-600 bg-red-50 p-5 text-red-950">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-red-600" />
-            <h2 className="font-display text-xl font-bold text-red-900">
-              Safety &amp; &ldquo;Do Not Do&rdquo; Advisories
-            </h2>
+      {/* High-Contrast Verified Safety & Do Not Do Banner */}
+      {(publicAlerts.length > 0 || (pendingAlerts.length > 0 && canModerateSafety)) && (
+        <section className="print-card space-y-4 rounded-2xl border-2 border-red-600 bg-red-50 p-5 text-red-950">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="h-6 w-6 text-red-600" />
+              <h2 className="font-display text-xl font-bold text-red-900">
+                Verified Safety &amp; &ldquo;Do Not Do&rdquo; Advisories
+              </h2>
+            </div>
+            <span className="rounded-full bg-white px-3 py-1 text-[11px] font-bold text-red-900">
+              Pathfinder+ / 2+ Community Verified
+            </span>
           </div>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {place.safetyAlerts.map((alert, idx) => (
-              <div
-                key={idx}
-                className="rounded-xl border border-red-200 bg-white p-3.5 shadow-2xs"
-              >
-                <span className="inline-flex items-center gap-1 rounded-full bg-red-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
-                  {alert.tag === "Low Network" ? (
-                    <WifiOff className="h-3 w-3" />
-                  ) : (
-                    <AlertTriangle className="h-3 w-3" />
-                  )}
-                  {alert.tag}
-                </span>
-                <p className="mt-2 text-sm font-medium text-stone-800">{alert.message}</p>
+
+          {publicAlerts.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {publicAlerts.map(({ alert, idx }) => (
+                <div
+                  key={idx}
+                  className="flex flex-col justify-between rounded-xl border border-red-200 bg-white p-3.5 shadow-2xs"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-600 px-2.5 py-0.5 text-[11px] font-bold text-white">
+                        {alert.tag === "Low Network" ? (
+                          <WifiOff className="h-3 w-3" />
+                        ) : (
+                          <AlertTriangle className="h-3 w-3" />
+                        )}
+                        {alert.tag}
+                      </span>
+                      <span className="text-[11px] font-semibold text-emerald-800">
+                        Verified ({alert.verifiedBy?.length ?? 0})
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm font-medium text-stone-800">{alert.message}</p>
+                  </div>
+                  <div className="no-print mt-3 flex items-center gap-2 border-t border-red-100 pt-2.5 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => void handleSafetyVote(idx, "verify")}
+                      className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 px-2.5 py-1 font-bold text-emerald-900 hover:bg-emerald-100"
+                    >
+                      <ShieldCheck className="h-3 w-3" /> Verify ({alert.verifiedBy?.length ?? 0})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void handleSafetyVote(idx, "flag")}
+                      className="inline-flex items-center gap-1 rounded-lg bg-stone-100 px-2.5 py-1 font-bold text-stone-700 hover:bg-red-100 hover:text-red-900"
+                    >
+                      <Flag className="h-3 w-3" /> Flag ({alert.flaggedBy?.length ?? 0})
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs font-medium text-red-900">
+              No public safety alerts yet—pending alerts await Pathfinder+ or 2+ user verification below.
+            </p>
+          )}
+
+          {pendingAlerts.length > 0 && canModerateSafety && (
+            <div className="no-print rounded-xl border border-amber-300 bg-amber-50 p-3.5">
+              <div className="text-xs font-bold uppercase tracking-wider text-amber-950">
+                Pending Verification (Hidden publicly until Pathfinder+ or 2+ verifies)
               </div>
-            ))}
-          </div>
+              <div className="mt-2 space-y-2">
+                {pendingAlerts.map(({ alert, idx }) => (
+                  <div
+                    key={idx}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs"
+                  >
+                    <span>
+                      <strong>[{alert.tag}]</strong> {alert.message}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => void handleSafetyVote(idx, "verify")}
+                        className="rounded-lg bg-emerald-700 px-2.5 py-1 font-bold text-white hover:bg-emerald-800"
+                      >
+                        1-Click Verify
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleSafetyVote(idx, "flag")}
+                        className="rounded-lg bg-red-100 px-2.5 py-1 font-bold text-red-900 hover:bg-red-200"
+                      >
+                        Flag
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
       )}
 
@@ -576,7 +677,7 @@ export default function PlaceDetailPage() {
           Interactive Area &amp; Safety Map
         </h2>
         <LeafletMap
-          places={[place]}
+          places={[{ ...place, safetyAlerts: publicAlerts.map((p) => p.alert) }]}
           vendors={place.localVendors}
           center={[place.lat, place.lng]}
           zoom={13}

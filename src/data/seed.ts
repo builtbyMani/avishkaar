@@ -69,7 +69,7 @@ export const SEED_PROFILES: Profile[] = [
   },
 ];
 
-export const SEED_PLACES: Place[] = [
+export const SEED_PLACES_RAW: Place[] = [
   {
     id: "22222222-2222-4222-8222-222222222001",
     authorId: "11111111-1111-4111-8111-111111111101",
@@ -953,7 +953,149 @@ export const SEED_PLACES: Place[] = [
     verifiedCheckinsCount: 6,
     createdAt: "2026-11-18T16:45:00Z",
   },
+  {
+    id: "22222222-2222-4222-8222-222222222017",
+    authorId: "11111111-1111-4111-8111-111111111103",
+    title: "Pandavula Gutta Prehistoric Cliffs & Millet Kitchens",
+    region: "Deccan & Western Ghats",
+    category: "Living Heritage",
+    rawDescription:
+      "Older than Bhimbetka in Telangana's Jayashankar Bhupalpally forests, sandstone overhangs hide ochre Mesolithic rock art above quiet tribal jowar-roti kitchens.",
+    lat: 18.2341,
+    lng: 79.8825,
+    media: [
+      {
+        type: "image",
+        url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80",
+        aspect: "portrait",
+        caption: "Red sandstone ridge shelter with Mesolithic rock art",
+      },
+    ],
+    structuredCards: {
+      commute: [
+        "Take a morning TSRTC bus from Warangal Bus Stand to Regonda crossroad (75 mins).",
+        "Hire a local auto 6 km through dry-deciduous forest road to Pandavula Gutta base shelter.",
+      ],
+      food: [
+        { name: "Jonna Rotte & Wild Tamarind Pulusu", detail: "Hand-patted sorghum flatbread with forest-herb tamarind gravy.", priceHint: "INR 95" },
+        { name: "Sarvapindi", detail: "Crisp savory rice-flour pancake studded with peanuts and sesame.", priceHint: "INR 60" },
+      ],
+      activities: [
+        "Walk the sandstone ridge gallery spotting ancient deer, fish, and geometric motifs.",
+        "Join village naturalists on the morning climbing-trail conservation walk.",
+      ],
+      livingHeritage: [
+        "Never trace or wet prehistoric mineral rock-art panels—moisture fades millennia-old ochre.",
+        "Hire forest-community elders from Regonda as local storytelling guides.",
+      ],
+    },
+    localVendors: [
+      {
+        id: "v-pand-1",
+        name: "Gutta Eco-Guide & Millet Kitchen",
+        category: "Food Vendor",
+        specialty: "Telangana Jonna Rotte, Sarvapindi & rock-shelter trail orientation",
+        lat: 18.2355,
+        lng: 79.8842,
+        contact: "+91 94401-66219",
+        upiId: "guttamillet@upi",
+      },
+    ],
+    safetyAlerts: [
+      { tag: "Cultural Etiquette", message: "Zero touching or chalking near Mesolithic cave walls.", lat: 18.234, lng: 79.882 },
+      { tag: "Low Network", message: "Patchy cellular data inside forest clefts; save Offline Pocket Card first.", lat: 18.233, lng: 79.88 },
+    ],
+    mainstreamPopularityIndex: 13,
+    vouchesCount: 42,
+    verifiedCheckinsCount: 15,
+    createdAt: "2026-11-19T08:15:00Z",
+  },
+  {
+    id: "22222222-2222-4222-8222-222222222018",
+    authorId: "11111111-1111-4111-8111-111111111102",
+    title: "Ziro Valley — Apatani Bamboo & Paddy-Fish Terraces",
+    region: "Meghalaya & Northeast",
+    category: "Hidden Village",
+    rawDescription:
+      "In Arunachal's pine-ringed plateau, Apatani villages raise carp right inside flooded wet-rice terraces without machinery, pairing bamboo shoots with earthen salt.",
+    lat: 27.5449,
+    lng: 93.8197,
+    media: [
+      {
+        type: "image",
+        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80",
+        aspect: "portrait",
+        caption: "Apatani wet-rice terraces and bamboo grove fences in morning mist",
+      },
+    ],
+    structuredCards: {
+      commute: [
+        "Take the overnight Donyi Polo train from Guwahati to Naharlagun (8 hrs).",
+        "Take a shared Tata Sumo uphill through pine valleys to Hapoli / Hong village (3 hrs).",
+      ],
+      food: [
+        { name: "Pika Pila & Bamboo Shoot Stew", detail: "Traditional Apatani pickle and smoked bamboo shoot broth with valley carp.", priceHint: "INR 170" },
+        { name: "Tapyo Black Salt", detail: "Mineral plant-ash salt crafted from native valley reeds.", priceHint: "INR 90" },
+      ],
+      activities: [
+        "Walk the bund trails of Hong village observing integrated rice-and-fish farming.",
+        "Visit weaver cooperatives crafting hand-spun Apatani geometric shawls.",
+      ],
+      livingHeritage: [
+        "Walk only on reinforced bunds between paddy fields to avoid breaching fish channels.",
+        "Confirm Inner Line Permit (ILP) check before boarding the Sumo at Naharlagun.",
+      ],
+    },
+    localVendors: [
+      {
+        id: "v-ziro-1",
+        name: "Kago Heritage Bamboo Stay",
+        category: "Homestay",
+        specialty: "Stilt bamboo homestay & Apatani rice-fish farm tours",
+        lat: 27.5462,
+        lng: 93.8211,
+        contact: "+91 94362-54108",
+        upiId: "kagostayziro@upi",
+      },
+    ],
+    safetyAlerts: [
+      { tag: "Cultural Etiquette", message: "Seek consent before photographing Apatani elders; carry valid Arunachal ILP.", lat: 27.545, lng: 93.82 },
+      { tag: "Avoid After Dark", message: "Valley roads drop into dense mist after 5:00 PM.", lat: 27.541, lng: 93.815 },
+    ],
+    mainstreamPopularityIndex: 19,
+    vouchesCount: 39,
+    verifiedCheckinsCount: 14,
+    createdAt: "2026-11-19T12:00:00Z",
+  },
 ];
+
+// Normalize seeded places so all 18 entries carry Living Heritage tips, UPI handles, and Pathfinder+ verified alerts
+export const SEED_PLACES: Place[] = SEED_PLACES_RAW.map((place) => ({
+  ...place,
+  structuredCards: {
+    ...place.structuredCards,
+    livingHeritage:
+      place.structuredCards.livingHeritage && place.structuredCards.livingHeritage.length > 0
+        ? place.structuredCards.livingHeritage
+        : [
+            `Engage directly with ${place.region} craft stewards and greet elders respectfully.`,
+            "Leave zero plastic waste and follow local village footpath etiquette.",
+          ],
+  },
+  localVendors: place.localVendors.map((v) => ({
+    ...v,
+    upiId: v.upiId || `${v.name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12)}@upi`,
+  })),
+  safetyAlerts: place.safetyAlerts.map((a) => ({
+    ...a,
+    authorTier: a.authorTier ?? "Local Legend",
+    verifiedBy: a.verifiedBy ?? [
+      "11111111-1111-4111-8111-111111111101",
+      "11111111-1111-4111-8111-111111111102",
+    ],
+    flaggedBy: a.flaggedBy ?? [],
+  })),
+}));
 
 export const SEED_VOUCHES: VouchRecord[] = [
   {

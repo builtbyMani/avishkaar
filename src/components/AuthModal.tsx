@@ -227,6 +227,7 @@ export function AuthModal({
             })}
           </div>
         </div>
+        )}
       </div>
     </div>
   );

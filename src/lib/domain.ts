@@ -234,8 +234,9 @@ export function isSafetyAlertPublic(alert: SafetyAlert): boolean {
   if (flags >= 2 && flags > verifies) return false;
   if (alert.authorTier === "Pathfinder" || alert.authorTier === "Local Legend") return true;
   if (verifies >= 2) return true;
-  // Backwards compatibility for legacy untagged alerts without explicit authorTier
-  return alert.authorTier === undefined;
+  // No legacy exemption: untagged alerts stay private until Pathfinder+ authorship
+  // or 2+ community verifies. Seed alerts are tagged Local Legend in src/data/seed.ts.
+  return false;
 }
 
 export function applySafetyVote(
@@ -266,4 +267,14 @@ export function applySafetyVote(
     verifiedBy: Array.from(verifiedSet),
     flaggedBy: Array.from(flaggedSet),
   };
+}
+
+export function isDemoCheckInAllowed(env: {
+  NODE_ENV?: string;
+  ALLOW_DEMO_CHECKIN?: string;
+}): boolean {
+  // Local development demo always allows it (hackathon judging flow).
+  // In production it requires an explicit opt-in, e.g. on a judging deployment.
+  if (env.NODE_ENV === "production") return env.ALLOW_DEMO_CHECKIN === "true";
+  return true;
 }

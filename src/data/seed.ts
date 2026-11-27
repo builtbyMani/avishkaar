@@ -83,18 +83,18 @@ export const SEED_PLACES_RAW: Place[] = [
     lng: 78.2535,
     media: [
       {
-        type: "video",
-        url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-        thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80",
+        type: "image",
+        url: "/images/places/kalpa.jpg",
         aspect: "portrait",
-        caption: "Dawn mist drifting across Roghi cliff path (0:18)",
-        durationSec: 18,
+        caption: "Kinnaur Kailash ridge above terraced stone homes in Kalpa",
       },
       {
-        type: "image",
-        url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80",
+        type: "video",
+        url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+        thumbnail: "/images/places/kalpa.jpg",
         aspect: "portrait",
-        caption: "Kinnaur Kailash ridge above terraced stone homes",
+        caption: "Spring orchard blossoms on the Roghi trail (0:18)",
+        durationSec: 18,
       },
     ],
     structuredCards: {
@@ -152,18 +152,18 @@ export const SEED_PLACES_RAW: Place[] = [
     lng: 91.8551,
     media: [
       {
+        type: "image",
+        url: "/images/places/kongthong.jpg",
+        aspect: "portrait",
+        caption: "Khasi hillside trails in East Khasi Hills, Meghalaya",
+      },
+      {
         type: "video",
         url: "https://media.w3.org/2010/05/sintel/trailer.mp4",
-        thumbnail: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=900&q=80",
+        thumbnail: "/images/places/kongthong.jpg",
         aspect: "portrait",
         caption: "Bamboo ridge trail & monsoon stream song (0:15)",
         durationSec: 15,
-      },
-      {
-        type: "image",
-        url: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=900&q=80",
-        aspect: "portrait",
-        caption: "Khasi hillside trails draped in mist",
       },
     ],
     structuredCards: {
@@ -213,7 +213,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/anegundi.jpg",
         aspect: "square",
         caption: "Granite boulder alleys and heritage stone verandas",
       },
@@ -273,18 +273,18 @@ export const SEED_PLACES_RAW: Place[] = [
     lng: 69.5218,
     media: [
       {
+        type: "image",
+        url: "/images/places/nirona.jpg",
+        aspect: "portrait",
+        caption: "Rogan Tree of Life painting by Khatri artisans in Nirona",
+      },
+      {
         type: "video",
         url: "https://media.w3.org/2010/05/bunny/trailer.mp4",
-        thumbnail: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=900&q=80",
+        thumbnail: "/images/places/nirona.jpg",
         aspect: "portrait",
         caption: "Hand-forged desert artisan craft studio (0:14)",
         durationSec: 14,
-      },
-      {
-        type: "image",
-        url: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=900&q=80",
-        aspect: "portrait",
-        caption: "Sun-baked courtyard walls and intricate geometric motifs",
       },
     ],
     structuredCards: {
@@ -343,7 +343,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/chettinad.jpg",
         aspect: "portrait",
         caption: "Burma-teak pillars & cool hand-poured Athangudi floors",
       },
@@ -403,7 +403,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/turtuk.jpg",
         aspect: "landscape",
         caption: "Stone water channels winding past Balti wooden homes",
       },
@@ -455,7 +455,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/dzukou.jpg",
         aspect: "portrait",
         caption: "Velvet dwarf-bamboo folds above the Kohima mist line",
       },
@@ -507,7 +507,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/kumbalangi.jpg",
         aspect: "square",
         caption: "Still evening lagoons and traditional cantilevered nets",
       },
@@ -558,7 +558,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/kaas.jpg",
         aspect: "landscape",
         caption: "Misty plateau lakes and seasonal monsoon wildflowers",
       },
@@ -609,7 +609,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/bundi.jpg",
         aspect: "portrait",
         caption: "Indigo-washed lane walls leading down to Raniji ki Baori",
       },
@@ -660,7 +660,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/majuli.jpg",
         aspect: "square",
         caption: "Bamboo riverbanks and quiet ferry landings on the Brahmaputra",
       },
@@ -711,7 +711,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/gokarna.jpg",
         aspect: "portrait",
         caption: "Quiet basalt cove beyond the headland footpath",
       },
@@ -762,7 +762,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/gurez.jpg",
         aspect: "landscape",
         caption: "Limestone pyramid ridge overlooking wooden log settlements",
       },
@@ -813,7 +813,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/channapatna.jpg",
         aspect: "square",
         caption: "Natural turmeric, indigo, and lac pigment sticks on ivory-wood",
       },
@@ -864,7 +864,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/patola.jpg",
         aspect: "portrait",
         caption: "Hand-tied silk warp threads aligned on angled bamboo looms",
       },
@@ -915,7 +915,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/dhanushkodi.jpg",
         aspect: "landscape",
         caption: "Two-ocean sandbar convergence and coral-stone ruins",
       },
@@ -967,7 +967,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/pandavula-gutta.jpg",
         aspect: "portrait",
         caption: "Red sandstone ridge shelter with Mesolithic rock art",
       },
@@ -1024,7 +1024,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=900&q=80",
+        url: "/images/places/ziro.jpg",
         aspect: "portrait",
         caption: "Apatani wet-rice terraces and bamboo grove fences in morning mist",
       },
@@ -2484,7 +2484,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://tribesindia.com/public/uploads/all/zscQM6CL9gxDBzImgmSVw6ijGxbg4V15OjTysSZJ.webp",
+        url: "/images/places/warli.jpg",
         aspect: "portrait",
         caption: "A Warli mural in its living village form",
       },
@@ -3155,7 +3155,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://banglalive.today/wp-content/uploads/2025/02/Chhau-Mask-Photo-Story_Pradipta-Chakraborty-6-682x1024.jpeg",
+        url: "/images/places/chhau.jpg",
         aspect: "portrait",
         caption: "Chhau masks drying outside a Charida workshop",
       },

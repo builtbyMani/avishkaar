@@ -15,11 +15,10 @@ export default function Preloader() {
   const [imgIndex, setImgIndex] = useState(0);
   const progress = usePreloadProgress(PRELOADER_IMAGES, shouldShow);
 
-  // Session gate + reduced motion + unmount overflow cleanup
+  // Reduced motion gate + unmount overflow cleanup
   useEffect(() => {
-    const seen = sessionStorage.getItem("avishkaar-preloaded");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!seen && !reduced) {
+    if (!reduced) {
       setShouldShow(true);
       document.body.style.overflow = "hidden";
     }
@@ -38,12 +37,11 @@ export default function Preloader() {
     return () => clearInterval(id);
   }, [shouldShow, done]);
 
-  // Finish: mark session, release scroll, trigger curtain exit
+  // Finish: release scroll and trigger curtain exit
   useEffect(() => {
     if (progress >= 100 && shouldShow && !done) {
       const t = setTimeout(() => {
         setDone(true);
-        sessionStorage.setItem("avishkaar-preloaded", "1");
         document.body.style.overflow = "";
       }, 250);
       return () => clearTimeout(t);

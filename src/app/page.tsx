@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
+  ArrowRight,
   CheckCircle2,
   Crown,
   Flame,
@@ -12,13 +13,31 @@ import {
   LayoutGrid,
   MapPin,
   PlusCircle,
+  Route,
   Sparkles,
   Store,
+  X,
 } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
 import type { EnrichedPlace, PlaceCategory, UserBadge } from "@/types/domain";
+
+interface DetourAlternativeView {
+  place: EnrichedPlace;
+  matchReason: string;
+  crowdReductionPercent: number;
+  commuteSummary: string;
+}
+
+interface DetourResponseView {
+  hotspot: string;
+  hotspotCrowdIndex: number;
+  alternatives: DetourAlternativeView[];
+  source: "gemini" | "fallback";
+}
+
+const QUICK_DETOURS = ["Ooty", "Goa", "Hampi"];
 
 const CATEGORIES: Array<"All" | PlaceCategory> = [
   "All",
@@ -38,6 +57,10 @@ export default function DiscoverPage() {
   const [viewMode, setViewMode] = useState<"masonry" | "map">("masonry");
   const [toast, setToast] = useState<string | null>(null);
   const [vouchingId, setVouchingId] = useState<string | null>(null);
+  const [detourQuery, setDetourQuery] = useState("");
+  const [detourLoading, setDetourLoading] = useState(false);
+  const [detourResult, setDetourResult] = useState<DetourResponseView | null>(null);
+  const [openScoreId, setOpenScoreId] = useState<string | null>(null);
 
   const loadFeed = useCallback(async () => {
     setLoading(true);
@@ -104,6 +127,29 @@ export default function DiscoverPage() {
     }
   }
 
+  async function handleDetourSearch(queryText: string) {
+    const cleaned = queryText.trim();
+    if (!cleaned) {
+      setDetourResult(null);
+      return;
+    }
+    setDetourQuery(cleaned);
+    setDetourLoading(true);
+    try {
+      const res = await fetch("/api/detour", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: cleaned, viewerId: activeUser?.id }),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as DetourResponseView;
+        setDetourResult(data);
+      }
+    } finally {
+      setDetourLoading(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Editorial Hero */}
@@ -164,6 +210,105 @@ export default function DiscoverPage() {
           </button>
         </div>
       )}
+
+      {/* "Instead of X, Go Here" Detour Bar */}
+      <section className="rounded-2xl border border-[#E8E0D4] bg-white p-4 shadow-xs sm:p-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handleDetourSearch(detourQuery);
+          }}
+          className="flex flex-col gap-3 sm:flex-row sm:items-center"
+        >
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#C85A32] shrink-0">
+            <Route className="h-4 w-4" />
+            Instead of X, Go Here
+          </div>
+          <div className="relative flex-1">
+            <input
+              value={detourQuery}
+              onChange={(e) => setDetourQuery(e.target.value)}
+              placeholder="Skip the crowds at Ooty, Goa, Hampi, Manali..."
+              className="w-full rounded-full border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-2 text-sm outline-none focus:border-[#C85A32]"
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="submit"
+              disabled={detourLoading || !detourQuery.trim()}
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#1B3B36] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#C85A32] disabled:opacity-50"
+            >
+              {detourLoading ? "Finding Detours..." : "Find Top 3 Gems"}
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+            {detourResult && (
+              <button
+                type="button"
+                onClick={() => {
+                  setDetourResult(null);
+                  setDetourQuery("");
+                }}
+                className="inline-flex items-center gap-1 rounded-full border border-[#E8E0D4] px-3 py-2 text-xs font-semibold text-[#52635F] hover:text-[#1B3B36]"
+              >
+                <X className="h-3.5 w-3.5" /> Clear
+              </button>
+            )}
+          </div>
+        </form>
+
+        <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-semibold text-[#52635F]">Quick detours:</span>
+          {QUICK_DETOURS.map((hub) => (
+            <button
+              key={hub}
+              type="button"
+              onClick={() => void handleDetourSearch(hub)}
+              className="rounded-full bg-[#FAF7F2] px-3 py-1 font-semibold text-[#1B3B36] transition hover:bg-[#C85A32] hover:text-white"
+            >
+              Skip {hub}
+            </button>
+          ))}
+        </div>
+
+        {detourResult && (
+          <div className="mt-4 border-t border-[#F1EBE1] pt-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span className="font-bold text-[#1B3B36]">
+                Top 3 Offbeat Detours for &ldquo;{detourResult.hotspot}&rdquo; (Crowd Index{" "}
+                {detourResult.hotspotCrowdIndex})
+              </span>
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 font-bold text-amber-900">
+                {detourResult.source === "gemini" ? "Gemini Vibe Match" : "Crowd + Vibe Engine"}
+              </span>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {detourResult.alternatives.map((alt) => (
+                <Link
+                  key={alt.place.id}
+                  href={`/place/${alt.place.id}`}
+                  className="rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] p-3.5 transition hover:border-[#C85A32] hover:bg-white"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-900">
+                      {alt.crowdReductionPercent}% Less Crowded
+                    </span>
+                    <span className="text-[11px] font-bold text-[#1B3B36]">
+                      Gem {alt.place.hiddenGemScore}
+                    </span>
+                  </div>
+                  <h3 className="mt-2 font-display text-sm font-bold text-[#1B3B36]">
+                    {alt.place.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-[#52635F]">{alt.matchReason}</p>
+                  <p className="mt-2 text-[11px] font-semibold text-[#C85A32]">
+                    Commute: {alt.commuteSummary}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Filter Pills */}
       <section className="space-y-3">
@@ -235,19 +380,30 @@ export default function DiscoverPage() {
           {filtered.map((place) => (
             <article
               key={place.id}
-              className="group break-inside-avoid overflow-hidden rounded-2xl border border-[#E8E0D4] bg-white shadow-xs transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group relative break-inside-avoid overflow-hidden rounded-2xl border border-[#E8E0D4] bg-white shadow-xs transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <Link href={`/place/${place.id}`} className="block relative">
-                <MediaCardPlayer
-                  media={place.media[0]}
-                  title={place.title}
-                  compact
-                />
-                <div className="absolute bottom-2.5 left-2.5 flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#1B3B36]/90 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur-xs">
+              <div className="relative">
+                <Link href={`/place/${place.id}`} className="block">
+                  <MediaCardPlayer
+                    media={place.media[0]}
+                    title={place.title}
+                    compact
+                  />
+                </Link>
+                <div className="pointer-events-none absolute bottom-2.5 left-2.5 flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setOpenScoreId((prev) => (prev === place.id ? null : place.id));
+                    }}
+                    className="pointer-events-auto inline-flex items-center gap-1 rounded-full bg-[#1B3B36]/95 px-2.5 py-1 text-[11px] font-bold text-white shadow-xs backdrop-blur-xs transition hover:bg-[#C85A32]"
+                    title="Click for Hidden Gem Score math breakdown"
+                  >
                     <Flame className="h-3 w-3 text-amber-300" />
                     Gem {place.hiddenGemScore}
-                  </span>
+                  </button>
                   {place.safetyAlerts.length > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-red-600/90 px-2 py-1 text-[10px] font-bold text-white">
                       <AlertTriangle className="h-3 w-3" />
@@ -255,7 +411,42 @@ export default function DiscoverPage() {
                     </span>
                   )}
                 </div>
-              </Link>
+              </div>
+
+              {openScoreId === place.id && (
+                <div className="border-b border-[#E8E0D4] bg-[#FAF7F2] p-3 text-[11px] text-[#1B3B36]">
+                  <div className="flex items-center justify-between font-bold">
+                    <span>Explainable Gem Math</span>
+                    <button
+                      type="button"
+                      onClick={() => setOpenScoreId(null)}
+                      className="text-[#C85A32] hover:underline"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <div className="mt-1.5 space-y-1 text-[#52635F]">
+                    <div className="flex justify-between">
+                      <span>Community Vouches ({place.vouchesCount} × 2)</span>
+                      <strong className="text-[#1B3B36]">+{place.vouchesCount * 2}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Local Impact / Check-ins ({place.verifiedCheckinsCount} × 5)</span>
+                      <strong className="text-[#1B3B36]">+{place.verifiedCheckinsCount * 5}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Crowd Penalty log10({place.mainstreamPopularityIndex} + 10)</span>
+                      <strong className="text-[#1B3B36]">
+                        ÷ {Math.log10(Math.max(0, place.mainstreamPopularityIndex) + 10).toFixed(2)}
+                      </strong>
+                    </div>
+                    <div className="flex justify-between border-t border-[#E8E0D4] pt-1 font-bold text-[#1B3B36]">
+                      <span>Final Hidden Gem Score</span>
+                      <span>{place.hiddenGemScore}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2.5 p-3.5">
                 <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-[#52635F]">

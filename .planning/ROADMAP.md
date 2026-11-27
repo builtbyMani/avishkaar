@@ -95,10 +95,11 @@ Plans:
   4. Multilingual notes (English, Hindi, Telugu, Tamil, Hinglish) extract into 4 structured cards including **Living Heritage & Etiquette**
   5. Support Local cards include Navigate, WhatsApp/Call, and Direct UPI QR actions; Safety Advisories enforce `Pathfinder+` / `2+` verify gate inside `places.safety_alerts` JSONB
   6. Dataset has 18 destinations (including Pandavula Gutta & Ziro Valley), `"Simulate GPS Check-In"` label, and Impact/Architecture drawer
-**Plans:** 3 plans
+
+**Plans:** 1/3 plans executed
 
 Plans:
-- [ ] 06-01: Detour Bar, Explainable Gem Score popover, hover video (<8 MB) & YouTube Shorts
+- [x] 06-01: Detour Bar, Explainable Gem Score popover, hover video (<8 MB) & YouTube Shorts
 - [ ] 06-02: Multilingual Gemini + Living Heritage card + Zero-Commission Vendor Actions (Navigate, WhatsApp/Call, Direct UPI QR)
 - [ ] 06-03: Community Safety Verify/Flag gate, Pandavula Gutta & Ziro Valley seeds, Simulate GPS label, Impact drawer & E2E verification
 
@@ -111,4 +112,4 @@ Plans:
 | 3. Location Detail, Gemini AI, Support Local, Offline & Map | 3/3 | Complete | 2026-11-27 |
 | 4. Check-ins, Badges & Volunteer Guides | 2/2 | Complete | 2026-11-27 |
 | 5. Polish, Deploy & Demo Readiness | 2/2 | Complete | 2026-11-27 |
-| 6. Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety | 0/3 | Planned — awaiting execution authorization | - |
+| 6. Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety | 1/3 | In Progress|  |

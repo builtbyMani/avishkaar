@@ -4,7 +4,8 @@ import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient, isSupabaseConfigured } from "@/lib/supabase";
 
-const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB for short clips & photos
+const MAX_IMAGE_SIZE_BYTES = 25 * 1024 * 1024; // 25 MB for photos
+const MAX_VIDEO_SIZE_BYTES = 8 * 1024 * 1024; // <8 MB for short hover clips
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,18 +15,25 @@ export async function POST(request: NextRequest) {
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
-    if (file.size > MAX_FILE_SIZE_BYTES) {
-      return NextResponse.json(
-        { error: "File exceeds 25 MB short-clip/photo limit" },
-        { status: 400 },
-      );
-    }
 
     const isVideo = file.type.startsWith("video/");
     const isImage = file.type.startsWith("image/");
     if (!isVideo && !isImage) {
       return NextResponse.json(
         { error: "Only image and short video files are supported" },
+        { status: 400 },
+      );
+    }
+
+    if (isVideo && file.size > MAX_VIDEO_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "Short video clip exceeds the 8 MB limit (or paste a YouTube Shorts URL instead)." },
+        { status: 400 },
+      );
+    }
+    if (isImage && file.size > MAX_IMAGE_SIZE_BYTES) {
+      return NextResponse.json(
+        { error: "Photo exceeds 25 MB limit" },
         { status: 400 },
       );
     }

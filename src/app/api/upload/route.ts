@@ -44,18 +44,20 @@ export async function POST(request: NextRequest) {
 
     if (isSupabaseConfigured()) {
       const sb = getSupabaseServerClient();
-      if (sb) {
-        const { error } = await sb.storage
-          .from("place-media")
-          .upload(safeName, bytes, { contentType: file.type, upsert: false });
-        if (!error) {
-          const { data } = sb.storage.from("place-media").getPublicUrl(safeName);
-          return NextResponse.json({
-            type: isVideo ? "video" : "image",
-            url: data.publicUrl,
-          });
-        }
+      if (!sb) {
+        return NextResponse.json({ error: "Supabase storage client unavailable" }, { status: 500 });
       }
+      const { error } = await sb.storage
+        .from("place-media")
+        .upload(safeName, bytes, { contentType: file.type, upsert: false });
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      const { data } = sb.storage.from("place-media").getPublicUrl(safeName);
+      return NextResponse.json({
+        type: isVideo ? "video" : "image",
+        url: data.publicUrl,
+      });
     }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads");

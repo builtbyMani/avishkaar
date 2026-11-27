@@ -1,3 +1,4 @@
+import { formatUpiHandle } from "../lib/domain";
 import type { GuideRequest, Place, Profile, UserBadge, VouchRecord } from "../types/domain";
 
 export const SEED_PROFILES: Profile[] = [
@@ -83,7 +84,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "video",
-        url: "https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-mountain-ridge-and-forest-42362-large.mp4",
+        url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
         thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=900&q=80",
         aspect: "portrait",
         caption: "Dawn mist drifting across Roghi cliff path (0:18)",
@@ -152,7 +153,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "video",
-        url: "https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-a-forest-2512-large.mp4",
+        url: "https://media.w3.org/2010/05/sintel/trailer.mp4",
         thumbnail: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=900&q=80",
         aspect: "portrait",
         caption: "Bamboo ridge trail & monsoon stream song (0:15)",
@@ -273,7 +274,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "video",
-        url: "https://assets.mixkit.co/videos/preview/mixkit-potter-working-on-clay-vessel-43235-large.mp4",
+        url: "https://media.w3.org/2010/05/bunny/trailer.mp4",
         thumbnail: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=900&q=80",
         aspect: "portrait",
         caption: "Hand-forged desert artisan craft studio (0:14)",
@@ -812,7 +813,7 @@ export const SEED_PLACES_RAW: Place[] = [
     media: [
       {
         type: "image",
-        url: "https://images.unsplash.com/photo-1513519245088-029cb4e57126?auto=format&fit=crop&w=900&q=80",
+        url: "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?auto=format&fit=crop&w=900&q=80",
         aspect: "square",
         caption: "Natural turmeric, indigo, and lac pigment sticks on ivory-wood",
       },
@@ -1084,7 +1085,7 @@ export const SEED_PLACES: Place[] = SEED_PLACES_RAW.map((place) => ({
   },
   localVendors: place.localVendors.map((v) => ({
     ...v,
-    upiId: v.upiId || `${v.name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12)}@upi`,
+    upiId: formatUpiHandle(v.name, v.upiId),
   })),
   safetyAlerts: place.safetyAlerts.map((a) => ({
     ...a,

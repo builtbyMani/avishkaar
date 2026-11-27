@@ -7,14 +7,13 @@ import { AuthModal } from "./AuthModal";
 
 const ACTIVE_USER_KEY = "avishkaar_active_user_id";
 const OFFLINE_CARDS_KEY = "avishkaar_offline_cards_v1";
+const DEFAULT_DEMO_USER_ID = "11111111-1111-4111-8111-111111111106";
 
 interface AppContextValue {
   activeUser: Profile | null;
   profiles: Profile[];
   mode: "supabase" | "demo";
-  geminiConfigured: boolean;
   offlineCards: OfflinePocketCard[];
-  loadingAuth: boolean;
   switchDemoUser: (userId: string) => void;
   refreshProfiles: () => Promise<void>;
   openAuthModal: () => void;
@@ -26,13 +25,14 @@ interface AppContextValue {
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const supabaseMode = isSupabaseConfigured();
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [activeUserId, setActiveUserId] = useState<string>("11111111-1111-4111-8111-111111111106");
-  const [mode, setMode] = useState<"supabase" | "demo">("demo");
-  const [geminiConfigured, setGeminiConfigured] = useState(false);
+  const [activeUserId, setActiveUserId] = useState<string>(
+    supabaseMode ? "" : DEFAULT_DEMO_USER_ID,
+  );
+  const [mode, setMode] = useState<"supabase" | "demo">(supabaseMode ? "supabase" : "demo");
   const [offlineCards, setOfflineCards] = useState<OfflinePocketCard[]>([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [loadingAuth, setLoadingAuth] = useState(true);
 
   const refreshProfiles = useCallback(async () => {
     try {
@@ -45,12 +45,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setProfiles(data.profiles ?? []);
       }
       if (healthRes.ok) {
-        const h = (await healthRes.json()) as {
-          mode: "supabase" | "demo";
-          geminiConfigured: boolean;
-        };
+        const h = (await healthRes.json()) as { mode: "supabase" | "demo" };
         setMode(h.mode);
-        setGeminiConfigured(h.geminiConfigured);
       }
     } catch {
       // Offline mode: retain cached state
@@ -58,8 +54,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const savedId = window.localStorage.getItem(ACTIVE_USER_KEY);
-    if (savedId) setActiveUserId(savedId);
+    if (!supabaseMode) {
+      const savedId = window.localStorage.getItem(ACTIVE_USER_KEY);
+      if (savedId) setActiveUserId(savedId);
+    }
 
     try {
       const rawCards = window.localStorage.getItem(OFFLINE_CARDS_KEY);
@@ -68,22 +66,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Ignore corrupt localStorage
     }
 
+    let unsubscribe: (() => void) | undefined;
     const init = async () => {
       await refreshProfiles();
-      if (isSupabaseConfigured()) {
+      if (supabaseMode) {
         const sb = getSupabaseBrowserClient();
         if (sb) {
           const { data } = await sb.auth.getUser();
-          if (data.user) {
-            setActiveUserId(data.user.id);
-          }
+          setActiveUserId(data.user?.id ?? "");
+          const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
+            setActiveUserId(session?.user?.id ?? "");
+          });
+          unsubscribe = () => sub.subscription.unsubscribe();
         }
       }
-      setLoadingAuth(false);
     };
 
     void init();
-  }, [refreshProfiles]);
+    return () => unsubscribe?.();
+  }, [refreshProfiles, supabaseMode]);
 
   const switchDemoUser = useCallback((userId: string) => {
     setActiveUserId(userId);
@@ -112,7 +113,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const activeUser =
-    profiles.find((p) => p.id === activeUserId) ?? profiles[profiles.length - 1] ?? null;
+    (activeUserId ? profiles.find((p) => p.id === activeUserId) : undefined) ??
+    (mode === "demo" ? profiles[profiles.length - 1] : null) ??
+    null;
 
   return (
     <AppContext.Provider
@@ -120,9 +123,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         activeUser,
         profiles,
         mode,
-        geminiConfigured,
         offlineCards,
-        loadingAuth,
         switchDemoUser,
         refreshProfiles,
         openAuthModal: () => setAuthModalOpen(true),

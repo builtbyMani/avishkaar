@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Loader2, Sparkles, UploadCloud } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
+import { PLACE_CATEGORIES, REGIONS } from "@/lib/domain";
+import { getAuthHeaders } from "@/lib/supabase";
 import type {
   LocalVendor,
   MediaItem,
@@ -13,28 +15,12 @@ import type {
   StructuredCards,
 } from "@/types/domain";
 
-const REGIONS = [
-  "Spiti & Kinnaur",
-  "Meghalaya & Northeast",
-  "Deccan & Western Ghats",
-  "Kutch & Thar",
-  "Malabar & Konkan",
-];
-
-const CATEGORIES: PlaceCategory[] = [
-  "Hidden Village",
-  "Regional Cuisine",
-  "Living Heritage",
-  "Sacred & Craft",
-  "Nature & Trail",
-];
-
 export default function SubmitGemPage() {
   const router = useRouter();
   const { activeUser, refreshProfiles } = useApp();
 
   const [title, setTitle] = useState("");
-  const [region, setRegion] = useState(REGIONS[0]);
+  const [region, setRegion] = useState<string>(REGIONS[0]);
   const [category, setCategory] = useState<PlaceCategory>("Hidden Village");
   const [lat, setLat] = useState("31.1048");
   const [lng, setLng] = useState("77.1734");
@@ -110,10 +96,9 @@ export default function SubmitGemPage() {
     setPublishing(true);
     setError(null);
     try {
-      const extracted =
-        structured && safetyAlerts.length > 0
-          ? { structuredCards: structured, safetyAlerts }
-          : await runGeminiStructuring();
+      const extracted = structured
+        ? { structuredCards: structured, safetyAlerts }
+        : await runGeminiStructuring();
 
       const media: MediaItem[] = [
         {
@@ -140,7 +125,10 @@ export default function SubmitGemPage() {
 
       const res = await fetch("/api/places", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getAuthHeaders()),
+        },
         body: JSON.stringify({
           authorId: activeUser.id,
           title,
@@ -224,7 +212,7 @@ export default function SubmitGemPage() {
               onChange={(e) => setCategory(e.target.value as PlaceCategory)}
               className="mt-1.5 w-full rounded-xl border border-[#E8E0D4] bg-white px-3.5 py-2.5 text-sm"
             >
-              {CATEGORIES.map((c) => (
+              {PLACE_CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>

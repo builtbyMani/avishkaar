@@ -21,7 +21,8 @@ import {
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import { isSafetyAlertPublic } from "@/lib/domain";
+import { getGemScoreBreakdown, isSafetyAlertPublic, PLACE_CATEGORIES } from "@/lib/domain";
+import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, PlaceCategory, UserBadge } from "@/types/domain";
 
 interface DetourAlternativeView {
@@ -40,14 +41,7 @@ interface DetourResponseView {
 
 const QUICK_DETOURS = ["Ooty", "Goa", "Hampi"];
 
-const CATEGORIES: Array<"All" | PlaceCategory> = [
-  "All",
-  "Hidden Village",
-  "Regional Cuisine",
-  "Living Heritage",
-  "Sacred & Craft",
-  "Nature & Trail",
-];
+const CATEGORIES: Array<"All" | PlaceCategory> = ["All", ...PLACE_CATEGORIES];
 
 export default function DiscoverPage() {
   const { activeUser, refreshProfiles } = useApp();
@@ -100,7 +94,10 @@ export default function DiscoverPage() {
     try {
       const res = await fetch(`/api/places/${placeId}/vouch`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getAuthHeaders()),
+        },
         body: JSON.stringify({ userId: activeUser.id }),
       });
       const data = (await res.json()) as {
@@ -378,7 +375,10 @@ export default function DiscoverPage() {
         </div>
       ) : (
         <section className="columns-1 gap-4 space-y-4 sm:columns-2 md:columns-4">
-          {filtered.map((place) => (
+          {filtered.map((place) => {
+            const publicAlertCount = place.safetyAlerts.filter(isSafetyAlertPublic).length;
+            const gemBreakdown = getGemScoreBreakdown(place);
+            return (
             <article
               key={place.id}
               className="group relative break-inside-avoid overflow-hidden rounded-2xl border border-[#E8E0D4] bg-white shadow-xs transition hover:-translate-y-0.5 hover:shadow-md"
@@ -405,11 +405,10 @@ export default function DiscoverPage() {
                     <Flame className="h-3 w-3 text-amber-300" />
                     Gem {place.hiddenGemScore}
                   </button>
-                  {place.safetyAlerts.filter(isSafetyAlertPublic).length > 0 && (
+                  {publicAlertCount > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-red-600/90 px-2 py-1 text-[10px] font-bold text-white">
                       <AlertTriangle className="h-3 w-3" />
-                      {place.safetyAlerts.filter(isSafetyAlertPublic).length} Alert
-                      {place.safetyAlerts.filter(isSafetyAlertPublic).length > 1 ? "s" : ""}
+                      {publicAlertCount} Alert{publicAlertCount > 1 ? "s" : ""}
                     </span>
                   )}
                 </div>
@@ -430,21 +429,21 @@ export default function DiscoverPage() {
                   <div className="mt-1.5 space-y-1 text-[#52635F]">
                     <div className="flex justify-between">
                       <span>Community Vouches ({place.vouchesCount} × 2)</span>
-                      <strong className="text-[#1B3B36]">+{place.vouchesCount * 2}</strong>
+                      <strong className="text-[#1B3B36]">+{gemBreakdown.vouchesPoints}</strong>
                     </div>
                     <div className="flex justify-between">
                       <span>Local Impact / Check-ins ({place.verifiedCheckinsCount} × 5)</span>
-                      <strong className="text-[#1B3B36]">+{place.verifiedCheckinsCount * 5}</strong>
+                      <strong className="text-[#1B3B36]">+{gemBreakdown.checkinsPoints}</strong>
                     </div>
                     <div className="flex justify-between">
                       <span>Crowd Penalty log10({place.mainstreamPopularityIndex} + 10)</span>
                       <strong className="text-[#1B3B36]">
-                        ÷ {Math.log10(Math.max(0, place.mainstreamPopularityIndex) + 10).toFixed(2)}
+                        ÷ {gemBreakdown.crowdPenalty.toFixed(2)}
                       </strong>
                     </div>
                     <div className="flex justify-between border-t border-[#E8E0D4] pt-1 font-bold text-[#1B3B36]">
                       <span>Final Hidden Gem Score</span>
-                      <span>{place.hiddenGemScore}</span>
+                      <span>{gemBreakdown.score}</span>
                     </div>
                   </div>
                 </div>
@@ -510,7 +509,8 @@ export default function DiscoverPage() {
                 </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </section>
       )}
     </div>

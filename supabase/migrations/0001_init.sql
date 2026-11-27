@@ -23,6 +23,38 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 
+-- AUTO-PROVISION PROFILE ON SUPABASE AUTH SIGNUP
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_name text;
+begin
+  v_name := coalesce(
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'name',
+    split_part(coalesce(new.email, 'traveler'), '@', 1)
+  );
+  insert into public.profiles (id, username, display_name, avatar_url)
+  values (
+    new.id,
+    lower(regexp_replace(v_name, '[^a-zA-Z0-9_]+', '_', 'g')) || '_' || substr(new.id::text, 1, 6),
+    v_name,
+    new.raw_user_meta_data->>'avatar_url'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
 -- 2. PLACES
 create table if not exists public.places (
   id uuid primary key default gen_random_uuid(),
@@ -105,7 +137,7 @@ begin
   join public.places p on p.id = v.place_id
   where v.user_id = p_user_id
     and v.vouched_at is not null
-    and (p.category ilike '%Cuisine%' or jsonb_array_length(coalesce(p.structured_cards->'food', '[]'::jsonb)) >= 2);
+    and (p.category = 'Regional Cuisine' or jsonb_array_length(coalesce(p.structured_cards->'food', '[]'::jsonb)) >= 2);
 
   if v_places_count >= 1 then
     insert into public.user_badges (user_id, badge_key, badge_name, description)
@@ -231,6 +263,68 @@ begin
   end if;
 
   return jsonb_build_object('vouched', true, 'points_awarded', v_points);
+end;
+$$;
+
+-- ATOMIC SAFETY VERIFY / FLAG RPC (lets Pathfinder+ or community moderate places.safety_alerts under RLS)
+create or replace function public.verify_safety_alert(
+  p_place_id uuid,
+  p_alert_index integer,
+  p_user_id uuid,
+  p_action text
+)
+returns jsonb
+language plpgsql
+security definer
+as $$
+declare
+  v_alerts jsonb;
+  v_alert jsonb;
+  v_voter_tier text;
+  v_verified jsonb;
+  v_flagged jsonb;
+  v_next_tier text;
+  v_uid text := p_user_id::text;
+begin
+  if p_action not in ('verify', 'flag') then
+    raise exception 'Invalid safety vote action';
+  end if;
+
+  select safety_alerts into v_alerts from public.places where id = p_place_id for update;
+  if v_alerts is null or p_alert_index < 0 or p_alert_index >= jsonb_array_length(v_alerts) then
+    raise exception 'Safety alert not found';
+  end if;
+
+  select tier into v_voter_tier from public.profiles where id = p_user_id;
+  v_alert := v_alerts -> p_alert_index;
+
+  v_verified := coalesce(
+    (select jsonb_agg(elem) from jsonb_array_elements_text(coalesce(v_alert->'verifiedBy', '[]'::jsonb)) elem where elem <> v_uid),
+    '[]'::jsonb
+  );
+  v_flagged := coalesce(
+    (select jsonb_agg(elem) from jsonb_array_elements_text(coalesce(v_alert->'flaggedBy', '[]'::jsonb)) elem where elem <> v_uid),
+    '[]'::jsonb
+  );
+
+  if p_action = 'verify' then
+    v_verified := v_verified || to_jsonb(v_uid);
+  else
+    v_flagged := v_flagged || to_jsonb(v_uid);
+  end if;
+
+  v_next_tier := coalesce(v_alert->>'authorTier', 'Wanderer');
+  if p_action = 'verify' and v_voter_tier in ('Pathfinder', 'Local Legend') then
+    v_next_tier := v_voter_tier;
+  end if;
+
+  v_alert := v_alert
+    || jsonb_build_object('authorTier', v_next_tier, 'verifiedBy', v_verified, 'flaggedBy', v_flagged);
+
+  v_alerts := jsonb_set(v_alerts, array[p_alert_index::text], v_alert, false);
+  update public.places set safety_alerts = v_alerts where id = p_place_id;
+
+  return v_alerts;
 end;
 $$;
 

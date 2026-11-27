@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BarChart3,
   BookmarkCheck,
@@ -26,6 +26,15 @@ export function Navbar() {
   const pathname = usePathname();
   const { activeUser, offlineCards, openAuthModal, mode } = useApp();
   const [impactOpen, setImpactOpen] = useState(false);
+
+  useEffect(() => {
+    if (!impactOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setImpactOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [impactOpen]);
 
   const navItems = [
     { href: "/", label: "Discover", icon: Compass },
@@ -118,8 +127,18 @@ export function Navbar() {
       </header>
 
       {impactOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="relative w-full max-w-2xl space-y-5 rounded-3xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setImpactOpen(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="impact-modal-title"
+            className="relative w-full max-w-2xl space-y-5 rounded-3xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl"
+          >
             <button
               type="button"
               onClick={() => setImpactOpen(false)}
@@ -134,7 +153,7 @@ export function Navbar() {
                 <Layers className="h-3.5 w-3.5" />
                 Anti-Overtourism Impact &amp; Scalable Stack
               </span>
-              <h2 className="mt-2 font-display text-2xl font-bold text-[#1B3B36]">
+              <h2 id="impact-modal-title" className="mt-2 font-display text-2xl font-bold text-[#1B3B36]">
                 Digital Discovery Layer for Swadesh Darshan 2.0 &amp; CBDD
               </h2>
             </div>

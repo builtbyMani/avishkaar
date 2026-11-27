@@ -7,6 +7,7 @@ import {
   listUserBadges,
   updateGuideProfile,
 } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get("userId");
@@ -46,12 +47,13 @@ export async function PATCH(request: NextRequest) {
       languages?: string[];
     };
 
-    if (!body.userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    const actorId = await resolveActorId(request, body.userId);
+    if (!actorId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
     const updated = await updateGuideProfile({
-      userId: body.userId,
+      userId: actorId,
       isGuide: Boolean(body.isGuide),
       guideRegion: body.guideRegion ?? null,
       languages: Array.isArray(body.languages) ? body.languages : [],

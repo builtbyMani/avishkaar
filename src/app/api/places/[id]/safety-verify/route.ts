@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyOrFlagSafetyAlert } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 
 export async function POST(
   request: NextRequest,
@@ -13,13 +14,17 @@ export async function POST(
       action?: "verify" | "flag";
     };
 
+    const actorId = await resolveActorId(request, body.userId);
+    if (!actorId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
     if (
-      !body.userId ||
       typeof body.alertIndex !== "number" ||
       (body.action !== "verify" && body.action !== "flag")
     ) {
       return NextResponse.json(
-        { error: "userId, alertIndex, and action ('verify' | 'flag') are required" },
+        { error: "alertIndex and action ('verify' | 'flag') are required" },
         { status: 400 },
       );
     }
@@ -27,7 +32,7 @@ export async function POST(
     const safetyAlerts = await verifyOrFlagSafetyAlert(
       id,
       body.alertIndex,
-      body.userId,
+      actorId,
       body.action,
     );
     return NextResponse.json({ safetyAlerts });

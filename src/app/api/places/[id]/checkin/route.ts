@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { haversineDistanceKm } from "@/lib/domain";
 import { getPlaceDetail, performCheckIn } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 
 const MAX_CHECKIN_RADIUS_KM = 25;
 
@@ -17,11 +18,12 @@ export async function POST(
       lng?: number;
     };
 
-    if (!body.userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    const actorId = await resolveActorId(request, body.userId);
+    if (!actorId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const { place } = await getPlaceDetail(id, body.userId);
+    const { place } = await getPlaceDetail(id, actorId);
     if (!place) {
       return NextResponse.json({ error: "Place not found" }, { status: 404 });
     }
@@ -50,7 +52,7 @@ export async function POST(
       }
     }
 
-    const result = await performCheckIn(id, body.userId);
+    const result = await performCheckIn(id, actorId);
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(

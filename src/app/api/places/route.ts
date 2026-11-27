@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPlace, listPlaces } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 import type { LocalVendor, MediaItem, PlaceCategory, SafetyAlert, StructuredCards } from "@/types/domain";
 
 export async function GET(request: NextRequest) {
@@ -34,15 +35,20 @@ export async function POST(request: NextRequest) {
       safetyAlerts?: SafetyAlert[];
     };
 
-    if (!body.authorId || !body.title?.trim() || !body.region?.trim() || !body.rawDescription?.trim()) {
+    const actorId = await resolveActorId(request, body.authorId);
+    if (!actorId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    if (!body.title?.trim() || !body.region?.trim() || !body.rawDescription?.trim()) {
       return NextResponse.json(
-        { error: "authorId, title, region, and rawDescription are required." },
+        { error: "title, region, and rawDescription are required." },
         { status: 400 },
       );
     }
 
     const result = await createPlace({
-      authorId: body.authorId,
+      authorId: actorId,
       title: body.title.trim(),
       region: body.region.trim(),
       category: body.category || "Hidden Village",

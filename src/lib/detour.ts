@@ -1,5 +1,6 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
 import type { EnrichedPlace, PlaceCategory } from "@/types/domain";
+import { generateGeminiJson } from "./gemini";
 
 export interface DetourAlternative {
   place: EnrichedPlace;
@@ -73,9 +74,7 @@ function matchHotspotProfile(query: string): HotspotProfile {
       return entry.profile;
     }
   }
-  const tokens = normalized
-    .split(/[^a-z0-9]+/)
-    .filter((t) => t.length >= 3);
+  const tokens = normalized.split(/[^a-z0-9]+/).filter((t) => t.length >= 3);
   return {
     label: query.trim(),
     crowdIndex: 90,
@@ -92,9 +91,15 @@ function scoreDetourCandidate(place: EnrichedPlace, profile: HotspotProfile): nu
   for (const kw of profile.vibeKeywords) {
     if (haystack.includes(kw)) score += 2.5;
   }
-  // Prefer genuinely uncrowded spots
   score += Math.max(0, 40 - place.mainstreamPopularityIndex) * 0.2;
   return score;
+}
+
+function calcCrowdReduction(hotspotCrowdIndex: number, mpi: number): number {
+  return Math.max(
+    35,
+    Math.min(92, Math.round(((hotspotCrowdIndex - mpi) / hotspotCrowdIndex) * 100)),
+  );
 }
 
 export function findDetourAlternativesFallback(
@@ -109,25 +114,13 @@ export function findDetourAlternativesFallback(
     .sort((a, b) => scoreDetourCandidate(b, profile) - scoreDetourCandidate(a, profile))
     .slice(0, 3);
 
-  const alternatives: DetourAlternative[] = ranked.map((place) => {
-    const crowdReductionPercent = Math.max(
-      35,
-      Math.min(
-        92,
-        Math.round(((profile.crowdIndex - place.mainstreamPopularityIndex) / profile.crowdIndex) * 100),
-      ),
-    );
-    const commuteSummary =
-      place.structuredCards.commute[0] ||
-      `Reach via regional transit in ${place.region}`;
-
-    return {
-      place,
-      matchReason: `Matches ${profile.label} vibe (${place.category}) with ${place.vouchesCount} community vouches and MPI ${place.mainstreamPopularityIndex}.`,
-      crowdReductionPercent,
-      commuteSummary,
-    };
-  });
+  const alternatives: DetourAlternative[] = ranked.map((place) => ({
+    place,
+    matchReason: `Matches ${profile.label} vibe (${place.category}) with ${place.vouchesCount} community vouches and MPI ${place.mainstreamPopularityIndex}.`,
+    crowdReductionPercent: calcCrowdReduction(profile.crowdIndex, place.mainstreamPopularityIndex),
+    commuteSummary:
+      place.structuredCards.commute[0] || `Reach via regional transit in ${place.region}`,
+  }));
 
   return {
     hotspot: cleaned,
@@ -142,13 +135,8 @@ export async function findDetourAlternatives(
   places: EnrichedPlace[],
 ): Promise<DetourResult> {
   const fallback = findDetourAlternativesFallback(query, places);
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || places.length === 0) {
-    return fallback;
-  }
+  if (places.length === 0) return fallback;
 
-  const ai = new GoogleGenAI({ apiKey });
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const compactCatalog = places.map((p) => ({
     id: p.id,
     title: p.title,
@@ -159,80 +147,61 @@ export async function findDetourAlternatives(
     commute: p.structuredCards.commute[0] ?? "",
   }));
 
-  const prompt = `A traveler wants to skip the crowds at "${query}".
+  const parsed = await generateGeminiJson<{
+    picks?: Array<{ id: string; matchReason: string; commuteSummary: string }>;
+  }>({
+    prompt: `A traveler wants to skip the crowds at "${query}".
 Pick the TOP 3 offbeat alternatives from this catalog that match the vibe/landscape/heritage while keeping mainstream popularity (mpi) low and Gem Score high.
 Return strict JSON with each chosen place id, a short 1-sentence matchReason comparing vibe & crowd relief, and a 1-line commuteSummary.
 
 Catalog:
-${JSON.stringify(compactCatalog)}`;
-
-  const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Gemini detour timeout")), 6000),
-  );
-
-  try {
-    const response = await Promise.race([
-      ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
+${JSON.stringify(compactCatalog)}`,
+    schema: {
+      type: Type.OBJECT,
+      properties: {
+        picks: {
+          type: Type.ARRAY,
+          items: {
             type: Type.OBJECT,
             properties: {
-              picks: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    id: { type: Type.STRING },
-                    matchReason: { type: Type.STRING },
-                    commuteSummary: { type: Type.STRING },
-                  },
-                  required: ["id", "matchReason", "commuteSummary"],
-                },
-              },
+              id: { type: Type.STRING },
+              matchReason: { type: Type.STRING },
+              commuteSummary: { type: Type.STRING },
             },
-            required: ["picks"],
+            required: ["id", "matchReason", "commuteSummary"],
           },
         },
-      }),
-      timeoutPromise,
-    ]);
+      },
+      required: ["picks"],
+    },
+    timeoutMs: 6000,
+  });
 
-    const parsed = JSON.parse(response.text || "{}") as {
-      picks?: Array<{ id: string; matchReason: string; commuteSummary: string }>;
-    };
-    const byId = new Map(places.map((p) => [p.id, p]));
-    const picked: DetourAlternative[] = [];
+  if (!parsed?.picks?.length) return fallback;
 
-    for (const item of parsed.picks ?? []) {
-      const place = byId.get(item.id);
-      if (!place || picked.some((x) => x.place.id === place.id)) continue;
-      picked.push({
-        place,
-        matchReason: item.matchReason,
-        crowdReductionPercent: Math.max(
-          35,
-          Math.min(
-            92,
-            Math.round(((fallback.hotspotCrowdIndex - place.mainstreamPopularityIndex) / fallback.hotspotCrowdIndex) * 100),
-          ),
-        ),
-        commuteSummary: item.commuteSummary || place.structuredCards.commute[0] || "",
-      });
-    }
+  const byId = new Map(places.map((p) => [p.id, p]));
+  const picked: DetourAlternative[] = [];
 
-    if (picked.length >= 2) {
-      return {
+  for (const item of parsed.picks) {
+    const place = byId.get(item.id);
+    if (!place || picked.some((x) => x.place.id === place.id)) continue;
+    picked.push({
+      place,
+      matchReason: item.matchReason,
+      crowdReductionPercent: calcCrowdReduction(
+        fallback.hotspotCrowdIndex,
+        place.mainstreamPopularityIndex,
+      ),
+      commuteSummary: item.commuteSummary || place.structuredCards.commute[0] || "",
+    });
+  }
+
+  return picked.length >= 2
+    ? {
         hotspot: query.trim(),
         hotspotCrowdIndex: fallback.hotspotCrowdIndex,
         alternatives: picked.slice(0, 3),
         source: "gemini",
-      };
-    }
-    return fallback;
-  } catch {
-    return fallback;
-  }
+      }
+    : fallback;
 }

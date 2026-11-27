@@ -10,8 +10,12 @@ import {
   computeHiddenGemScore,
   computeVouchPointsDelta,
   evaluateNewBadges,
+  formatUpiHandle,
+  getGemScoreBreakdown,
   getTierFromScore,
   isSafetyAlertPublic,
+  PLACE_CATEGORIES,
+  REGIONS,
   sortFeedPlaces,
 } from "../src/lib/domain";
 import { extractStructuredPlaceFallback } from "../src/lib/gemini";
@@ -146,4 +150,28 @@ test("Seed dataset has 18 destinations including Pandavula Gutta, Chettinad, Zir
   const profilesMap = new Map(SEED_PROFILES.map((p) => [p.id, p]));
   const sorted = sortFeedPlaces(SEED_PLACES, profilesMap, new Map());
   assert.ok(sorted[0].hiddenGemScore >= sorted[sorted.length - 1].hiddenGemScore);
+  assert.ok(
+    SEED_PLACES.flatMap((p) => p.media).every(
+      (m) => !m.url.includes("mixkit.co") && !m.url.includes("1513519245088"),
+    ),
+  );
+});
+
+test("Shared domain constants, UPI formatting, and Gem Score breakdown match canonical values", () => {
+  assert.equal(REGIONS.length, 5);
+  assert.equal(PLACE_CATEGORIES.length, 5);
+  assert.equal(formatUpiHandle("Kago Stay Ziro", "kagostayziro@upi"), "kagostayziro@upi");
+  assert.equal(formatUpiHandle("Mei Siew Kitchen & Stay"), "meisiewkitch@upi");
+
+  const breakdown = getGemScoreBreakdown({
+    vouchesCount: 10,
+    verifiedCheckinsCount: 4,
+    mainstreamPopularityIndex: 90,
+  });
+  assert.deepEqual(breakdown, {
+    vouchesPoints: 20,
+    checkinsPoints: 20,
+    crowdPenalty: 2,
+    score: 20,
+  });
 });

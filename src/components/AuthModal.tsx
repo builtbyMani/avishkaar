@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Award, Check, LogIn, Shield, X } from "lucide-react";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase";
 import { useApp } from "./AppProvider";
@@ -18,6 +18,15 @@ export function AuthModal({
   const [isSignUp, setIsSignUp] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -54,8 +63,18 @@ export function AuthModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="relative w-full max-w-lg rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="auth-modal-title"
+        className="relative w-full max-w-lg rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl"
+      >
         <button
           type="button"
           onClick={onClose}
@@ -65,7 +84,7 @@ export function AuthModal({
           <X className="h-5 w-5" />
         </button>
 
-        <h2 className="font-display text-2xl font-bold text-[#1B3B36]">
+        <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#1B3B36]">
           Traveler Account &amp; Demo Personas
         </h2>
         <p className="mt-1 text-sm text-[#52635F]">

@@ -1,12 +1,57 @@
 import type {
   EnrichedPlace,
   Place,
+  PlaceCategory,
   Profile,
   SafetyAlert,
   TrailblazerTier,
   UserBadge,
   VouchRecord,
 } from "../types/domain";
+
+export const REGIONS = [
+  "Spiti & Kinnaur",
+  "Meghalaya & Northeast",
+  "Deccan & Western Ghats",
+  "Kutch & Thar",
+  "Malabar & Konkan",
+] as const;
+
+export const PLACE_CATEGORIES: readonly PlaceCategory[] = [
+  "Hidden Village",
+  "Regional Cuisine",
+  "Living Heritage",
+  "Sacred & Craft",
+  "Nature & Trail",
+];
+
+export function formatUpiHandle(name: string, explicitUpiId?: string): string {
+  if (explicitUpiId?.trim()) return explicitUpiId.trim();
+  return `${name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12)}@upi`;
+}
+
+export function getGemScoreBreakdown(
+  place: Pick<Place, "vouchesCount" | "verifiedCheckinsCount" | "mainstreamPopularityIndex">,
+): {
+  vouchesPoints: number;
+  checkinsPoints: number;
+  crowdPenalty: number;
+  score: number;
+} {
+  const vouchesPoints = place.vouchesCount * 2;
+  const checkinsPoints = place.verifiedCheckinsCount * 5;
+  const crowdPenalty = Math.log10(Math.max(0, place.mainstreamPopularityIndex) + 10);
+  const score =
+    crowdPenalty > 0
+      ? Number(((vouchesPoints + checkinsPoints) / crowdPenalty).toFixed(2))
+      : 0;
+  return {
+    vouchesPoints,
+    checkinsPoints,
+    crowdPenalty: Number(crowdPenalty.toFixed(2)),
+    score,
+  };
+}
 
 /**
  * Computes the blueprint's Hidden Gem Score:
@@ -17,10 +62,11 @@ export function computeHiddenGemScore(
   verifiedCheckinsCount: number,
   mainstreamPopularityIndex: number,
 ): number {
-  const numerator = vouchesCount * 2 + verifiedCheckinsCount * 5;
-  const denominator = Math.log10(Math.max(0, mainstreamPopularityIndex) + 10);
-  if (denominator <= 0) return 0;
-  return Number((numerator / denominator).toFixed(2));
+  return getGemScoreBreakdown({
+    vouchesCount,
+    verifiedCheckinsCount,
+    mainstreamPopularityIndex,
+  }).score;
 }
 
 export function getTierFromScore(score: number): TrailblazerTier {

@@ -9,8 +9,10 @@ import {
   BookmarkCheck,
   BookmarkPlus,
   Bus,
+  Check,
   CheckCircle2,
   Compass,
+  Copy,
   Flag,
   HandHeart,
   Landmark,
@@ -19,7 +21,6 @@ import {
   Navigation,
   Phone,
   Printer,
-  QrCode,
   ShieldAlert,
   ShieldCheck,
   Store,
@@ -31,7 +32,8 @@ import {
 import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
-import { isSafetyAlertPublic } from "@/lib/domain";
+import { formatUpiHandle, isSafetyAlertPublic } from "@/lib/domain";
+import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, LocalVendor, Profile, SafetyAlert, UserBadge } from "@/types/domain";
 
 export default function PlaceDetailPage() {
@@ -56,6 +58,8 @@ export default function PlaceDetailPage() {
   const [requestNotes, setRequestNotes] = useState("");
   const [submittingGuide, setSubmittingGuide] = useState(false);
   const [upiVendor, setUpiVendor] = useState<LocalVendor | null>(null);
+  const [activeMediaIdx, setActiveMediaIdx] = useState(0);
+  const [copiedUpi, setCopiedUpi] = useState(false);
 
   const loadPlace = useCallback(async () => {
     if (!placeId) return;
@@ -70,6 +74,7 @@ export default function PlaceDetailPage() {
           guideRequests: GuideRequest[];
         };
         setPlace(data.place);
+        setActiveMediaIdx(0);
         setMatchingGuides(data.matchingGuides ?? []);
         setGuideRequests(data.guideRequests ?? []);
       }
@@ -82,11 +87,26 @@ export default function PlaceDetailPage() {
     void loadPlace();
   }, [loadPlace]);
 
+  useEffect(() => {
+    if (!selectedGuide && !upiVendor) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedGuide(null);
+        setUpiVendor(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedGuide, upiVendor]);
+
   async function handleVouch() {
     if (!activeUser || !place) return;
     const res = await fetch(`/api/places/${place.id}/vouch`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(await getAuthHeaders()),
+      },
       body: JSON.stringify({ userId: activeUser.id }),
     });
     const data = (await res.json()) as {
@@ -118,7 +138,10 @@ export default function PlaceDetailPage() {
     if (demoCheckInToggle) {
       const res = await fetch(`/api/places/${place.id}/checkin`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getAuthHeaders()),
+        },
         body: JSON.stringify({ userId: activeUser.id, demoCheckIn: true }),
       });
       const data = (await res.json()) as { bonusDelta?: number; error?: string };
@@ -144,7 +167,10 @@ export default function PlaceDetailPage() {
       async (pos) => {
         const res = await fetch(`/api/places/${place.id}/checkin`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(await getAuthHeaders()),
+          },
           body: JSON.stringify({
             userId: activeUser.id,
             demoCheckIn: false,
@@ -194,7 +220,10 @@ export default function PlaceDetailPage() {
     if (!activeUser || !place) return;
     const res = await fetch(`/api/places/${place.id}/safety-verify`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(await getAuthHeaders()),
+      },
       body: JSON.stringify({ userId: activeUser.id, alertIndex, action }),
     });
     const data = (await res.json()) as { safetyAlerts?: SafetyAlert[]; error?: string };
@@ -217,7 +246,10 @@ export default function PlaceDetailPage() {
     try {
       const res = await fetch("/api/guide-requests", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(await getAuthHeaders()),
+        },
         body: JSON.stringify({
           placeId: place.id,
           guideId: selectedGuide.id,
@@ -322,8 +354,30 @@ export default function PlaceDetailPage() {
       {/* Hero Header + Media */}
       <section className="print-card overflow-hidden rounded-3xl border border-[#E8E0D4] bg-white shadow-xs">
         <div className="grid gap-0 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <MediaCardPlayer media={place.media[0]} title={place.title} />
+          <div className="lg:col-span-7 space-y-2.5">
+            <MediaCardPlayer
+              media={place.media[activeMediaIdx] ?? place.media[0]}
+              title={place.title}
+            />
+            {place.media.length > 1 && (
+              <div className="no-print flex flex-wrap items-center gap-2 px-3 pb-2">
+                {place.media.map((item, idx) => (
+                  <button
+                    key={`${item.url}-${idx}`}
+                    type="button"
+                    onClick={() => setActiveMediaIdx(idx)}
+                    className={`rounded-full border px-3 py-1 text-xs font-semibold transition ${
+                      idx === activeMediaIdx
+                        ? "border-[#1B3B36] bg-[#1B3B36] text-white"
+                        : "border-[#E8E0D4] bg-[#FAF7F2] text-[#1B3B36] hover:border-[#1B3B36]"
+                    }`}
+                  >
+                    {idx + 1}. {item.type === "video" ? "Clip" : "Photo"}
+                    {item.caption ? ` · ${item.caption.slice(0, 28)}` : ""}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex flex-col justify-between p-6 lg:col-span-5">
             <div className="space-y-4">
@@ -609,9 +663,7 @@ export default function PlaceDetailPage() {
             {place.localVendors.map((v) => {
               const phoneDigits = (v.whatsapp || v.contact).replace(/[^\d+]/g, "");
               const waDigits = phoneDigits.replace(/^\+/, "");
-              const upiHandle =
-                v.upiId ||
-                `${v.name.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 12)}@upi`;
+              const upiHandle = formatUpiHandle(v.name, v.upiId);
               return (
                 <div
                   key={v.id}
@@ -658,10 +710,13 @@ export default function PlaceDetailPage() {
                     ) : null}
                     <button
                       type="button"
-                      onClick={() => setUpiVendor({ ...v, upiId: upiHandle })}
+                      onClick={() => {
+                        setCopiedUpi(false);
+                        setUpiVendor({ ...v, upiId: upiHandle });
+                      }}
                       className="inline-flex items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-[11px] font-bold text-amber-950 hover:bg-amber-100"
                     >
-                      <QrCode className="h-3 w-3" /> Direct UPI QR
+                      <Copy className="h-3 w-3" /> Direct UPI Pay
                     </button>
                   </div>
                 </div>
@@ -773,12 +828,20 @@ export default function PlaceDetailPage() {
 
       {/* Request Guide Modal */}
       {selectedGuide && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedGuide(null);
+          }}
+        >
           <form
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="guide-modal-title"
             onSubmit={handleGuideRequestSubmit}
             className="w-full max-w-md space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 shadow-2xl"
           >
-            <h3 className="font-display text-xl font-bold text-[#1B3B36]">
+            <h3 id="guide-modal-title" className="font-display text-xl font-bold text-[#1B3B36]">
               Request Guide: {selectedGuide.displayName}
             </h3>
             <p className="text-xs text-[#52635F]">
@@ -825,45 +888,64 @@ export default function PlaceDetailPage() {
         </div>
       )}
 
-      {/* Zero-Commission Direct UPI QR Modal */}
+      {/* Zero-Commission Direct UPI Pay Modal */}
       {upiVendor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="relative w-full max-w-sm space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 text-center shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setUpiVendor(null);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upi-modal-title"
+            className="relative w-full max-w-sm space-y-4 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] p-6 text-center shadow-2xl"
+          >
             <button
               type="button"
               onClick={() => setUpiVendor(null)}
               className="absolute right-4 top-4 rounded-full p-1 text-[#52635F] hover:bg-[#E8E0D4]"
-              aria-label="Close UPI preview"
+              aria-label="Close UPI payment dialog"
             >
               <X className="h-4 w-4" />
             </button>
             <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900">
               0% Platform Commission · Direct to Local
             </span>
-            <h3 className="font-display text-xl font-bold text-[#1B3B36]">{upiVendor.name}</h3>
+            <h3 id="upi-modal-title" className="font-display text-xl font-bold text-[#1B3B36]">
+              {upiVendor.name}
+            </h3>
             <p className="text-xs text-[#52635F]">{upiVendor.specialty}</p>
-            <div className="mx-auto flex h-40 w-40 items-center justify-center rounded-2xl border border-[#E8E0D4] bg-white p-3">
-              <svg viewBox="0 0 21 21" className="h-full w-full fill-[#1B3B36]" aria-label="UPI QR Code Preview">
-                <rect x="0" y="0" width="7" height="7" />
-                <rect x="1" y="1" width="5" height="5" fill="#fff" />
-                <rect x="2" y="2" width="3" height="3" />
-                <rect x="14" y="0" width="7" height="7" />
-                <rect x="15" y="1" width="5" height="5" fill="#fff" />
-                <rect x="16" y="2" width="3" height="3" />
-                <rect x="0" y="14" width="7" height="7" />
-                <rect x="1" y="15" width="5" height="5" fill="#fff" />
-                <rect x="2" y="16" width="3" height="3" />
-                <rect x="9" y="2" width="2" height="2" />
-                <rect x="8" y="6" width="3" height="2" />
-                <rect x="9" y="10" width="4" height="3" />
-                <rect x="14" y="9" width="3" height="2" />
-                <rect x="10" y="15" width="3" height="3" />
-                <rect x="15" y="14" width="4" height="2" />
-                <rect x="17" y="17" width="3" height="3" />
-              </svg>
-            </div>
-            <div className="rounded-xl border border-[#E8E0D4] bg-white px-3 py-2 text-xs font-mono font-bold text-[#1B3B36]">
-              {upiVendor.upiId}
+            <div className="rounded-xl border border-[#E8E0D4] bg-white p-3.5 text-left space-y-2">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#52635F]">
+                Verified Direct UPI ID
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate font-mono text-sm font-bold text-[#1B3B36]">
+                  {upiVendor.upiId}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (upiVendor.upiId) {
+                      void navigator.clipboard?.writeText(upiVendor.upiId);
+                      setCopiedUpi(true);
+                    }
+                  }}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-[#E8E0D4] bg-[#FAF7F2] px-2.5 py-1 text-xs font-bold text-[#1B3B36] hover:bg-[#E8E0D4]"
+                >
+                  {copiedUpi ? (
+                    <>
+                      <Check className="h-3.5 w-3.5 text-emerald-700" /> Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" /> Copy
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             <a
               href={`upi://pay?pa=${encodeURIComponent(upiVendor.upiId || "")}&pn=${encodeURIComponent(upiVendor.name)}&cu=INR`}

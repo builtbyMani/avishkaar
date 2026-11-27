@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { performVouch } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 
 export async function POST(
   request: NextRequest,
@@ -8,10 +9,11 @@ export async function POST(
   try {
     const { id } = await context.params;
     const body = (await request.json()) as { userId?: string };
-    if (!body.userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    const actorId = await resolveActorId(request, body.userId);
+    if (!actorId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
-    const result = await performVouch(id, body.userId);
+    const result = await performVouch(id, actorId);
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json(

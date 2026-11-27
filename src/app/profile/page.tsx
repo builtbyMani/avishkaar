@@ -4,16 +4,9 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Award, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "lucide-react";
 import { useApp } from "@/components/AppProvider";
-import { canVolunteerAsGuide } from "@/lib/domain";
+import { canVolunteerAsGuide, REGIONS } from "@/lib/domain";
+import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, Profile, UserBadge } from "@/types/domain";
-
-const REGIONS = [
-  "Spiti & Kinnaur",
-  "Meghalaya & Northeast",
-  "Deccan & Western Ghats",
-  "Kutch & Thar",
-  "Malabar & Konkan",
-];
 
 export default function ProfilePage() {
   const { activeUser, refreshProfiles, openAuthModal } = useApp();
@@ -23,7 +16,7 @@ export default function ProfilePage() {
   const [authoredPlaces, setAuthoredPlaces] = useState<EnrichedPlace[]>([]);
 
   const [isGuide, setIsGuide] = useState(false);
-  const [guideRegion, setGuideRegion] = useState(REGIONS[0]);
+  const [guideRegion, setGuideRegion] = useState<string>(REGIONS[0]);
   const [languagesText, setLanguagesText] = useState("English, Hindi");
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
@@ -59,7 +52,10 @@ export default function ProfilePage() {
     setStatusMsg(null);
     const res = await fetch("/api/profile", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(await getAuthHeaders()),
+      },
       body: JSON.stringify({
         userId: profile.id,
         isGuide,
@@ -83,7 +79,10 @@ export default function ProfilePage() {
     if (!profile) return;
     const res = await fetch("/api/guide-requests", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...(await getAuthHeaders()),
+      },
       body: JSON.stringify({ requestId, guideId: profile.id }),
     });
     if (res.ok) {

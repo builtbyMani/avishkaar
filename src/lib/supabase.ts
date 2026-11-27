@@ -24,3 +24,32 @@ export function getSupabaseServerClient(): SupabaseClient | null {
     auth: { persistSession: false },
   });
 }
+
+/**
+ * In Supabase mode, derives actor identity from the verified Bearer session token
+ * rather than trusting a spoofable client-provided userId. In local Demo Mode, accepts fallbackBodyUserId.
+ */
+export async function resolveActorId(
+  request: Request,
+  fallbackBodyUserId?: string,
+): Promise<string | null> {
+  if (!isSupabaseConfigured()) {
+    return fallbackBodyUserId?.trim() || null;
+  }
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+  if (!token) return null;
+  const sb = getSupabaseServerClient();
+  if (!sb) return null;
+  const { data, error } = await sb.auth.getUser(token);
+  if (error || !data.user) return null;
+  return data.user.id;
+}
+
+export async function getAuthHeaders(): Promise<Record<string, string>> {
+  const sb = getSupabaseBrowserClient();
+  if (!sb) return {};
+  const { data } = await sb.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}

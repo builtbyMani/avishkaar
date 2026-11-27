@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, type Schema } from "@google/genai";
 import type { SafetyAlert, SafetyTag, StructuredCards } from "../types/domain";
 
 export interface GeminiExtractionResult {
@@ -13,6 +13,47 @@ const VALID_SAFETY_TAGS: SafetyTag[] = [
   "Low Network",
   "Scam Alert",
 ];
+
+/**
+ * Shared strict-JSON Gemini helper with leak-free timeout cleanup.
+ * Returns null if GEMINI_API_KEY is unset, API errors, or timeout expires.
+ */
+export async function generateGeminiJson<T>(params: {
+  prompt: string;
+  schema: Schema;
+  timeoutMs?: number;
+}): Promise<T | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  const ai = new GoogleGenAI({ apiKey });
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const timeoutMs = params.timeoutMs ?? 8000;
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error("Gemini API timeout")), timeoutMs);
+  });
+
+  try {
+    const response = await Promise.race([
+      ai.models.generateContent({
+        model,
+        contents: params.prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: params.schema,
+        },
+      }),
+      timeoutPromise,
+    ]);
+    return JSON.parse(response.text || "{}") as T;
+  } catch {
+    return null;
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+}
 
 /**
  * Deterministic multilingual-aware fallback when GEMINI_API_KEY is unset,
@@ -129,115 +170,77 @@ export async function structurePlaceWithGemini(
   title: string,
   region: string,
 ): Promise<GeminiExtractionResult> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return extractStructuredPlaceFallback(rawText, title, region);
-  }
+  const fallback = extractStructuredPlaceFallback(rawText, title, region);
 
-  const ai = new GoogleGenAI({ apiKey });
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-
-  const prompt = `The user may write field notes in English, Hindi, Telugu, Tamil, or Hinglish (romanized regional text).
+  const parsed = await generateGeminiJson<{
+    commute?: string[];
+    food?: Array<{ name: string; detail: string; priceHint?: string }>;
+    activities?: string[];
+    livingHeritage?: string[];
+    safetyAlerts?: Array<{ tag: SafetyTag; message: string }>;
+  }>({
+    prompt: `The user may write field notes in English, Hindi, Telugu, Tamil, or Hinglish (romanized regional text).
 Translate and extract concise, practical, accurate English travel cards for "${title}" in "${region}" without inventing fake place or vendor names.
 Return strict JSON matching the schema, including Living Heritage & Etiquette.
 
 User description:
 """
 ${rawText}
-"""`;
-
-  const timeoutPromise = new Promise<never>((_, reject) =>
-    setTimeout(() => reject(new Error("Gemini API timeout")), 8000),
-  );
-
-  try {
-    const response = await Promise.race([
-      ai.models.generateContent({
-        model,
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
+"""`,
+    schema: {
+      type: Type.OBJECT,
+      properties: {
+        commute: { type: Type.ARRAY, items: { type: Type.STRING } },
+        food: {
+          type: Type.ARRAY,
+          items: {
             type: Type.OBJECT,
             properties: {
-              commute: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-              },
-              food: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    name: { type: Type.STRING },
-                    detail: { type: Type.STRING },
-                    priceHint: { type: Type.STRING },
-                  },
-                  required: ["name", "detail"],
-                },
-              },
-              activities: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-              },
-              livingHeritage: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-              },
-              safetyAlerts: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    tag: {
-                      type: Type.STRING,
-                      enum: VALID_SAFETY_TAGS,
-                    },
-                    message: { type: Type.STRING },
-                  },
-                  required: ["tag", "message"],
-                },
-              },
+              name: { type: Type.STRING },
+              detail: { type: Type.STRING },
+              priceHint: { type: Type.STRING },
             },
-            required: ["commute", "food", "activities", "livingHeritage", "safetyAlerts"],
+            required: ["name", "detail"],
           },
         },
-      }),
-      timeoutPromise,
-    ]);
-
-    const parsed = JSON.parse(response.text || "{}") as {
-      commute?: string[];
-      food?: Array<{ name: string; detail: string; priceHint?: string }>;
-      activities?: string[];
-      livingHeritage?: string[];
-      safetyAlerts?: Array<{ tag: SafetyTag; message: string }>;
-    };
-
-    const sanitizedAlerts = (parsed.safetyAlerts ?? []).filter(
-      (a) => VALID_SAFETY_TAGS.includes(a.tag) && a.message?.trim(),
-    );
-
-    if (!parsed.commute?.length && !parsed.food?.length && !parsed.activities?.length) {
-      return extractStructuredPlaceFallback(rawText, title, region);
-    }
-
-    const fallback = extractStructuredPlaceFallback(rawText, title, region);
-    return {
-      structuredCards: {
-        commute: parsed.commute?.slice(0, 4) ?? [],
-        food: parsed.food?.slice(0, 4) ?? [],
-        activities: parsed.activities?.slice(0, 4) ?? [],
-        livingHeritage:
-          parsed.livingHeritage && parsed.livingHeritage.length > 0
-            ? parsed.livingHeritage.slice(0, 4)
-            : fallback.structuredCards.livingHeritage,
+        activities: { type: Type.ARRAY, items: { type: Type.STRING } },
+        livingHeritage: { type: Type.ARRAY, items: { type: Type.STRING } },
+        safetyAlerts: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              tag: { type: Type.STRING, enum: VALID_SAFETY_TAGS },
+              message: { type: Type.STRING },
+            },
+            required: ["tag", "message"],
+          },
+        },
       },
-      safetyAlerts:
-        sanitizedAlerts.length > 0 ? sanitizedAlerts : fallback.safetyAlerts,
-      source: "gemini",
-    };
-  } catch {
-    return extractStructuredPlaceFallback(rawText, title, region);
+      required: ["commute", "food", "activities", "livingHeritage", "safetyAlerts"],
+    },
+    timeoutMs: 8000,
+  });
+
+  if (!parsed || (!parsed.commute?.length && !parsed.food?.length && !parsed.activities?.length)) {
+    return fallback;
   }
+
+  const sanitizedAlerts = (parsed.safetyAlerts ?? []).filter(
+    (a) => VALID_SAFETY_TAGS.includes(a.tag) && a.message?.trim(),
+  );
+
+  return {
+    structuredCards: {
+      commute: parsed.commute?.slice(0, 4) ?? [],
+      food: parsed.food?.slice(0, 4) ?? [],
+      activities: parsed.activities?.slice(0, 4) ?? [],
+      livingHeritage:
+        parsed.livingHeritage && parsed.livingHeritage.length > 0
+          ? parsed.livingHeritage.slice(0, 4)
+          : fallback.structuredCards.livingHeritage,
+    },
+    safetyAlerts: sanitizedAlerts.length > 0 ? sanitizedAlerts : fallback.safetyAlerts,
+    source: "gemini",
+  };
 }

@@ -4,6 +4,7 @@ import {
   createGuideRequest,
   listGuideRequests,
 } from "@/lib/store";
+import { resolveActorId } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   const placeId = request.nextUrl.searchParams.get("placeId") || undefined;
@@ -22,9 +23,14 @@ export async function POST(request: NextRequest) {
       notes?: string;
     };
 
-    if (!body.placeId || !body.guideId || !body.requesterId || !body.notes?.trim()) {
+    const requesterId = await resolveActorId(request, body.requesterId);
+    if (!requesterId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+
+    if (!body.placeId || !body.guideId || !body.notes?.trim()) {
       return NextResponse.json(
-        { error: "placeId, guideId, requesterId, and notes are required" },
+        { error: "placeId, guideId, and notes are required" },
         { status: 400 },
       );
     }
@@ -32,7 +38,7 @@ export async function POST(request: NextRequest) {
     const created = await createGuideRequest({
       placeId: body.placeId,
       guideId: body.guideId,
-      requesterId: body.requesterId,
+      requesterId,
       preferredDate: body.preferredDate || "",
       notes: body.notes.trim(),
     });
@@ -51,13 +57,17 @@ export async function PATCH(request: NextRequest) {
       requestId?: string;
       guideId?: string;
     };
-    if (!body.requestId || !body.guideId) {
+    const guideId = await resolveActorId(request, body.guideId);
+    if (!guideId) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+    }
+    if (!body.requestId) {
       return NextResponse.json(
-        { error: "requestId and guideId are required" },
+        { error: "requestId is required" },
         { status: 400 },
       );
     }
-    const updated = await acceptGuideRequest(body.requestId, body.guideId);
+    const updated = await acceptGuideRequest(body.requestId, guideId);
     return NextResponse.json({ guideRequest: updated });
   } catch (error) {
     return NextResponse.json(

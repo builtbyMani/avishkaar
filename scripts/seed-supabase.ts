@@ -5,6 +5,7 @@ import {
   SEED_PROFILES,
   SEED_VOUCHES,
 } from "../src/data/seed";
+import { toSupabasePlaceRow } from "../src/lib/store";
 import { getSupabaseServerClient } from "../src/lib/supabase";
 
 async function main() {
@@ -30,26 +31,9 @@ async function main() {
   if (profErr) throw profErr;
 
   console.log(`Seeding ${SEED_PLACES.length} offbeat destinations...`);
-  const { error: placeErr } = await sb.from("places").upsert(
-    SEED_PLACES.map((pl) => ({
-      id: pl.id,
-      author_id: pl.authorId,
-      title: pl.title,
-      region: pl.region,
-      category: pl.category,
-      raw_description: pl.rawDescription,
-      lat: pl.lat,
-      lng: pl.lng,
-      media: pl.media,
-      structured_cards: pl.structuredCards,
-      local_vendors: pl.localVendors,
-      safety_alerts: pl.safetyAlerts,
-      mainstream_popularity_index: pl.mainstreamPopularityIndex,
-      vouches_count: pl.vouchesCount,
-      verified_checkins_count: pl.verifiedCheckinsCount,
-      created_at: pl.createdAt,
-    })),
-  );
+  const { error: placeErr } = await sb
+    .from("places")
+    .upsert(SEED_PLACES.map(toSupabasePlaceRow));
   if (placeErr) throw placeErr;
 
   const { error: vouchErr } = await sb.from("vouches").upsert(

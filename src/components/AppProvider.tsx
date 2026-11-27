@@ -36,6 +36,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [activeUserId, setActiveUserId] = useState<string>(
     supabaseMode ? "" : DEFAULT_DEMO_USER_ID,
   );
+  const [authUserMeta, setAuthUserMeta] = useState<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  } | null>(null);
   const [mode, setMode] = useState<"supabase" | "demo">(supabaseMode ? "supabase" : "demo");
   const [offlineCards, setOfflineCards] = useState<OfflinePocketCard[]>([]);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -82,10 +87,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (supabaseMode) {
         const sb = getSupabaseBrowserClient();
         if (sb) {
+          const syncAuth = (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> } | null) => {
+            if (!user) {
+              setActiveUserId("");
+              setAuthUserMeta(null);
+              return;
+            }
+            const meta = user.user_metadata ?? {};
+            const name =
+              (typeof meta.full_name === "string" && meta.full_name) ||
+              (typeof meta.name === "string" && meta.name) ||
+              user.email?.split("@")[0] ||
+              "Traveler";
+            const avatarUrl =
+              typeof meta.avatar_url === "string" ? meta.avatar_url : undefined;
+            setActiveUserId(user.id);
+            setAuthUserMeta({ id: user.id, name, avatarUrl });
+          };
+
           const { data } = await sb.auth.getUser();
-          setActiveUserId(data.user?.id ?? "");
+          syncAuth(data.user);
           const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
-            setActiveUserId(session?.user?.id ?? "");
+            syncAuth(session?.user ?? null);
+            if (session?.user) {
+              void refreshProfiles();
+            }
           });
           unsubscribe = () => sub.subscription.unsubscribe();
         }
@@ -122,8 +148,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     [offlineCards],
   );
 
-  const activeUser =
+  const activeUser: Profile | null =
     (activeUserId ? profiles.find((p) => p.id === activeUserId) : undefined) ??
+    (mode === "supabase" && authUserMeta
+      ? {
+          id: authUserMeta.id,
+          username: authUserMeta.name.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+          displayName: authUserMeta.name,
+          avatarUrl: authUserMeta.avatarUrl,
+          trailblazerScore: 0,
+          tier: "Wanderer",
+          isGuide: false,
+          isVerifiedLocal: false,
+          guideRegion: null,
+          languages: ["English"],
+        }
+      : undefined) ??
     (mode === "demo" ? profiles[profiles.length - 1] : null) ??
     null;
 

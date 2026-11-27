@@ -14,6 +14,15 @@ const VALID_SAFETY_TAGS: SafetyTag[] = [
   "Scam Alert",
 ];
 
+export function cleanText(value: unknown, maxLen = 280): string {
+  return typeof value === "string" ? value.trim().slice(0, maxLen) : "";
+}
+
+export function cleanTextList(value: unknown, maxItems = 4, maxLen = 280): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((v) => cleanText(v, maxLen)).filter(Boolean).slice(0, maxItems);
+}
+
 /**
  * Shared strict-JSON Gemini helper with leak-free timeout cleanup.
  * Returns null if GEMINI_API_KEY is unset, API errors, or timeout expires.
@@ -170,6 +179,11 @@ export async function structurePlaceWithGemini(
   title: string,
   region: string,
 ): Promise<GeminiExtractionResult> {
+  // Cap input and strip the prompt delimiter so user text cannot break out
+  // of the quoted block and inject instructions (Issue 9).
+  rawText = rawText.slice(0, 4000).replace(/"""/g, " ");
+  title = title.slice(0, 120).replace(/"""/g, " ");
+  region = region.slice(0, 80).replace(/"""/g, " ");
   const fallback = extractStructuredPlaceFallback(rawText, title, region);
 
   const parsed = await generateGeminiJson<{
@@ -230,17 +244,28 @@ ${rawText}
     (a) => VALID_SAFETY_TAGS.includes(a.tag) && a.message?.trim(),
   );
 
+  const cleanFood = (parsed.food ?? [])
+    .map((f) => ({
+      name: cleanText(f.name, 80),
+      detail: cleanText(f.detail),
+      priceHint: f.priceHint ? cleanText(f.priceHint, 40) : undefined,
+    }))
+    .filter((f) => f.name && f.detail)
+    .slice(0, 4);
+  const cleanAlerts = sanitizedAlerts
+    .map((a) => ({ tag: a.tag, message: cleanText(a.message) }))
+    .filter((a) => a.message);
+  const cleanHeritage = cleanTextList(parsed.livingHeritage);
+
   return {
     structuredCards: {
-      commute: parsed.commute?.slice(0, 4) ?? [],
-      food: parsed.food?.slice(0, 4) ?? [],
-      activities: parsed.activities?.slice(0, 4) ?? [],
+      commute: cleanTextList(parsed.commute),
+      food: cleanFood,
+      activities: cleanTextList(parsed.activities),
       livingHeritage:
-        parsed.livingHeritage && parsed.livingHeritage.length > 0
-          ? parsed.livingHeritage.slice(0, 4)
-          : fallback.structuredCards.livingHeritage,
+        cleanHeritage.length > 0 ? cleanHeritage : fallback.structuredCards.livingHeritage,
     },
-    safetyAlerts: sanitizedAlerts.length > 0 ? sanitizedAlerts : fallback.safetyAlerts,
+    safetyAlerts: cleanAlerts.length > 0 ? cleanAlerts : fallback.safetyAlerts,
     source: "gemini",
   };
 }

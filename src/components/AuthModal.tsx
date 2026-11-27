@@ -93,33 +93,33 @@ export function AuthModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="auth-modal-title"
-        className="animate-panel-in relative w-full max-w-lg rounded-2xl border border-black/15 bg-[#EAECE0] p-6 shadow-none"
+        className="animate-panel-in relative w-full max-w-lg rounded-2xl border border-[#2B141A]/15 bg-[#F5F0E6] p-6 shadow-none"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1.5 text-[#566151] hover:bg-black/5"
+          className="absolute right-4 top-4 rounded-full p-1.5 text-[#61454D] hover:bg-black/5"
           aria-label="Close modal"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <h2 id="auth-modal-title" className="font-display text-2xl font-bold text-[#1F271C]">
+        <h2 id="auth-modal-title" className="font-rozha text-2xl text-[#2B141A]">
           Account &amp; Profiles
         </h2>
-        <p className="mt-1 text-sm text-[#566151]">
+        <p className="mt-1 text-sm text-[#61454D]">
           {mode === "supabase"
             ? "Sign in with Google or an email magic link."
             : "Choose a traveler profile to browse, vouch, or guide."}
         </p>
 
         {supabaseEnabled && (
-          <div className="mt-4 space-y-3 rounded-xl border border-black/12 bg-[#F4F5ED] p-4">
+          <div className="mt-4 space-y-3 rounded-xl border border-[#2B141A]/12 bg-[#FAF7F0] p-4">
             <button
               type="button"
               disabled={busy}
               onClick={handleGoogleAuth}
-              className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-[#3D5236] px-4 py-2.5 text-sm font-semibold text-[#F4F5ED] transition hover:bg-[#2f4029] disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2.5 rounded-full bg-[#6B1D2F] px-4 py-2.5 text-sm font-semibold text-[#F5F0E6] transition hover:bg-[#521523] disabled:opacity-60"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -130,10 +130,10 @@ export function AuthModal({
               Continue with Google
             </button>
 
-            <div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-[#566151]">
-              <span className="h-px flex-1 bg-black/12" />
+            <div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-[#61454D]">
+              <span className="h-px flex-1 bg-[#2B141A]/12" />
               or email link
-              <span className="h-px flex-1 bg-black/12" />
+              <span className="h-px flex-1 bg-[#2B141A]/12" />
             </div>
 
             <form onSubmit={handleMagicLink} className="flex gap-2">
@@ -143,12 +143,12 @@ export function AuthModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="traveler@example.com"
-                className="flex-1 rounded-full border border-black/12 bg-white px-4 py-2 text-sm text-[#1F271C] outline-none focus:border-[#3D5236]"
+                className="flex-1 rounded-full border border-[#2B141A]/12 bg-white px-4 py-2 text-sm text-[#2B141A] outline-none focus:border-[#6B1D2F]"
               />
               <button
                 type="submit"
                 disabled={busy}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/12 bg-white px-4 py-2 text-xs font-semibold text-[#1F271C] transition hover:border-[#3D5236] disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#2B141A]/12 bg-white px-4 py-2 text-xs font-semibold text-[#2B141A] transition hover:border-[#6B1D2F] disabled:opacity-60"
               >
                 <Mail className="h-3.5 w-3.5" />
                 Send Link
@@ -160,18 +160,19 @@ export function AuthModal({
                 type="button"
                 disabled={busy}
                 onClick={handleSignOut}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#566151] hover:text-[#1F271C]"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#61454D] hover:text-[#2B141A]"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 Sign out ({activeUser.displayName})
               </button>
             )}
 
-            {message && <p className="text-xs font-medium text-[#3D5236]">{message}</p>}
+            {message && <p className="text-xs font-medium text-[#6B1D2F]">{message}</p>}
           </div>
         )}
 
-        <div className="mt-5">
+        {mode === "demo" && (
+          <div className="mt-5">
           <div className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#61454D]">
             <Shield className="h-3.5 w-3.5 text-[#D9A12B]" />
             Traveler Profiles

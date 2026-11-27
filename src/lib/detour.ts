@@ -134,6 +134,7 @@ export async function findDetourAlternatives(
   query: string,
   places: EnrichedPlace[],
 ): Promise<DetourResult> {
+  query = query.slice(0, 100).replace(/["\n\r]/g, " ");
   const fallback = findDetourAlternativesFallback(query, places);
   if (places.length === 0) return fallback;
 
@@ -187,12 +188,12 @@ ${JSON.stringify(compactCatalog)}`,
     if (!place || picked.some((x) => x.place.id === place.id)) continue;
     picked.push({
       place,
-      matchReason: item.matchReason,
+      matchReason: String(item.matchReason ?? "").slice(0, 280),
       crowdReductionPercent: calcCrowdReduction(
         fallback.hotspotCrowdIndex,
         place.mainstreamPopularityIndex,
       ),
-      commuteSummary: item.commuteSummary || place.structuredCards.commute[0] || "",
+      commuteSummary: String(item.commuteSummary ?? "").slice(0, 280) || place.structuredCards.commute[0] || "",
     });
   }
 

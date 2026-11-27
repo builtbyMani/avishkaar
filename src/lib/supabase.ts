@@ -7,11 +7,19 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
+let browserClient: SupabaseClient | null = null;
+let browserClientKey = "";
+
 export function getSupabaseBrowserClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) return null;
-  return createClient(url, key);
+  const cacheKey = `${url}|${key}`;
+  if (!browserClient || browserClientKey !== cacheKey) {
+    browserClient = createClient(url, key);
+    browserClientKey = cacheKey;
+  }
+  return browserClient;
 }
 
 export function getSupabaseServerClient(): SupabaseClient | null {
@@ -34,6 +42,12 @@ export async function resolveActorId(
   fallbackBodyUserId?: string,
 ): Promise<string | null> {
   if (!isSupabaseConfigured()) {
+    // Demo Mode trusts the client-provided id — but only outside production,
+    // or when DEMO_MODE=true is set explicitly. A production deploy that
+    // forgot its Supabase env vars must fail closed, not accept any userId.
+    if (process.env.NODE_ENV === "production" && process.env.DEMO_MODE !== "true") {
+      return null;
+    }
     return fallbackBodyUserId?.trim() || null;
   }
   const authHeader = request.headers.get("authorization");

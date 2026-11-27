@@ -21,7 +21,7 @@ import { ScrollProgressBar } from "./ScrollProgressBar";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { activeUser, offlineCards, openAuthModal, preloaderDone, enteredHome } = useApp();
+  const { activeUser, offlineCards, openAuthModal, preloaderDone, enteredHome, enterHome } = useApp();
   const [impactOpen, setImpactOpen] = useState(false);
 
   useEffect(() => {
@@ -70,6 +70,7 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={item.href === "/" ? enterHome : undefined}
                   title={item.label}
                   className={`group relative flex w-full flex-col items-center justify-center gap-1 rounded-xl py-2 transition ${
                     active ? "text-[#F5F0E6]" : "text-[#2B141A] hover:bg-black/5"
@@ -113,7 +114,7 @@ export function Navbar() {
         <ScrollProgressBar />
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link href="/" onClick={enterHome} className="flex items-center gap-2 group">
               {preloaderDone ? (
                 <motion.div
                   layoutId="avishkaar-brand-mark"

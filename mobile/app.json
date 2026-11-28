@@ -1,0 +1,73 @@
+{
+  "expo": {
+    "name": "Avishkaar",
+    "slug": "avishkaar",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "avishkaar",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F5F0E6",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.avishkaar.app",
+      "icon": "./assets/expo.icon",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Avishkaar uses your location to verify on-site check-ins within 25 km and prefill coordinates when sharing a hidden gem.",
+        "NSPhotoLibraryUsageDescription": "Allow Avishkaar to attach photos and short clips (<8 MB) to hidden gem field guides.",
+        "NSCameraUsageDescription": "Allow Avishkaar to capture photos and short clips while exploring offbeat spots."
+      }
+    },
+    "android": {
+      "package": "com.avishkaar.app",
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": true,
+      "adaptiveIcon": {
+        "backgroundColor": "#6B1D2F",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#2B141A",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Avishkaar uses your location to verify on-site check-ins within 25 km and prefill coordinates when sharing a hidden gem."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Avishkaar to attach photos and short clips (<8 MB) to hidden gem field guides.",
+          "cameraPermission": "Allow Avishkaar to capture photos and short clips while exploring offbeat spots."
+        }
+      ],
+      "expo-video",
+      "expo-font",
+      "expo-sharing"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

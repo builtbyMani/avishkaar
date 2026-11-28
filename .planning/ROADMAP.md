@@ -138,3 +138,16 @@ Plans:
 | 5. Polish, Deploy & Demo Readiness | 2/2 | Complete | 2026-11-27 |
 | 6. Anti-Overtourism Upgrades, Detour Bar, Multilingual AI & Verified Safety | 3/3 | Complete    | 2026-11-27 |
 | 7. UI Alignment, Surface Restraint & Functional Semantics | 0/2 | Ready to execute | — |
+| 8. Expo Mobile App (iOS & Android) | 3/3 | Complete | 2026-11-28 |
+
+### Phase 8: Expo Mobile App (iOS & Android)
+
+**Goal:** Deliver a native iOS & Android Expo mobile app in `mobile/` with complete feature parity to the deployed web app, 60/30/10 Wine Red design system, custom SVG icons, offline-ready bundled assets, Supabase Auth + Postgres + Storage with Demo Mode fallback, and 60/120fps physics-driven Reanimated transitions.
+**Requirements**: MOB-01, MOB-02, MOB-03, MOB-04, MOB-05, MOB-06, MOB-07, MOB-08, MOB-09, MOB-10
+**Depends on:** Phase 6
+**Plans:** 3/3 plans complete
+
+Plans:
+- [x] 08-01: Scaffold `mobile/` Expo SDK 58 Router app, isolate root CI, bundle assets/fonts, and implement dual-mode Supabase + AsyncStorage Demo layer across 58 destinations
+- [x] 08-02: Build 60/30/10 Wine Red tokens, Reanimated + Haptics motion toolkit, custom SVG icons/avatars/logo, cinematic preloader, sunset meadow landing hero, Auth sheet, Impact modal, and shell
+- [x] 08-03: Implement Explore Masonry + Map + Detour Bar, Place Detail (Vouch, GPS/Demo check-in, Safety verify/flag, 4 Guide cards, Support Local + UPI QR, Volunteer Guides), Post Gem, Offline Pocket + PDF, Profile, and full verification

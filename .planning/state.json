@@ -37,6 +37,11 @@
       "number": "7",
       "name": "UI Alignment, Surface Restraint & Functional Semantics",
       "status": "pending"
+    },
+    {
+      "number": "8",
+      "name": "Expo Mobile App (iOS & Android)",
+      "status": "complete"
     }
   ],
   "next": {
@@ -44,5 +49,5 @@
     "label": "Show progress",
     "reason": "Unsure of state — showing progress"
   },
-  "updated_at": "2026-11-27T13:15:38.160Z"
+  "updated_at": "2026-11-27T21:57:05.417Z"
 }

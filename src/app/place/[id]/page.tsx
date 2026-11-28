@@ -74,7 +74,10 @@ export default function PlaceDetailPage() {
     setLoading(true);
     try {
       const qs = activeUser ? `?viewerId=${encodeURIComponent(activeUser.id)}` : "";
-      const res = await fetch(`/api/places/${placeId}${qs}`, { cache: "no-store" });
+      const res = await fetch(`/api/places/${placeId}${qs}`, {
+        cache: "no-store",
+        headers: await getAuthHeaders(),
+      });
       if (res.ok) {
         const data = (await res.json()) as {
           place: EnrichedPlace;

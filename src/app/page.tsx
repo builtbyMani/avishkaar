@@ -73,7 +73,10 @@ export default function DiscoverPage() {
     setLoading(true);
     try {
       const qs = activeUser ? `?viewerId=${encodeURIComponent(activeUser.id)}` : "";
-      const res = await fetch(`/api/places${qs}`, { cache: "no-store" });
+      const res = await fetch(`/api/places${qs}`, {
+        cache: "no-store",
+        headers: await getAuthHeaders(),
+      });
       if (!res.ok) {
         setToast({ kind: "error", text: "Could not load discovery feed — check connection and retry." });
         return;

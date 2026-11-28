@@ -39,6 +39,7 @@ import {
   buildGoogleMapsUrl,
   filterPlaces,
   getGemScoreBreakdown,
+  getPlaceSlug,
   isSafetyAlertPublic,
   PLACE_CATEGORIES,
 } from "../../lib/domain";
@@ -429,7 +430,7 @@ export default function DiscoverScreen() {
             {detourResult.alternatives.map((alt) => (
               <TactilePressable
                 key={alt.place.id}
-                onPress={() => router.push(`/place/${alt.place.id}`)}
+                onPress={() => router.push(`/place/${getPlaceSlug(alt.place)}`)}
                 style={styles.detourItemCard}
               >
                 <View style={styles.detourItemTop}>
@@ -530,7 +531,7 @@ export default function DiscoverScreen() {
                       <View style={styles.mediaWrap}>
                         <TactilePressable
                           scaleTo={0.985}
-                          onPress={() => router.push(`/place/${place.id}`)}
+                          onPress={() => router.push(`/place/${getPlaceSlug(place)}`)}
                         >
                           <MediaCardPlayer
                             media={place.media[0]}
@@ -593,7 +594,7 @@ export default function DiscoverScreen() {
 
                         <TactilePressable
                           scaleTo={0.985}
-                          onPress={() => router.push(`/place/${place.id}`)}
+                          onPress={() => router.push(`/place/${getPlaceSlug(place)}`)}
                         >
                           <Text style={styles.cardTitle}>{place.title}</Text>
                         </TactilePressable>

@@ -2,7 +2,7 @@ import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Linking, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { WebView } from "react-native-webview";
-import { escapeHtml } from "../lib/domain";
+import { escapeHtml, getPlaceSlug } from "../lib/domain";
 import { TactilePressable } from "../theme/motion";
 import { COLORS } from "../theme/tokens";
 import type { LocalVendor, SafetyAlert } from "../types/domain";
@@ -215,7 +215,7 @@ export function OsmMapView({
             {places.map((p) => (
               <View key={p.id} style={styles.fallbackRow}>
                 <TactilePressable
-                  onPress={() => router.push(`/place/${p.id}`)}
+                  onPress={() => router.push(`/place/${getPlaceSlug(p)}`)}
                   style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8 }}
                 >
                   <MapPin size={15} color={COLORS.wine} />

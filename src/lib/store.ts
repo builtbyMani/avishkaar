@@ -16,6 +16,8 @@ import {
   computeVouchPointsDelta,
   evaluateNewBadges,
   getTierFromScore,
+  isUuid,
+  matchPlaceByIdOrSlug,
   sortFeedPlaces,
 } from "./domain";
 import { getSupabaseServerClient, isSupabaseConfigured } from "./supabase";
@@ -287,7 +289,7 @@ export async function listPlaces(
 }
 
 export async function getPlaceDetail(
-  placeId: string,
+  placeIdOrSlug: string,
   viewerId?: string,
 ): Promise<{
   place: EnrichedPlace | null;
@@ -296,21 +298,29 @@ export async function getPlaceDetail(
 }> {
   const sb = requireSupabase();
   if (sb) {
-    const [placeRes, guidesRes, requestsRes, vouchRes] = await Promise.all([
-      sb.from("places").select("*").eq("id", placeId).maybeSingle(),
+    let rawPlace: Place | null = null;
+    if (isUuid(placeIdOrSlug)) {
+      const { data, error } = await sb.from("places").select("*").eq("id", placeIdOrSlug).maybeSingle();
+      if (error) throw error;
+      rawPlace = data ? mapSupabasePlace(data) : null;
+    } else {
+      const { data, error } = await sb.from("places").select("*");
+      if (error) throw error;
+      rawPlace = matchPlaceByIdOrSlug((data ?? []).map(mapSupabasePlace), placeIdOrSlug) ?? null;
+    }
+    if (!rawPlace) return { place: null, matchingGuides: [], guideRequests: [] };
+
+    const [guidesRes, requestsRes, vouchRes] = await Promise.all([
       sb.from("profiles").select("*").eq("is_guide", true).order("trailblazer_score", { ascending: false }),
-      sb.from("guide_requests").select("*").eq("place_id", placeId).order("created_at", { ascending: false }),
+      sb.from("guide_requests").select("*").eq("place_id", rawPlace.id).order("created_at", { ascending: false }),
       viewerId
-        ? sb.from("vouches").select("*").eq("place_id", placeId).eq("user_id", viewerId).maybeSingle()
+        ? sb.from("vouches").select("*").eq("place_id", rawPlace.id).eq("user_id", viewerId).maybeSingle()
         : Promise.resolve({ data: null, error: null }),
     ]);
-    if (placeRes.error) throw placeRes.error;
-    if (!placeRes.data) return { place: null, matchingGuides: [], guideRequests: [] };
     if (guidesRes.error) throw guidesRes.error;
     if (requestsRes.error) throw requestsRes.error;
     if (vouchRes.error) throw vouchRes.error;
 
-    const rawPlace = mapSupabasePlace(placeRes.data);
     const author = await getProfileById(rawPlace.authorId);
     const profilesMap = new Map<string, Profile>(author ? [[author.id, author]] : []);
     const vouchesMap = new Map<string, VouchRecord>(
@@ -332,14 +342,14 @@ export async function getPlaceDetail(
 
   // Single disk read in Demo Mode
   const state = readDemoState();
-  const rawPlace = state.places.find((p) => p.id === placeId);
+  const rawPlace = matchPlaceByIdOrSlug(state.places, placeIdOrSlug);
   if (!rawPlace) return { place: null, matchingGuides: [], guideRequests: [] };
 
   const profilesMap = new Map(state.profiles.map((p) => [p.id, p]));
   const vouchesMap = new Map(
     viewerId
       ? state.vouches
-          .filter((v) => v.placeId === placeId && v.userId === viewerId)
+          .filter((v) => v.placeId === rawPlace.id && v.userId === viewerId)
           .map((v) => [v.placeId, v])
       : [],
   );
@@ -353,7 +363,7 @@ export async function getPlaceDetail(
     )
     .sort((a, b) => b.trailblazerScore - a.trailblazerScore);
   const guideRequests = state.guideRequests.filter(
-    (r) => r.placeId === placeId && viewerId !== undefined && (r.requesterId === viewerId || r.guideId === viewerId),
+    (r) => r.placeId === rawPlace.id && viewerId !== undefined && (r.requesterId === viewerId || r.guideId === viewerId),
   );
   return { place, matchingGuides, guideRequests };
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { escapeHtml } from "@/lib/domain";
+import { escapeHtml, getPlaceSlug } from "@/lib/domain";
 import type { LocalVendor, SafetyAlert } from "@/types/domain";
 
 export interface MapMarkerPlace {
@@ -73,7 +73,7 @@ export function LeafletMap({
               <div style="color:#52635F;font-size:11px;margin-top:2px">${escapeHtml(p.region)}${
                 p.hiddenGemScore ? ` · Gem Score ${p.hiddenGemScore}` : ""
               }</div>
-              <a href="/place/${encodeURIComponent(p.id)}" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#C85A32;font-weight:700;font-size:12px;text-decoration:none">Open Guide <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+              <a href="/place/${encodeURIComponent(getPlaceSlug(p))}" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;color:#C85A32;font-weight:700;font-size:12px;text-decoration:none">Open Guide <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
             </div>`,
           );
 

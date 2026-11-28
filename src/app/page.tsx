@@ -28,6 +28,7 @@ import {
   buildGoogleMapsUrl,
   FEEDBACK_TONE_STYLES,
   filterPlaces,
+  getPlaceSlug,
   getGemScoreBreakdown,
   getRegionStyle,
   isSafetyAlertPublic,
@@ -355,7 +356,7 @@ export default function DiscoverPage() {
             {detourResult.alternatives.map((alt) => (
               <Link
                 key={alt.place.id}
-                href={`/place/${alt.place.id}`}
+                href={`/place/${getPlaceSlug(alt.place)}`}
                 className="flex h-full flex-col justify-between rounded-xl border border-[#2B141A]/12 bg-[#FAF7F0] p-4 transition hover:border-[#6B1D2F] hover:bg-white"
               >
                 <div>
@@ -457,7 +458,7 @@ export default function DiscoverPage() {
               >
                 {/* Media Frame with Clean Gist Hover Overlay (no duplicate title or pill collision) */}
                 <div className="relative overflow-hidden bg-[#DDE1D2]">
-                  <Link href={`/place/${place.id}`} className="block">
+                  <Link href={`/place/${getPlaceSlug(place)}`} className="block">
                     <MediaCardPlayer
                       media={place.media[0]}
                       title={place.title}
@@ -530,7 +531,7 @@ export default function DiscoverPage() {
                   </div>
 
                   <Link
-                    href={`/place/${place.id}`}
+                    href={`/place/${getPlaceSlug(place)}`}
                     className="block text-[19px] font-bold leading-snug tracking-[-0.015em] text-[#2B141A] hover:text-[#6B1D2F]"
                   >
                     {place.title}

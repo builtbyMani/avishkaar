@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Award, Check, CheckCircle2, Info, Lock, ShieldCheck, Trophy, UserCheck } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { MemojiAvatar } from "@/components/MemojiAvatar";
-import { canVolunteerAsGuide, getTierDisplayLabel, REGIONS, TRAILBLAZER_TIER_STYLES, VOLUNTEER_GUIDE_DISCLAIMERS } from "@/lib/domain";
+import { canVolunteerAsGuide, getPlaceSlug, getTierDisplayLabel, REGIONS, TRAILBLAZER_TIER_STYLES, VOLUNTEER_GUIDE_DISCLAIMERS } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, Profile, UserBadge } from "@/types/domain";
 
@@ -345,7 +345,7 @@ export default function ProfilePage() {
           {authoredPlaces.map((p) => (
             <Link
               key={p.id}
-              href={`/place/${p.id}`}
+              href={`/place/${getPlaceSlug(p)}`}
               className="rounded-full border border-[#E8E0D4] bg-[#FAF7F2] px-4 py-1.5 text-xs font-semibold text-[#6B1D2F] hover:border-[#C85A32]"
             >
               {p.title} · Gem {p.hiddenGemScore}

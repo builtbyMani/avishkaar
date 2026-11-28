@@ -20,7 +20,7 @@ import {
   MapPin,
   UploadCloud,
 } from "../../components/Icons";
-import { PLACE_CATEGORIES, REGIONS } from "../../lib/domain";
+import { getPlaceSlug, PLACE_CATEGORIES, REGIONS } from "../../lib/domain";
 import {
   createPlace,
   structurePlaceNotes,
@@ -304,7 +304,7 @@ export default function SubmitGemScreen() {
       setVendorName("");
       setVendorSpecialty("");
       setVendorContact("");
-      router.push(`/place/${result.place.id}`);
+      router.push(`/place/${getPlaceSlug(result.place)}`);
     } catch (err) {
       triggerHaptic("warning");
       setError(err instanceof Error ? err.message : "Could not publish hidden gem");

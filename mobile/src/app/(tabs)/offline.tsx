@@ -16,7 +16,7 @@ import {
   Utensils,
   WifiOff,
 } from "../../components/Icons";
-import { escapeHtml } from "../../lib/domain";
+import { escapeHtml, getPlaceSlug } from "../../lib/domain";
 import {
   LIST_LAYOUT_TRANSITION,
   StaggerReveal,
@@ -180,7 +180,11 @@ export default function OfflinePocketScreen() {
                         </View>
                       </View>
 
-                      <TactilePressable onPress={() => router.push(`/place/${card.placeId}`)}>
+                      <TactilePressable
+                        onPress={() =>
+                          router.push(`/place/${getPlaceSlug({ id: card.placeId, title: card.title })}`)
+                        }
+                      >
                         <Text style={styles.cardTitle}>{card.title}</Text>
                       </TactilePressable>
                     </View>

@@ -16,9 +16,12 @@ import {
   filterPlaces,
   formatUpiHandle,
   getGemScoreBreakdown,
+  getPlaceSlug,
   getTierDisplayLabel,
   getTierFromScore,
   isSafetyAlertPublic,
+  isUuid,
+  matchPlaceByIdOrSlug,
   PLACE_CATEGORIES,
   REGIONS,
   sortFeedPlaces,
@@ -206,4 +209,14 @@ test("Google Maps links, live place search, and volunteer disclaimers work clean
   assert.ok(
     VOLUNTEER_GUIDE_DISCLAIMERS.points.some((d) => /not licensed tour operators/i.test(d)),
   );
+
+  const kongthong = SEED_PLACES.find((p) => p.id === "22222222-2222-4222-8222-222222222002")!;
+  assert.equal(getPlaceSlug(kongthong), "kongthong-the-whistling-village");
+  assert.equal(isUuid(kongthong.id), true);
+  assert.equal(isUuid("kongthong-the-whistling-village"), false);
+  assert.equal(matchPlaceByIdOrSlug(SEED_PLACES, "kongthong-the-whistling-village")?.id, kongthong.id);
+  assert.equal(matchPlaceByIdOrSlug(SEED_PLACES, kongthong.id)?.id, kongthong.id);
+
+  const slugs = new Set(SEED_PLACES.map((p) => getPlaceSlug(p)));
+  assert.equal(slugs.size, SEED_PLACES.length);
 });

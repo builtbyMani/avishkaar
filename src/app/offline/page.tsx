@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { Bus, ChevronRight, Landmark, Printer, ShieldAlert, Trash2, Utensils, WifiOff } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
-import { GUIDE_MODULE_STYLES, PLACE_CATEGORY_STYLES } from "@/lib/domain";
+import { getPlaceSlug, GUIDE_MODULE_STYLES, PLACE_CATEGORY_STYLES } from "@/lib/domain";
 import type { PlaceCategory } from "@/types/domain";
 
 export default function OfflinePocketPage() {
@@ -77,7 +77,7 @@ export default function OfflinePocketPage() {
                       {card.category}
                     </span>
                   </div>
-                  <Link href={`/place/${card.placeId}`} className="block">
+                  <Link href={`/place/${getPlaceSlug({ id: card.placeId, title: card.title })}`} className="block">
                     <h2 className="font-display text-xl font-bold text-[#6B1D2F] hover:text-[#C85A32]">
                       {card.title}
                     </h2>

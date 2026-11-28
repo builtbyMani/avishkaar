@@ -35,6 +35,7 @@ import {
 import { MemojiAvatar } from "../../components/MemojiAvatar";
 import {
   canVolunteerAsGuide,
+  getPlaceSlug,
   getTierDisplayLabel,
   REGIONS,
   VOLUNTEER_GUIDE_DISCLAIMERS,
@@ -524,7 +525,7 @@ export default function ProfileScreen() {
               {authoredPlaces.map((p) => (
                 <TactilePressable
                   key={p.id}
-                  onPress={() => router.push(`/place/${p.id}`)}
+                  onPress={() => router.push(`/place/${getPlaceSlug(p)}`)}
                   style={styles.spotChip}
                 >
                   <Text style={styles.spotChipText}>

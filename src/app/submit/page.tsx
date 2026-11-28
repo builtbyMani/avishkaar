@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AlertTriangle, FileCheck2, Loader2, UploadCloud } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
-import { PLACE_CATEGORIES, REGIONS } from "@/lib/domain";
+import { getPlaceSlug, PLACE_CATEGORIES, REGIONS } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
 import type {
   LocalVendor,
@@ -143,11 +143,11 @@ export default function SubmitGemPage() {
           safetyAlerts: extracted.safetyAlerts,
         }),
       });
-      const data = (await res.json()) as { place?: { id: string }; error?: string };
+      const data = (await res.json()) as { place?: { id: string; title?: string }; error?: string };
       if (!res.ok || !data.place) throw new Error(data.error || "Failed to publish");
 
       await refreshProfiles();
-      router.push(`/place/${data.place.id}`);
+      router.push(`/place/${getPlaceSlug({ id: data.place.id, title: data.place.title ?? title })}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not publish hidden gem");
     } finally {

@@ -433,6 +433,44 @@ export const GUIDE_MODULE_STYLES: Record<
   },
 };
 
+export function buildGoogleMapsUrl(lat: number, lng: number): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`;
+}
+
+export function filterPlaces<
+  T extends {
+    title: string;
+    region: string;
+    category: PlaceCategory;
+    rawDescription: string;
+    author?: { displayName: string };
+  },
+>(
+  places: readonly T[],
+  filters: { category?: "All" | PlaceCategory; region?: string; query?: string },
+): T[] {
+  const category = filters.category ?? "All";
+  const region = filters.region ?? "All";
+  const q = filters.query?.trim().toLowerCase() ?? "";
+  const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+  return places.filter((p) => {
+    if (category !== "All" && p.category !== category) return false;
+    if (region !== "All" && p.region !== region) return false;
+    if (tokens.length === 0) return true;
+    const haystack = `${p.title} ${p.region} ${p.category} ${p.rawDescription} ${p.author?.displayName ?? ""}`.toLowerCase();
+    return tokens.every((t) => haystack.includes(t));
+  });
+}
+
+export const VOLUNTEER_GUIDE_DISCLAIMERS = {
+  title: "Volunteer Local Guide Disclaimer",
+  points: [
+    "Independent community peers: Volunteer guides are community members verified by local reputation, not licensed tour operators or employees of Avishkaar.",
+    "Agree on plans upfront: Confirm timings, meetup spot, language, and any shared transport or meal costs directly in advance, and meet first in public areas.",
+    "Personal safety responsibility: Travelers remain responsible for checking weather, terrain, permits, and regional advisories before departing.",
+  ],
+} as const;
+
 export function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")

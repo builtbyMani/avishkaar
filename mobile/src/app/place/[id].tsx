@@ -57,9 +57,11 @@ import { MediaCardPlayer } from "../../components/MediaCardPlayer";
 import { OsmMapView } from "../../components/OsmMapView";
 import { UpiQrModal } from "../../components/UpiQrModal";
 import {
+  buildGoogleMapsUrl,
   escapeHtml,
   getGemScoreBreakdown,
   isSafetyAlertPublic,
+  VOLUNTEER_GUIDE_DISCLAIMERS,
 } from "../../lib/domain";
 import {
   createGuideRequest,
@@ -435,14 +437,8 @@ export default function PlaceDetailScreen() {
     }
   }
 
-  const openDirections = (lat: number, lng: number, label: string) => {
-    const q = encodeURIComponent(label);
-    const url = Platform.select({
-      ios: `https://maps.apple.com/?daddr=${lat},${lng}&q=${q}`,
-      android: `geo:${lat},${lng}?q=${lat},${lng}(${q})`,
-      default: `https://www.openstreetmap.org/directions?to=${lat},${lng}`,
-    });
-    if (url) void Linking.openURL(url);
+  const openDirections = (lat: number, lng: number, _label?: string) => {
+    void Linking.openURL(buildGoogleMapsUrl(lat, lng));
   };
 
   if (loading) {
@@ -663,6 +659,18 @@ export default function PlaceDetailScreen() {
 
             <Text style={styles.placeTitle}>{place.title}</Text>
             <Text style={styles.placeDesc}>{place.rawDescription}</Text>
+
+            <TactilePressable
+              onPress={() => openDirections(place.lat, place.lng, place.title)}
+              style={styles.googleMapsHeroBtn}
+              accessibilityLabel={`Open ${place.title} in Google Maps`}
+            >
+              <MapPin size={14} color={COLORS.wine} />
+              <Text style={styles.googleMapsHeroText}>
+                Open in Google Maps ({place.lat.toFixed(4)}, {place.lng.toFixed(4)})
+              </Text>
+              <ArrowRight size={13} color={COLORS.wine} />
+            </TactilePressable>
 
             <View style={styles.authorCard}>
               <Text style={styles.authorCardTitle}>
@@ -1004,6 +1012,18 @@ export default function PlaceDetailScreen() {
           <Text style={styles.sectionSub}>
             Only Field Scouts (100+ pts), Regional Stewards (300+ pts), or verified locals can guide in {place.region}.
           </Text>
+
+          <View style={styles.disclaimerBox}>
+            <View style={styles.disclaimerHeadingRow}>
+              <Info size={14} color={COLORS.wine} />
+              <Text style={styles.disclaimerHeading}>{VOLUNTEER_GUIDE_DISCLAIMERS.title}</Text>
+            </View>
+            {VOLUNTEER_GUIDE_DISCLAIMERS.points.map((line) => (
+              <Text key={line} style={styles.disclaimerItem}>
+                • {line}
+              </Text>
+            ))}
+          </View>
 
           {matchingGuides.length === 0 ? (
             <Text style={styles.mutedLine}>No active volunteer guides for {place.region} yet.</Text>
@@ -1993,5 +2013,47 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "700",
     color: "#FFFFFF",
+  },
+  googleMapsHeroBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 7,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(107, 29, 47, 0.25)",
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
+  },
+  googleMapsHeroText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.wine,
+    fontVariant: ["tabular-nums"],
+  },
+  disclaimerBox: {
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.turmericBorder,
+    backgroundColor: "#FFFBEB",
+    padding: 11,
+    gap: 4,
+  },
+  disclaimerHeadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 2,
+  },
+  disclaimerHeading: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.wine,
+  },
+  disclaimerItem: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: "#78350F",
   },
 });

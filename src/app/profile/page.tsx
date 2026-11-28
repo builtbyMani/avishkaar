@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Award, Check, CheckCircle2, Lock, ShieldCheck, Trophy, UserCheck } from "@/components/Icons";
+import { Award, Check, CheckCircle2, Info, Lock, ShieldCheck, Trophy, UserCheck } from "@/components/Icons";
 import { useApp } from "@/components/AppProvider";
 import { MemojiAvatar } from "@/components/MemojiAvatar";
-import { canVolunteerAsGuide, getTierDisplayLabel, REGIONS, TRAILBLAZER_TIER_STYLES } from "@/lib/domain";
+import { canVolunteerAsGuide, getTierDisplayLabel, REGIONS, TRAILBLAZER_TIER_STYLES, VOLUNTEER_GUIDE_DISCLAIMERS } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
 import type { EnrichedPlace, GuideRequest, Profile, UserBadge } from "@/types/domain";
 
@@ -231,6 +231,18 @@ export default function ProfilePage() {
           <strong>Regional Stewards (300+ pts)</strong>, or verified locals can enable guide status.
         </p>
 
+        <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-950">
+          <div className="flex items-center gap-1.5 font-bold text-[#6B1D2F]">
+            <Info className="h-3.5 w-3.5" />
+            <span>{VOLUNTEER_GUIDE_DISCLAIMERS.title}</span>
+          </div>
+          <ul className="mt-1.5 space-y-1">
+            {VOLUNTEER_GUIDE_DISCLAIMERS.points.map((line) => (
+              <li key={line}>• {line}</li>
+            ))}
+          </ul>
+        </div>
+
         {!guideEligible ? (
           <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
             You currently have <strong>{profile.trailblazerScore} pts</strong> ({getTierDisplayLabel(profile.tier)}). Earn{" "}
@@ -341,6 +353,18 @@ export default function ProfilePage() {
           ))}
         </div>
       </section>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#E8E0D4] bg-[#FAF7F2] px-5 py-4 text-xs text-[#61454D]">
+        <span>Questions about Local Guides, verification tiers, or trail updates?</span>
+        <div className="flex items-center gap-4 font-bold text-[#6B1D2F]">
+          <Link href="/about" className="hover:underline">
+            About Us
+          </Link>
+          <Link href="/contact" className="hover:underline">
+            Contact Us
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import {
   Info,
   LayoutGrid,
   MapIcon,
+  MapPin,
   PlusCircle,
   ScoreFlameIcon,
   Search,
@@ -24,7 +25,9 @@ import { MediaCardPlayer } from "@/components/MediaCardPlayer";
 import { MemojiAvatar } from "@/components/MemojiAvatar";
 import Hero64 from "@/components/originkit/hero-64";
 import {
+  buildGoogleMapsUrl,
   FEEDBACK_TONE_STYLES,
+  filterPlaces,
   getGemScoreBreakdown,
   getRegionStyle,
   isSafetyAlertPublic,
@@ -94,12 +97,16 @@ export default function DiscoverPage() {
   }, [places]);
 
   const filtered = useMemo(() => {
-    return places.filter((p) => {
-      if (category !== "All" && p.category !== category) return false;
-      if (region !== "All" && p.region !== region) return false;
-      return true;
-    });
-  }, [places, category, region]);
+    const matches = filterPlaces(places, { category, region, query: detourQuery });
+    if (
+      matches.length === 0 &&
+      detourResult &&
+      detourQuery.trim().toLowerCase() === detourResult.hotspot.toLowerCase()
+    ) {
+      return filterPlaces(places, { category, region });
+    }
+    return matches;
+  }, [places, category, region, detourQuery, detourResult]);
 
   async function handleVouch(placeId: string) {
     if (!activeUser) return;
@@ -184,10 +191,19 @@ export default function DiscoverPage() {
             <Search className="h-4 w-4 shrink-0 text-[#61454D]" strokeWidth={1.75} />
             <input
               value={detourQuery}
-              onChange={(e) => setDetourQuery(e.target.value)}
-              placeholder="Skip crowded hubs (Ooty, Goa, Hampi, Manali)..."
+              onChange={(e) => {
+                const next = e.target.value;
+                setDetourQuery(next);
+                if (!next.trim()) setDetourResult(null);
+              }}
+              placeholder="Search destinations, regions, or skip Ooty/Goa/Hampi..."
               className="min-h-8 w-full bg-transparent text-sm text-[#2B141A] placeholder:text-[#61454D] outline-none"
             />
+            {detourQuery.trim().length > 0 && (
+              <span className="hidden shrink-0 rounded-full bg-[#EBE4D5] px-2 py-0.5 text-[11px] font-medium text-[#61454D] tabular-nums sm:inline">
+                {filtered.length} shown
+              </span>
+            )}
             {detourQuery && (
               <button
                 type="button"
@@ -395,12 +411,14 @@ export default function DiscoverPage() {
             Clear active filters or post a verified offbeat spot to seed this region.
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            {(category !== "All" || region !== "All") && (
+            {(category !== "All" || region !== "All" || detourQuery.trim() !== "") && (
               <button
                 type="button"
                 onClick={() => {
                   setCategory("All");
                   setRegion("All");
+                  setDetourQuery("");
+                  setDetourResult(null);
                 }}
                 className="min-h-9 rounded-full border border-[#2B141A]/12 bg-[#F5F0E6] px-4 py-1.5 text-xs font-bold text-[#2B141A] hover:border-[#6B1D2F]"
               >
@@ -526,12 +544,25 @@ export default function DiscoverPage() {
                         />
                       )}
                     </div>
-                    {place.localVendors.length > 0 && (
-                      <span className="inline-flex items-center gap-1 text-xs font-medium text-[#61454D]">
-                        <Store className="h-3.5 w-3.5 text-[#6B1D2F]" />
-                        {place.localVendors.length}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={buildGoogleMapsUrl(place.lat, place.lng)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        title={`Open ${place.title} in Google Maps`}
+                        className="inline-flex items-center gap-1 rounded-full border border-[#2B141A]/12 bg-[#FAF7F0] px-2 py-0.5 text-[11px] font-medium text-[#6B1D2F] transition hover:border-[#6B1D2F]"
+                      >
+                        <MapPin className="h-3 w-3 text-[#6B1D2F]" strokeWidth={1.75} />
+                        Maps
+                      </a>
+                      {place.localVendors.length > 0 && (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-[#61454D]">
+                          <Store className="h-3.5 w-3.5 text-[#6B1D2F]" />
+                          {place.localVendors.length}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {openScoreId === place.id && (
@@ -572,6 +603,18 @@ export default function DiscoverPage() {
           })}
         </section>
       )}
+
+      <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[#2B141A]/10 pt-5 text-xs text-[#61454D]">
+        <span>Avishkaar — Community-verified offbeat travel across India</span>
+        <div className="flex items-center gap-4 font-semibold text-[#6B1D2F]">
+          <Link href="/about" className="hover:underline">
+            About Us
+          </Link>
+          <Link href="/contact" className="hover:underline">
+            Contact Us
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }

@@ -57,6 +57,20 @@ function RootNavigator() {
               animation: "slide_from_right",
             }}
           />
+          <Stack.Screen
+            name="about"
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="contact"
+            options={{
+              headerShown: false,
+              animation: "slide_from_right",
+            }}
+          />
         </Stack>
       </View>
 

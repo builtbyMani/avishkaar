@@ -34,11 +34,13 @@ import { useApp } from "@/components/AppProvider";
 import { LeafletMap } from "@/components/LeafletMap";
 import { MediaCardPlayer } from "@/components/MediaCardPlayer";
 import {
+  buildGoogleMapsUrl,
   FEEDBACK_TONE_STYLES,
   GUIDE_MODULE_STYLES,
   isSafetyAlertPublic,
   PLACE_CATEGORY_STYLES,
   TRAILBLAZER_TIER_STYLES,
+  VOLUNTEER_GUIDE_DISCLAIMERS,
   type FeedbackMessage,
 } from "@/lib/domain";
 import { getAuthHeaders } from "@/lib/supabase";
@@ -418,6 +420,17 @@ export default function PlaceDetailPage() {
 
               <p className="text-sm leading-relaxed text-[#52635F]">{place.rawDescription}</p>
 
+              <a
+                href={buildGoogleMapsUrl(place.lat, place.lng)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 self-start rounded-full border border-[#6B1D2F]/25 bg-[#FAF7F2] px-4 py-2 text-xs font-bold text-[#6B1D2F] transition hover:border-[#6B1D2F] hover:bg-[#6B1D2F] hover:text-white"
+              >
+                <MapPin className="h-3.5 w-3.5" />
+                Open in Google Maps ({place.lat.toFixed(4)}, {place.lng.toFixed(4)})
+                <span aria-hidden="true">↗</span>
+              </a>
+
               <div className="rounded-xl border border-[#E8E0D4] bg-[#FAF7F2] p-3 text-xs">
                 <div className="font-bold text-[#6B1D2F]">
                   Discovered by {place.author.displayName} ({place.author.tier} · {place.author.trailblazerScore} pts)
@@ -707,12 +720,12 @@ export default function PlaceDetailPage() {
                   </div>
                   <div className="no-print mt-3 flex flex-wrap gap-2 border-t border-[#E8E0D4] pt-3">
                     <a
-                      href={`https://www.openstreetmap.org/directions?to=${v.lat},${v.lng}`}
+                      href={buildGoogleMapsUrl(v.lat, v.lng)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 rounded-lg bg-[#6B1D2F] px-2.5 py-1.5 text-[11px] font-bold text-white hover:bg-[#C85A32]"
                     >
-                      <Navigation className="h-3 w-3" /> Navigate to Pin
+                      <Navigation className="h-3 w-3" /> Google Maps Pin
                     </a>
                     {waDigits.length >= 8 ? (
                       <a
@@ -775,6 +788,15 @@ export default function PlaceDetailPage() {
             Volunteer as a Guide
             <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
           </Link>
+        </div>
+
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50/80 p-3.5 text-xs text-amber-950">
+          <p className="font-bold text-[#6B1D2F]">{VOLUNTEER_GUIDE_DISCLAIMERS.title}</p>
+          <ul className="mt-1.5 space-y-1">
+            {VOLUNTEER_GUIDE_DISCLAIMERS.points.map((line) => (
+              <li key={line}>• {line}</li>
+            ))}
+          </ul>
         </div>
 
         {matchingGuides.length === 0 ? (

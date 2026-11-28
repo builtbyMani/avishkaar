@@ -2,6 +2,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Keyboard,
+  Linking,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -23,6 +24,7 @@ import {
   Info,
   LayoutGrid,
   MapIcon,
+  MapPin,
   PlusCircle,
   ScoreFlameIcon,
   Search,
@@ -34,6 +36,8 @@ import { MediaCardPlayer } from "../../components/MediaCardPlayer";
 import { MemojiAvatar } from "../../components/MemojiAvatar";
 import { OsmMapView } from "../../components/OsmMapView";
 import {
+  buildGoogleMapsUrl,
+  filterPlaces,
   getGemScoreBreakdown,
   isSafetyAlertPublic,
   PLACE_CATEGORIES,
@@ -141,12 +145,16 @@ export default function DiscoverScreen() {
   }, [places]);
 
   const filtered = useMemo(() => {
-    return places.filter((p) => {
-      if (category !== "All" && p.category !== category) return false;
-      if (region !== "All" && p.region !== region) return false;
-      return true;
+    const directMatches = filterPlaces(places, {
+      category,
+      region,
+      query: detourQuery,
     });
-  }, [places, category, region]);
+    if (directMatches.length === 0 && detourResult) {
+      return filterPlaces(places, { category, region });
+    }
+    return directMatches;
+  }, [places, category, region, detourQuery, detourResult]);
 
   const columns = useMemo(() => {
     const cols: EnrichedPlace[][] = Array.from({ length: numColumns }, () => []);
@@ -241,7 +249,7 @@ export default function DiscoverScreen() {
           onChangeText={setDetourQuery}
           onSubmitEditing={() => void handleDetourSearch(detourQuery)}
           returnKeyType="search"
-          placeholder="Skip crowded hubs (Ooty, Goa, Hampi, Manali)..."
+          placeholder="Search places, regions, cuisines, or skip Ooty/Goa..."
           placeholderTextColor={COLORS.muted}
           style={styles.searchInput}
         />
@@ -475,11 +483,13 @@ export default function DiscoverScreen() {
             Clear active filters or post a verified offbeat spot to seed this region.
           </Text>
           <View style={styles.emptyActions}>
-            {(category !== "All" || region !== "All") && (
+            {(category !== "All" || region !== "All" || detourQuery.trim().length > 0) && (
               <TactilePressable
                 onPress={() => {
                   setCategory("All");
                   setRegion("All");
+                  setDetourQuery("");
+                  setDetourResult(null);
                 }}
                 style={styles.clearFiltersBtn}
               >
@@ -603,14 +613,26 @@ export default function DiscoverScreen() {
                             )}
                           </View>
 
-                          {place.localVendors.length > 0 && (
-                            <View style={styles.vendorCount}>
-                              <Store size={12} color={COLORS.wine} />
-                              <Text style={styles.vendorCountText}>
-                                {place.localVendors.length}
-                              </Text>
-                            </View>
-                          )}
+                          <View style={styles.cardFooterRight}>
+                            {place.localVendors.length > 0 && (
+                              <View style={styles.vendorCount}>
+                                <Store size={12} color={COLORS.wine} />
+                                <Text style={styles.vendorCountText}>
+                                  {place.localVendors.length}
+                                </Text>
+                              </View>
+                            )}
+                            <TactilePressable
+                              onPress={() =>
+                                void Linking.openURL(buildGoogleMapsUrl(place.lat, place.lng))
+                              }
+                              style={styles.cardMapsPill}
+                              accessibilityLabel={`Open ${place.title} in Google Maps`}
+                            >
+                              <MapPin size={10} color={COLORS.wine} />
+                              <Text style={styles.cardMapsText}>Maps</Text>
+                            </TactilePressable>
+                          </View>
                         </View>
 
                         {isScoreOpen && (
@@ -663,6 +685,16 @@ export default function DiscoverScreen() {
           ))}
         </View>
       )}
+
+      <View style={styles.discoverFooter}>
+        <TactilePressable onPress={() => router.push("/about")}>
+          <Text style={styles.discoverFooterLink}>About Us</Text>
+        </TactilePressable>
+        <Text style={styles.discoverFooterDot}>·</Text>
+        <TactilePressable onPress={() => router.push("/contact")}>
+          <Text style={styles.discoverFooterLink}>Contact Us</Text>
+        </TactilePressable>
+      </View>
     </Animated.ScrollView>
   );
 }
@@ -1172,5 +1204,45 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#1F271C",
     fontVariant: ["tabular-nums"],
+  },
+  cardFooterRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  cardMapsPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  cardMapsText: {
+    fontSize: 10,
+    fontWeight: "700",
+    color: COLORS.wine,
+  },
+  discoverFooter: {
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
+  discoverFooterLink: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.wine,
+  },
+  discoverFooterDot: {
+    fontSize: 12,
+    color: COLORS.muted,
   },
 });

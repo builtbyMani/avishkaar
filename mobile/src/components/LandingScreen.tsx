@@ -94,7 +94,9 @@ export function LandingScreen({ visible }: { visible: boolean }) {
 
   if (!mounted) return null;
 
-  const navigateAndEnter = (href: "/(tabs)" | "/(tabs)/submit" | "/(tabs)/offline" | "/(tabs)/profile") => {
+  const navigateAndEnter = (
+    href: "/(tabs)" | "/(tabs)/submit" | "/(tabs)/offline" | "/(tabs)/profile" | "/about" | "/contact",
+  ) => {
     enterHome();
     router.navigate(href);
   };
@@ -143,6 +145,12 @@ export function LandingScreen({ visible }: { visible: boolean }) {
             </TactilePressable>
             <TactilePressable onPress={() => navigateAndEnter("/(tabs)/profile")}>
               <Text style={styles.tabletLinkText}>Profile</Text>
+            </TactilePressable>
+            <TactilePressable onPress={() => navigateAndEnter("/about")}>
+              <Text style={styles.tabletLinkText}>About</Text>
+            </TactilePressable>
+            <TactilePressable onPress={() => navigateAndEnter("/contact")}>
+              <Text style={styles.tabletLinkText}>Contact</Text>
             </TactilePressable>
           </View>
         )}

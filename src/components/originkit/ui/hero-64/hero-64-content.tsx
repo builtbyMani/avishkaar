@@ -50,6 +50,8 @@ export default function Hero() {
           <Link href="/submit">Post Gem</Link>
           <Link href="/offline">Saved</Link>
           <Link href="/profile">Profile</Link>
+          <Link href="/about">About</Link>
+          <Link href="/contact">Contact</Link>
         </nav>
 
         <button type="button" onClick={openAuthModal} className="btn btn-sm">

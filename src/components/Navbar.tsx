@@ -8,7 +8,9 @@ import {
   BarChart3,
   BookmarkCheck,
   Compass,
+  Info,
   Layers,
+  Mail,
   PlusCircle,
   User,
   X,
@@ -47,6 +49,8 @@ export function Navbar() {
       badge: offlineCards.length > 0 ? offlineCards.length : null,
     },
     { href: "/profile", label: "Profile", icon: User },
+    { href: "/about", label: "About", icon: Info },
+    { href: "/contact", label: "Contact", icon: Mail },
   ];
 
   return (

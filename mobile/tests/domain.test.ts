@@ -6,12 +6,14 @@ import { SEED_PLACES, SEED_PROFILES } from "../src/data/seed";
 import { findDetourAlternativesFallback } from "../src/lib/detour";
 import {
   applySafetyVote,
+  buildGoogleMapsUrl,
   canVolunteerAsGuide,
   computeCheckInUpgradeDelta,
   computeHiddenGemScore,
   computeVouchPointsDelta,
   evaluateNewBadges,
   extractYouTubeEmbedId,
+  filterPlaces,
   formatUpiHandle,
   getGemScoreBreakdown,
   getTierDisplayLabel,
@@ -20,6 +22,7 @@ import {
   PLACE_CATEGORIES,
   REGIONS,
   sortFeedPlaces,
+  VOLUNTEER_GUIDE_DISCLAIMERS,
 } from "../src/lib/domain";
 import { extractStructuredPlaceFallback } from "../src/lib/gemini";
 import { detectFileKind } from "../src/lib/upload-validation";
@@ -173,4 +176,34 @@ test("Place validation and upload magic bytes cover mobile URIs and reject inval
   assert.equal(detectFileKind(mp4)?.kind, "video");
   const svg = new TextEncoder().encode("<svg></svg>");
   assert.equal(detectFileKind(svg), null);
+});
+
+test("Google Maps links, live place search, and volunteer disclaimers work cleanly", () => {
+  assert.equal(
+    buildGoogleMapsUrl(25.2586, 91.8559),
+    "https://www.google.com/maps/search/?api=1&query=25.2586%2C91.8559",
+  );
+
+  const whistlers = filterPlaces(SEED_PLACES, { query: "kongthong" });
+  assert.ok(whistlers.some((p) => p.id === "22222222-2222-4222-8222-222222222002"));
+
+  const malabarFood = filterPlaces(SEED_PLACES, {
+    region: "Malabar & Konkan",
+    category: "Regional Cuisine",
+  });
+  assert.ok(malabarFood.length > 0);
+  assert.ok(
+    malabarFood.every(
+      (p) => p.region === "Malabar & Konkan" && p.category === "Regional Cuisine",
+    ),
+  );
+
+  assert.equal(
+    filterPlaces(SEED_PLACES, { query: "nonexistent-destination-xyz-999" }).length,
+    0,
+  );
+  assert.ok(VOLUNTEER_GUIDE_DISCLAIMERS.points.length >= 3);
+  assert.ok(
+    VOLUNTEER_GUIDE_DISCLAIMERS.points.some((d) => /not licensed tour operators/i.test(d)),
+  );
 });

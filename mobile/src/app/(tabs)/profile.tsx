@@ -21,11 +21,13 @@ import Animated, {
 import { useApp } from "../../components/AppProvider";
 import {
   AlertTriangle,
+  ArrowRight,
   Award,
   Check,
   CheckCircle2,
   Info,
   Lock,
+  Mail,
   ShieldCheck,
   Trophy,
   UserCheck,
@@ -35,6 +37,7 @@ import {
   canVolunteerAsGuide,
   getTierDisplayLabel,
   REGIONS,
+  VOLUNTEER_GUIDE_DISCLAIMERS,
 } from "../../lib/domain";
 import {
   acceptGuideRequest,
@@ -210,6 +213,16 @@ export default function ProfileScreen() {
         <TactilePressable onPress={openAuthModal} style={styles.signInCta}>
           <Text style={styles.signInCtaText}>Account & Sign In</Text>
         </TactilePressable>
+        <View style={styles.signedOutLinksRow}>
+          <TactilePressable onPress={() => router.push("/about")} style={styles.signedOutLinkPill}>
+            <Info size={13} color={COLORS.wine} />
+            <Text style={styles.signedOutLinkText}>About Us</Text>
+          </TactilePressable>
+          <TactilePressable onPress={() => router.push("/contact")} style={styles.signedOutLinkPill}>
+            <Mail size={13} color={COLORS.wine} />
+            <Text style={styles.signedOutLinkText}>Contact Us</Text>
+          </TactilePressable>
+        </View>
       </View>
     );
   }
@@ -375,6 +388,18 @@ export default function ProfileScreen() {
             To prevent spam, only Field Scouts (100+ pts), Regional Stewards (300+ pts), or verified locals can enable guide status.
           </Text>
 
+          <View style={styles.disclaimerBox}>
+            <View style={styles.disclaimerHeadingRow}>
+              <Info size={14} color={COLORS.wine} />
+              <Text style={styles.disclaimerHeading}>{VOLUNTEER_GUIDE_DISCLAIMERS.title}</Text>
+            </View>
+            {VOLUNTEER_GUIDE_DISCLAIMERS.points.map((line) => (
+              <Text key={line} style={styles.disclaimerItem}>
+                • {line}
+              </Text>
+            ))}
+          </View>
+
           {!guideEligible ? (
             <View style={styles.gateWarnBox}>
               <Text style={styles.gateWarnText}>
@@ -509,6 +534,25 @@ export default function ProfileScreen() {
               ))}
             </View>
           )}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>About &amp; Support</Text>
+          <Text style={styles.sectionSub}>
+            Learn how Avishkaar scores hidden gems, read volunteer guide disclaimers, or reach our stewards.
+          </Text>
+          <View style={styles.aboutContactRow}>
+            <TactilePressable onPress={() => router.push("/about")} style={styles.aboutContactBtn}>
+              <Info size={14} color={COLORS.wine} />
+              <Text style={styles.aboutContactBtnText}>About Us</Text>
+              <ArrowRight size={13} color={COLORS.wine} />
+            </TactilePressable>
+            <TactilePressable onPress={() => router.push("/contact")} style={styles.aboutContactBtn}>
+              <Mail size={14} color={COLORS.wine} />
+              <Text style={styles.aboutContactBtnText}>Contact Us</Text>
+              <ArrowRight size={13} color={COLORS.wine} />
+            </TactilePressable>
+          </View>
         </View>
       </Animated.ScrollView>
     </KeyboardAvoidingView>
@@ -871,6 +915,76 @@ const styles = StyleSheet.create({
   spotChipText: {
     fontSize: 12,
     fontWeight: "600",
+    color: COLORS.wine,
+  },
+  signedOutLinksRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 4,
+  },
+  signedOutLinkPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  signedOutLinkText: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.wine,
+  },
+  disclaimerBox: {
+    marginTop: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.turmericBorder,
+    backgroundColor: "#FFFBEB",
+    padding: 11,
+    gap: 4,
+  },
+  disclaimerHeadingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 2,
+  },
+  disclaimerHeading: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.wine,
+  },
+  disclaimerItem: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: "#78350F",
+  },
+  aboutContactRow: {
+    marginTop: 10,
+    flexDirection: "row",
+    gap: 10,
+  },
+  aboutContactBtn: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.surface,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  aboutContactBtnText: {
+    fontSize: 12,
+    fontWeight: "700",
     color: COLORS.wine,
   },
 });

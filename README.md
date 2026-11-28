@@ -9,14 +9,28 @@ npm ci
 npm run dev        # http://localhost:3000
 ```
 
-With no env vars set, the app runs in **Demo Mode**: 18 seeded destinations, 6 demo personas (switchable in 1 click from the account menu), and a local JSON demo store. This is the mode for local development and live judging.
+With no env vars set, the app runs in **Demo Mode**: 58 seeded destinations, 6 demo personas (switchable in 1 click from the account menu), and a local JSON demo store. This is the mode for local development and live judging.
 
 ```bash
-npm test           # domain + API/security tests
+npm test           # domain + API/security + slug/search tests
 npx tsc --noEmit   # typecheck
-npm run lint       # ESLint
 npm run build      # production build
 npm start          # production server
+```
+
+## Expo mobile app (`mobile/`)
+
+```bash
+cd mobile
+cp .env.example .env   # optional: set Supabase + API base URL
+npm install
+npx expo start         # open in Expo Go (iOS / Android)
+```
+
+```bash
+cd mobile
+npm test               # mobile domain + store tests
+npm run typecheck      # mobile TypeScript check
 ```
 
 ## Modes
@@ -42,7 +56,16 @@ Copy `.env.example` to `.env.local`:
 | `GEMINI_API_KEY` | No | Without it, a deterministic multilingual fallback extractor is used |
 | `GEMINI_MODEL` | No | Default `gemini-2.5-flash` |
 | `DEMO_MODE` | No | Set `true` only to intentionally run Demo Mode in production |
-| `ALLOW_DEMO_CHECKIN` | No | Set `true` on a judging deployment to enable the simulated GPS check-in in production. In development it is always available. Real check-ins use browser geolocation within a 25 km haversine radius. |
+| `ALLOW_DEMO_CHECKIN` | No | Enabled by default (including deployment builds) for live judging. Set `false` to require real browser geolocation within a 25 km haversine radius. |
+
+## Vercel & Supabase deployment checklist
+
+1. **Vercel Domains & Protection:** Use your Production domain under **Vercel → Project → Settings → Domains** (or disable **Vercel Authentication** under **Deployment Protection** if sharing branch preview URLs across devices).
+2. **Vercel Environment Variables:** Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, and optionally `GEMINI_API_KEY`.
+3. **Supabase Auth Redirects:** In **Supabase → Authentication → URL Configuration**, set **Site URL** to your Production Vercel URL and add these to **Redirect URLs**:
+   - `https://<your-vercel-domain>/**`
+   - `http://localhost:3000/**`
+   - `avishkaar://**` and `exp://**` (for Expo Go mobile auth)
 
 ## Supabase setup
 
@@ -63,14 +86,15 @@ Copy `.env.example` to `.env.local`:
 ## Project layout
 
 ```
-src/app/          App Router pages + API routes
-src/components/   AppProvider, Navbar, AuthModal, LeafletMap, MediaCardPlayer
-src/lib/          domain.ts (scoring/trust rules), store.ts (Demo + Supabase),
+src/app/          App Router pages (`/`, `/about`, `/contact`, `/place/[id]` slug/UUID, `/submit`, `/offline`, `/profile`) + API routes
+src/components/   AppProvider, Navbar, AuthModal, LeafletMap, MediaCardPlayer, AvishkaarLogo
+src/lib/          domain.ts (scoring/trust/slug/search rules), store.ts (Demo + Supabase),
                   gemini.ts, detour.ts, supabase.ts, validation.ts,
                   upload-validation.ts
-src/data/seed.ts  18 seeded destinations, personas, vouches, badges
+src/data/seed.ts  58 seeded destinations, personas, vouches, badges
+mobile/           Expo SDK 58 iOS & Android app (Expo Router + Reanimated + Supabase parity)
 supabase/         SQL migrations
-tests/            node:test suites (domain, API validation/security)
+tests/            node:test suites (domain, API validation/security, search/slugs)
 .planning/        GSD project planning state (roadmap, requirements, state) —
                   kept in-repo on purpose: it is the shared project memory
                   for the GSD workflow described in GEMINI.md

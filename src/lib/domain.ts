@@ -277,10 +277,8 @@ export function isDemoCheckInAllowed(env: {
   NODE_ENV?: string;
   ALLOW_DEMO_CHECKIN?: string;
 }): boolean {
-  // Local development demo always allows it (hackathon judging flow).
-  // In production it requires an explicit opt-in, e.g. on a judging deployment.
-  if (env.NODE_ENV === "production") return env.ALLOW_DEMO_CHECKIN === "true";
-  return true;
+  // Enabled by default (including deployment builds) unless explicitly turned off.
+  return env.ALLOW_DEMO_CHECKIN !== "false";
 }
 
 export const PLACE_CATEGORY_STYLES: Record<

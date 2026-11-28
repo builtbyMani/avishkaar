@@ -41,10 +41,10 @@ test("Upload detection trusts magic bytes, not client claims", () => {
   assert.equal(detectFileKind(svg), null);
 });
 
-test("Demo check-in is allowed locally but gated in production", () => {
+test("Demo check-in is allowed in deployment builds unless explicitly disabled", () => {
   assert.equal(isDemoCheckInAllowed({ NODE_ENV: "development" }), true);
-  assert.equal(isDemoCheckInAllowed({ NODE_ENV: "production" }), false);
-  assert.equal(isDemoCheckInAllowed({ NODE_ENV: "production", ALLOW_DEMO_CHECKIN: "true" }), true);
+  assert.equal(isDemoCheckInAllowed({ NODE_ENV: "production" }), true);
+  assert.equal(isDemoCheckInAllowed({ NODE_ENV: "production", ALLOW_DEMO_CHECKIN: "false" }), false);
 });
 
 test("Safety alerts get no legacy exemption anymore", () => {
